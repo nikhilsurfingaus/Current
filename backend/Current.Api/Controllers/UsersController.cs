@@ -4,14 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Current.Api.Controllers;
 
-// HTTP layer only — receives requests, delegates to IUserService, returns responses
 [ApiController]
 [Route("users")]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
 
-    // IUserService is injected by DI — never call "new UserService()" here
     public UsersController(IUserService userService)
     {
         _userService = userService;
@@ -43,11 +41,11 @@ public class UsersController : ControllerBase
         try
         {
             var user = await _userService.CreateUserAsync(request);
-            return CreatedAtAction(nameof(GetById), new { id = user.Id }, user); // 201 + Location header
+            return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
         }
         catch (InvalidOperationException ex)
         {
-            return Conflict(new { message = ex.Message }); // 409 — duplicate email
+            return Conflict(new { message = ex.Message });
         }
     }
 }

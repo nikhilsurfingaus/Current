@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Current.Api.Data;
 
-// EF Core entry point — like a SQLAlchemy Session + model config combined
 public class ApplicationDbContext : DbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -34,7 +33,7 @@ public class ApplicationDbContext : DbContext
                 .IsRequired();
 
             entity.HasIndex(user => user.Email)
-                .IsUnique(); // no duplicate emails
+                .IsUnique(); // One email per user
         });
 
         modelBuilder.Entity<Account>(entity =>
@@ -46,22 +45,22 @@ public class ApplicationDbContext : DbContext
                 .IsRequired();
 
             entity.Property(account => account.AccountType)
-                .HasConversion<string>() // store enum as "Everyday", "Savings", etc.
+                .HasConversion<string>() // Persist enum as string
                 .HasMaxLength(50)
                 .IsRequired();
 
             entity.Property(account => account.CurrentBalance)
-                .HasPrecision(18, 2); // standard money precision
+                .HasPrecision(18, 2); // Monetary precision
 
             entity.Property(account => account.Currency)
                 .HasMaxLength(3)
                 .IsRequired();
 
-            // User 1 ──→ many Accounts
+            // One user owns many accounts
             entity.HasOne(account => account.User)
                 .WithMany(user => user.Accounts)
                 .HasForeignKey(account => account.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade); // Remove accounts when user is deleted
         });
     }
 }

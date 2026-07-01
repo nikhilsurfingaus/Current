@@ -45,7 +45,7 @@ public class AccountsController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new { message = ex.Message }); // 400 — e.g. user not found
+            return BadRequest(new { message = ex.Message });
         }
     }
 }

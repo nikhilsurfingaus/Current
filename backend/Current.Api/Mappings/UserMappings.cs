@@ -3,7 +3,6 @@ using Current.Api.Entities;
 
 namespace Current.Api.Mappings;
 
-// Converts database entities → API response DTOs (never expose entities directly)
 public static class UserMappings
 {
     public static UserResponse ToResponse(this User user)

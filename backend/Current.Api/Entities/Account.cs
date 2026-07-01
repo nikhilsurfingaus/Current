@@ -1,6 +1,5 @@
 namespace Current.Api.Entities;
 
-// Maps to the "Accounts" table in PostgreSQL
 public class Account
 {
     public Guid Id { get; set; }

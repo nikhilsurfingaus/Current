@@ -11,7 +11,6 @@ public class UserService : IUserService
 {
     private readonly ApplicationDbContext _dbContext;
 
-    // DbContext is injected automatically by the DI container (see ServiceCollectionExtensions)
     public UserService(ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
@@ -20,7 +19,7 @@ public class UserService : IUserService
     public async Task<IReadOnlyList<UserResponse>> GetAllUsersAsync()
     {
         var users = await _dbContext.Users
-            .AsNoTracking() // read-only — no change tracking overhead on GET
+            .AsNoTracking() // Read-only
             .OrderBy(user => user.LastName)
             .ThenBy(user => user.FirstName)
             .ToListAsync();
@@ -60,7 +59,7 @@ public class UserService : IUserService
         };
 
         _dbContext.Users.Add(user);
-        await _dbContext.SaveChangesAsync(); // commits to PostgreSQL
+        await _dbContext.SaveChangesAsync();
 
         return user.ToResponse();
     }

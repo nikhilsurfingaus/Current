@@ -2,15 +2,15 @@ using Current.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- Register services (DI container) ---
+// Services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddApplicationServices(builder.Configuration); // DbContext, UserService, AccountService
+builder.Services.AddApplicationServices(builder.Configuration);
 
 var app = builder.Build();
 
-// --- HTTP pipeline (order matters) ---
+// Middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -19,6 +19,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
-app.MapControllers(); // wires up UsersController, AccountsController, etc.
+app.MapControllers();
 
 app.Run();

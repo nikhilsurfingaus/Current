@@ -37,7 +37,7 @@ public class AccountService : IAccountService
 
     public async Task<AccountResponse> CreateAccountAsync(CreateAccountRequest request)
     {
-        // Account must belong to an existing user
+        // Account must belong to a valid user
         var userExists = await _dbContext.Users
             .AnyAsync(user => user.Id == request.UserId);
 
@@ -55,7 +55,7 @@ public class AccountService : IAccountService
             Name = request.Name.Trim(),
             AccountType = request.AccountType,
             CurrentBalance = request.CurrentBalance,
-            Currency = request.Currency.Trim().ToUpperInvariant(), // e.g. "usd" → "USD"
+            Currency = request.Currency.Trim().ToUpperInvariant(), // e.g. AUD, USD
             CreatedAt = utcNow,
             UpdatedAt = utcNow
         };
