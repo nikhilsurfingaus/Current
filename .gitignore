@@ -1,0 +1,19 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# IDE
+.idea/
+*.swp
+.DS_Store
+
+# Environment
+.env
+.env.*
+
+# Node (future frontend)
+node_modules/
+dist/
