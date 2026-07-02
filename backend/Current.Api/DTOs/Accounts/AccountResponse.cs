@@ -1,4 +1,4 @@
-using Current.Api.Entities;
+using Current.Api.Common.Enums;
 
 namespace Current.Api.DTOs.Accounts;
 

@@ -1,3 +1,5 @@
+using Current.Api.Common.Enums;
+
 namespace Current.Api.Entities;
 
 public class Account

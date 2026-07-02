@@ -1,4 +1,4 @@
-namespace Current.Api.Entities;
+namespace Current.Api.Common.Enums;
 
 public enum AccountType
 {

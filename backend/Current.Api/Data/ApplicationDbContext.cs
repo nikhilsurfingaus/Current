@@ -14,6 +14,10 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Account> Accounts => Set<Account>();
 
+    public DbSet<Transaction> Transactions => Set<Transaction>();
+
+    public DbSet<LedgerEntry> LedgerEntries => Set<LedgerEntry>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(entity =>
@@ -61,6 +65,56 @@ public class ApplicationDbContext : DbContext
                 .WithMany(user => user.Accounts)
                 .HasForeignKey(account => account.UserId)
                 .OnDelete(DeleteBehavior.Cascade); // Remove accounts when user is deleted
+        });
+
+        modelBuilder.Entity<Transaction>(entity =>
+        {
+            entity.HasKey(transaction => transaction.Id);
+
+            entity.Property(transaction => transaction.Amount)
+                .HasPrecision(18, 2);
+
+            entity.Property(transaction => transaction.Description)
+                .HasMaxLength(500)
+                .IsRequired();
+
+            entity.Property(transaction => transaction.Status)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.HasOne(transaction => transaction.FromAccount)
+                .WithMany()
+                .HasForeignKey(transaction => transaction.FromAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(transaction => transaction.ToAccount)
+                .WithMany()
+                .HasForeignKey(transaction => transaction.ToAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<LedgerEntry>(entity =>
+        {
+            entity.HasKey(ledgerEntry => ledgerEntry.Id);
+
+            entity.Property(ledgerEntry => ledgerEntry.EntryType)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(ledgerEntry => ledgerEntry.Amount)
+                .HasPrecision(18, 2);
+
+            entity.HasOne(ledgerEntry => ledgerEntry.Transaction)
+                .WithMany(transaction => transaction.LedgerEntries)
+                .HasForeignKey(ledgerEntry => ledgerEntry.TransactionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(ledgerEntry => ledgerEntry.Account)
+                .WithMany()
+                .HasForeignKey(ledgerEntry => ledgerEntry.AccountId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

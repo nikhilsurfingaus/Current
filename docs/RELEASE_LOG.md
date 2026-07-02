@@ -65,20 +65,30 @@ Clean ASP.NET Core API with Users and Accounts — no auth, no transfers, no fro
 
 ## Phase 2 — Ledger Engine
 
-**Status:** Not started
+**Status:** In progress  
+**Date started:** 2026-07-02
 
 ### Goal
 Financial core: transfers create balanced debit/credit ledger entries inside a DB transaction.
 
 ### Delivered
-- [ ] `Transaction` entity
-- [ ] `LedgerEntry` entity
+- [x] `Common/` folder (`Enums/`, `Constants/`, `Exceptions/`)
+- [x] `AccountType` moved to `Common/Enums`
+- [x] `TransactionStatus`, `LedgerEntryType` enums
+- [x] `Transaction` entity
+- [x] `LedgerEntry` entity
+- [x] `AddTransactionsAndLedgerEntries` migration
+- [x] `TransferRequest`, `TransactionResponse`, `LedgerEntryResponse` DTOs
+- [x] `ITransactionService` interface
+- [x] Transaction + LedgerEntry mappings
+- [ ] `TransactionService` (transfer logic)
 - [ ] `POST /transactions/transfer`
 - [ ] `GET /transactions`, `GET /transactions/{id}`
 - [ ] ACID transfer logic (transaction + rollback on failure)
 
 ### Notes
-—
+- Parts 1 + 2 complete — schema and contracts ready
+- Part 3 next: `TransferFundsAsync` with DB transaction
 
 ---
 
