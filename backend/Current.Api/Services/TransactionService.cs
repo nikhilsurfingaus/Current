@@ -1,0 +1,133 @@
+using Current.Api.Common.Enums;
+using Current.Api.Data;
+using Current.Api.DTOs.Transactions;
+using Current.Api.Entities;
+using Current.Api.Interfaces;
+using Current.Api.Mappings;
+using Microsoft.EntityFrameworkCore;
+
+namespace Current.Api.Services;
+
+public class TransactionService : ITransactionService
+{
+    private readonly ApplicationDbContext _dbContext;
+
+    public TransactionService(ApplicationDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task<TransactionResponse> TransferFundsAsync(TransferRequest request)
+    {
+        if (request.FromAccountId == request.ToAccountId)
+        {
+            throw new InvalidOperationException("Cannot transfer to the same account.");
+        }
+
+        if (request.Amount <= 0)
+        {
+            throw new InvalidOperationException("Amount must be greater than zero.");
+        }
+
+        await using var dbTransaction = await _dbContext.Database.BeginTransactionAsync();
+
+        try
+        {
+            var fromAccount = await _dbContext.Accounts
+                .FirstOrDefaultAsync(account => account.Id == request.FromAccountId);
+
+            if (fromAccount is null)
+            {
+                throw new InvalidOperationException("Source account not found.");
+            }
+
+            var toAccount = await _dbContext.Accounts
+                .FirstOrDefaultAsync(account => account.Id == request.ToAccountId);
+
+            if (toAccount is null)
+            {
+                throw new InvalidOperationException("Destination account not found.");
+            }
+
+            if (fromAccount.CurrentBalance < request.Amount)
+            {
+                throw new InvalidOperationException("Insufficient funds.");
+            }
+
+            var utcNow = DateTime.UtcNow;
+            var transferAmount = request.Amount;
+
+            var transaction = new Transaction
+            {
+                Id = Guid.NewGuid(),
+                FromAccountId = request.FromAccountId,
+                ToAccountId = request.ToAccountId,
+                Amount = transferAmount,
+                Description = request.Description.Trim(),
+                Status = TransactionStatus.Completed,
+                CreatedAt = utcNow
+            };
+
+            var debitEntry = new LedgerEntry
+            {
+                Id = Guid.NewGuid(),
+                TransactionId = transaction.Id,
+                AccountId = fromAccount.Id,
+                EntryType = LedgerEntryType.Debit,
+                Amount = transferAmount,
+                CreatedAt = utcNow
+            };
+
+            var creditEntry = new LedgerEntry
+            {
+                Id = Guid.NewGuid(),
+                TransactionId = transaction.Id,
+                AccountId = toAccount.Id,
+                EntryType = LedgerEntryType.Credit,
+                Amount = transferAmount,
+                CreatedAt = utcNow
+            };
+
+            fromAccount.CurrentBalance -= transferAmount;
+            fromAccount.UpdatedAt = utcNow;
+
+            toAccount.CurrentBalance += transferAmount;
+            toAccount.UpdatedAt = utcNow;
+
+            transaction.LedgerEntries.Add(debitEntry);
+            transaction.LedgerEntries.Add(creditEntry);
+
+            _dbContext.Transactions.Add(transaction);
+            await _dbContext.SaveChangesAsync();
+            await dbTransaction.CommitAsync();
+
+            return transaction.ToResponse();
+        }
+        catch
+        {
+            await dbTransaction.RollbackAsync();
+            throw;
+        }
+    }
+
+    public async Task<IReadOnlyList<TransactionResponse>> GetAllTransactionsAsync()
+    {
+        var transactions = await _dbContext.Transactions
+            .AsNoTracking()
+            .Include(transaction => transaction.LedgerEntries)
+            .OrderByDescending(transaction => transaction.CreatedAt)
+            .ToListAsync();
+
+        return transactions.Select(transaction => transaction.ToResponse()).ToList();
+    }
+
+    public async Task<TransactionResponse?> GetTransactionByIdAsync(Guid transactionId)
+    {
+        var transaction = await _dbContext.Transactions
+            .AsNoTracking()
+            .Include(transaction => transaction.LedgerEntries)
+            .FirstOrDefaultAsync(transaction => transaction.Id == transactionId);
+
+        return transaction?.ToResponse();
+    }
+}

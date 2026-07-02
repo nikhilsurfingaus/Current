@@ -81,14 +81,20 @@ Financial core: transfers create balanced debit/credit ledger entries inside a D
 - [x] `TransferRequest`, `TransactionResponse`, `LedgerEntryResponse` DTOs
 - [x] `ITransactionService` interface
 - [x] Transaction + LedgerEntry mappings
-- [ ] `TransactionService` (transfer logic)
-- [ ] `POST /transactions/transfer`
-- [ ] `GET /transactions`, `GET /transactions/{id}`
-- [ ] ACID transfer logic (transaction + rollback on failure)
+- [x] `TransactionService` (transfer logic)
+- [x] ACID transfer logic (transaction + rollback on failure)
+- [x] `POST /transactions/transfer`
+- [x] `GET /transactions`, `GET /transactions/{id}`
+
+### Endpoints
+| Method | Route | Status |
+|--------|-------|--------|
+| POST | `/transactions/transfer` | ✅ |
+| GET | `/transactions` | ✅ |
+| GET | `/transactions/{id}` | ✅ |
 
 ### Notes
-- Parts 1 + 2 complete — schema and contracts ready
-- Part 3 next: `TransferFundsAsync` with DB transaction
+- Parts 1–4 complete — ready for end-to-end testing (Part 5)
 
 ---
 

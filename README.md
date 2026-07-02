@@ -11,7 +11,7 @@ A full-stack personal finance platform built with Angular and ASP.NET Core.
 
 ## Status
 
-**Phase 1:** Backend foundation (Users + Accounts) — complete
+**Phase 2:** Ledger engine (Transfers) — in progress (Part 5 testing remaining)
 
 See [Release Log](docs/RELEASE_LOG.md) for full phase-by-phase progress.
 
@@ -60,7 +60,9 @@ Swagger: http://localhost:5231/swagger
 | `make migrate` | Apply pending EF migrations |
 | `make build` | Build the API |
 
-## API endpoints (Phase 1)
+## API endpoints
+
+### Phase 1
 
 | Method | Route | Description |
 |--------|-------|-------------|
@@ -70,3 +72,11 @@ Swagger: http://localhost:5231/swagger
 | GET | `/accounts` | List all accounts |
 | GET | `/accounts/{id}` | Get account by ID |
 | POST | `/accounts` | Create an account |
+
+### Phase 2
+
+| Method | Route | Description |
+|--------|-------|-------------|
+| POST | `/transactions/transfer` | Transfer funds between accounts |
+| GET | `/transactions` | List all transactions |
+| GET | `/transactions/{id}` | Get transaction by ID |
