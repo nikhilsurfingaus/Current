@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Current.Api.Common.Enums;
+using Current.Api.Common.Exceptions;
 using Current.Api.Data;
 using Current.Api.DTOs.Auth;
 using Current.Api.Entities;
@@ -42,7 +43,7 @@ public class AuthService : IAuthService
 
         if (userEmailExists)
         {
-            throw new InvalidOperationException("A user with this email already exists.");
+            throw new DuplicateEmailException();
         }
 
         var utcNow = DateTime.UtcNow;
@@ -75,7 +76,7 @@ public class AuthService : IAuthService
 
         if (userByEmail is null)
         {
-            throw new InvalidOperationException("Invalid email or password.");
+            throw new InvalidCredentialsException();
         }
 
         var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(
@@ -85,7 +86,7 @@ public class AuthService : IAuthService
 
         if (passwordVerificationResult == PasswordVerificationResult.Failed)
         {
-            throw new InvalidOperationException("Invalid email or password.");
+            throw new InvalidCredentialsException();
         }
 
         return BuildAuthResponse(userByEmail);

@@ -16,46 +16,39 @@ public class AccountService : IAccountService
         _dbContext = dbContext;
     }
 
-    public async Task<IReadOnlyList<AccountResponse>> GetAllAccountsAsync()
+    public async Task<IReadOnlyList<AccountResponse>> GetAllAccountsAsync(Guid currentUserId)
     {
         var accounts = await _dbContext.Accounts
             .AsNoTracking()
+            .Where(account => account.UserId == currentUserId)
             .OrderBy(account => account.Name)
             .ToListAsync();
 
         return accounts.Select(account => account.ToResponse()).ToList();
     }
 
-    public async Task<AccountResponse?> GetAccountByIdAsync(Guid accountId)
+    public async Task<AccountResponse?> GetAccountByIdAsync(Guid accountId, Guid currentUserId)
     {
         var account = await _dbContext.Accounts
             .AsNoTracking()
-            .FirstOrDefaultAsync(account => account.Id == accountId);
+            .FirstOrDefaultAsync(account =>
+                account.Id == accountId && account.UserId == currentUserId);
 
         return account?.ToResponse();
     }
 
-    public async Task<AccountResponse> CreateAccountAsync(CreateAccountRequest request)
+    public async Task<AccountResponse> CreateAccountAsync(CreateAccountRequest request, Guid currentUserId)
     {
-        // Account must belong to a valid user
-        var userExists = await _dbContext.Users
-            .AnyAsync(user => user.Id == request.UserId);
-
-        if (!userExists)
-        {
-            throw new InvalidOperationException("User not found.");
-        }
-
         var utcNow = DateTime.UtcNow;
 
         var account = new Account
         {
             Id = Guid.NewGuid(),
-            UserId = request.UserId,
+            UserId = currentUserId,
             Name = request.Name.Trim(),
             AccountType = request.AccountType,
             CurrentBalance = request.CurrentBalance,
-            Currency = request.Currency.Trim().ToUpperInvariant(), // e.g. AUD, USD
+            Currency = request.Currency.Trim().ToUpperInvariant(),
             CreatedAt = utcNow,
             UpdatedAt = utcNow
         };

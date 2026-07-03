@@ -100,8 +100,9 @@ Financial core: transfers create balanced debit/credit ledger entries inside a D
 
 ## Phase 3 — Authentication
 
-**Status:** In progress  
-**Date started:** 2026-07-03
+**Status:** Complete  
+**Date started:** 2026-07-03  
+**Date completed:** 2026-07-03
 
 ### Goal
 Secure the API with JWT auth and password hashing.
@@ -110,13 +111,30 @@ Secure the API with JWT auth and password hashing.
 - [x] `PasswordHash` and `Role` on `User`
 - [x] Auth DTOs (`RegisterRequest`, `LoginRequest`, `AuthResponse`)
 - [x] `IAuthService` and `AuthService` (register/login + JWT generation)
-- [ ] `POST /auth/register`
-- [ ] `POST /auth/login`
-- [ ] JWT middleware and authorization
+- [x] `POST /auth/register`
+- [x] `POST /auth/login`
+- [x] JWT middleware and authorization
+- [x] `[Authorize]` on protected endpoints
+- [x] Ownership checks (accounts/transactions scoped to current user)
+- [x] Swagger Bearer token support
+- [x] Typed auth exceptions (`DuplicateEmailException`, `InvalidCredentialsException`)
+
+### Endpoints
+| Method | Route | Status |
+|--------|-------|--------|
+| POST | `/auth/register` | ✅ |
+| POST | `/auth/login` | ✅ |
+| GET | `/users/me` | ✅ |
 
 ### Notes
 - Part 1 complete: user auth fields added and migrated
 - Parts 2–3 complete: auth contracts and service layer ready
+- Part 4 complete: JWT bearer authentication wired in startup/DI
+- Part 5 complete: AuthController endpoints available in Swagger
+- Part 6 complete: endpoints secured + ownership enforced
+- Part 7 complete: end-to-end auth and ownership testing passed
+- `POST /users` removed — use `/auth/register`
+- `POST /accounts` no longer accepts `userId` in body (uses JWT)
 
 ---
 

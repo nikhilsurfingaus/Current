@@ -1,31 +1,29 @@
 using Current.Api.DTOs.Users;
 using Current.Api.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Current.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("users")]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly ICurrentUserService _currentUserService;
 
-    public UsersController(IUserService userService)
+    public UsersController(IUserService userService, ICurrentUserService currentUserService)
     {
         _userService = userService;
+        _currentUserService = currentUserService;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<UserResponse>>> GetAll()
+    [HttpGet("me")]
+    public async Task<ActionResult<UserResponse>> GetMe()
     {
-        var users = await _userService.GetAllUsersAsync();
-        return Ok(users);
-    }
-
-    [HttpGet("{id:guid}")]
-    public async Task<ActionResult<UserResponse>> GetById(Guid id)
-    {
-        var user = await _userService.GetUserByIdAsync(id);
+        var currentUserId = _currentUserService.GetCurrentUserId();
+        var user = await _userService.GetUserByIdAsync(currentUserId, currentUserId);
 
         if (user is null)
         {
@@ -35,17 +33,17 @@ public class UsersController : ControllerBase
         return Ok(user);
     }
 
-    [HttpPost]
-    public async Task<ActionResult<UserResponse>> Create([FromBody] CreateUserRequest request)
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<UserResponse>> GetById(Guid id)
     {
-        try
+        var currentUserId = _currentUserService.GetCurrentUserId();
+        var user = await _userService.GetUserByIdAsync(id, currentUserId);
+
+        if (user is null)
         {
-            var user = await _userService.CreateUserAsync(request);
-            return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+            return NotFound();
         }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(new { message = ex.Message });
-        }
+
+        return Ok(user);
     }
 }

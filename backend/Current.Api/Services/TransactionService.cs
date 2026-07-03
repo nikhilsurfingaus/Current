@@ -17,7 +17,7 @@ public class TransactionService : ITransactionService
         _dbContext = dbContext;
     }
 
-    public async Task<TransactionResponse> TransferFundsAsync(TransferRequest request)
+    public async Task<TransactionResponse> TransferFundsAsync(TransferRequest request, Guid currentUserId)
     {
         if (request.FromAccountId == request.ToAccountId)
         {
@@ -34,7 +34,8 @@ public class TransactionService : ITransactionService
         try
         {
             var fromAccount = await _dbContext.Accounts
-                .FirstOrDefaultAsync(account => account.Id == request.FromAccountId);
+                .FirstOrDefaultAsync(account =>
+                    account.Id == request.FromAccountId && account.UserId == currentUserId);
 
             if (fromAccount is null)
             {
@@ -42,7 +43,8 @@ public class TransactionService : ITransactionService
             }
 
             var toAccount = await _dbContext.Accounts
-                .FirstOrDefaultAsync(account => account.Id == request.ToAccountId);
+                .FirstOrDefaultAsync(account =>
+                    account.Id == request.ToAccountId && account.UserId == currentUserId);
 
             if (toAccount is null)
             {
@@ -110,23 +112,41 @@ public class TransactionService : ITransactionService
         }
     }
 
-    public async Task<IReadOnlyList<TransactionResponse>> GetAllTransactionsAsync()
+    public async Task<IReadOnlyList<TransactionResponse>> GetAllTransactionsAsync(Guid currentUserId)
     {
+        var userAccountIds = await _dbContext.Accounts
+            .AsNoTracking()
+            .Where(account => account.UserId == currentUserId)
+            .Select(account => account.Id)
+            .ToListAsync();
+
         var transactions = await _dbContext.Transactions
             .AsNoTracking()
             .Include(transaction => transaction.LedgerEntries)
+            .Where(transaction =>
+                userAccountIds.Contains(transaction.FromAccountId) ||
+                userAccountIds.Contains(transaction.ToAccountId))
             .OrderByDescending(transaction => transaction.CreatedAt)
             .ToListAsync();
 
         return transactions.Select(transaction => transaction.ToResponse()).ToList();
     }
 
-    public async Task<TransactionResponse?> GetTransactionByIdAsync(Guid transactionId)
+    public async Task<TransactionResponse?> GetTransactionByIdAsync(Guid transactionId, Guid currentUserId)
     {
+        var userAccountIds = await _dbContext.Accounts
+            .AsNoTracking()
+            .Where(account => account.UserId == currentUserId)
+            .Select(account => account.Id)
+            .ToListAsync();
+
         var transaction = await _dbContext.Transactions
             .AsNoTracking()
             .Include(transaction => transaction.LedgerEntries)
-            .FirstOrDefaultAsync(transaction => transaction.Id == transactionId);
+            .FirstOrDefaultAsync(transaction =>
+                transaction.Id == transactionId &&
+                (userAccountIds.Contains(transaction.FromAccountId) ||
+                 userAccountIds.Contains(transaction.ToAccountId)));
 
         return transaction?.ToResponse();
     }

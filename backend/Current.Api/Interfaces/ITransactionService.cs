@@ -4,9 +4,9 @@ namespace Current.Api.Interfaces;
 
 public interface ITransactionService
 {
-    Task<TransactionResponse> TransferFundsAsync(TransferRequest request);
+    Task<TransactionResponse> TransferFundsAsync(TransferRequest request, Guid currentUserId);
 
-    Task<IReadOnlyList<TransactionResponse>> GetAllTransactionsAsync();
+    Task<IReadOnlyList<TransactionResponse>> GetAllTransactionsAsync(Guid currentUserId);
 
-    Task<TransactionResponse?> GetTransactionByIdAsync(Guid transactionId);
+    Task<TransactionResponse?> GetTransactionByIdAsync(Guid transactionId, Guid currentUserId);
 }
