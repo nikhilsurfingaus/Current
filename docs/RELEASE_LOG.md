@@ -108,12 +108,15 @@ Secure the API with JWT auth and password hashing.
 
 ### Delivered
 - [x] `PasswordHash` and `Role` on `User`
+- [x] Auth DTOs (`RegisterRequest`, `LoginRequest`, `AuthResponse`)
+- [x] `IAuthService` and `AuthService` (register/login + JWT generation)
 - [ ] `POST /auth/register`
 - [ ] `POST /auth/login`
 - [ ] JWT middleware and authorization
 
 ### Notes
 - Part 1 complete: user auth fields added and migrated
+- Parts 2–3 complete: auth contracts and service layer ready
 
 ---
 
