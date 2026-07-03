@@ -1,3 +1,5 @@
+using Current.Api.Common.Enums;
+
 namespace Current.Api.Entities;
 
 public class User
@@ -9,6 +11,10 @@ public class User
     public string LastName { get; set; } = string.Empty;
 
     public string Email { get; set; } = string.Empty;
+
+    public string PasswordHash { get; set; } = string.Empty;
+
+    public UserRole Role { get; set; } = UserRole.User;
 
     public DateTime CreatedAt { get; set; }
 

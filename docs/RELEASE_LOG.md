@@ -100,19 +100,20 @@ Financial core: transfers create balanced debit/credit ledger entries inside a D
 
 ## Phase 3 — Authentication
 
-**Status:** Not started
+**Status:** In progress  
+**Date started:** 2026-07-03
 
 ### Goal
 Secure the API with JWT auth and password hashing.
 
 ### Delivered
-- [ ] `PasswordHash` and `Role` on `User`
+- [x] `PasswordHash` and `Role` on `User`
 - [ ] `POST /auth/register`
 - [ ] `POST /auth/login`
 - [ ] JWT middleware and authorization
 
 ### Notes
-—
+- Part 1 complete: user auth fields added and migrated
 
 ---
 

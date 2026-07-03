@@ -1,3 +1,4 @@
+using Current.Api.Common.Enums;
 using Current.Api.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,6 +35,16 @@ public class ApplicationDbContext : DbContext
 
             entity.Property(user => user.Email)
                 .HasMaxLength(255)
+                .IsRequired();
+
+            entity.Property(user => user.PasswordHash)
+                .HasMaxLength(500)
+                .IsRequired();
+
+            entity.Property(user => user.Role)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .HasDefaultValue(UserRole.User)
                 .IsRequired();
 
             entity.HasIndex(user => user.Email)
