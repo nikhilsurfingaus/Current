@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
+import { AccountsComponent } from './features/accounts/accounts/accounts';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout';
@@ -36,11 +37,7 @@ export const routes: Routes = [
       },
       {
         path: 'accounts',
-        component: FeaturePlaceholderComponent,
-        data: {
-          pageTitle: 'Accounts',
-          pageSubtitle: 'Manage your accounts — Part 6',
-        },
+        component: AccountsComponent,
       },
       {
         path: 'transfer',

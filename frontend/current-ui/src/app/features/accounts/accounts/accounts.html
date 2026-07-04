@@ -1,0 +1,119 @@
+<div class="accounts-page">
+  <header class="accounts-page__header">
+    <div>
+      <h1 class="accounts-page__title">Accounts</h1>
+      <p class="accounts-page__subtitle">View and manage your accounts</p>
+    </div>
+    <button class="accounts-page__create-btn" type="button" (click)="openCreatePanel()">
+      Create account
+    </button>
+  </header>
+
+  @if (accountsLoadError) {
+    <div class="accounts-page__alert accounts-page__alert--error">{{ accountsLoadError }}</div>
+  }
+
+  @if (createPanelOpen) {
+    <section class="accounts-page__panel">
+      <div class="accounts-page__panel-header">
+        <h2 class="accounts-page__panel-title">Create account</h2>
+        <button class="accounts-page__panel-close" type="button" (click)="closeCreatePanel()">
+          Close
+        </button>
+      </div>
+
+      @if (createErrorMessage) {
+        <div class="accounts-page__alert accounts-page__alert--error">{{ createErrorMessage }}</div>
+      }
+
+      <form class="accounts-form" [formGroup]="createAccountForm" (ngSubmit)="onCreateAccount()">
+        <div class="accounts-form__field">
+          <label class="accounts-form__label" for="account-name">Account name</label>
+          <input
+            id="account-name"
+            class="accounts-form__input"
+            type="text"
+            formControlName="name"
+            placeholder="Everyday"
+          />
+          @if (createFormSubmitted && createAccountForm.controls.name.invalid) {
+            <span class="accounts-form__error">Account name is required.</span>
+          }
+        </div>
+
+        <div class="accounts-form__field">
+          <label class="accounts-form__label" for="account-type">Account type</label>
+          <select id="account-type" class="accounts-form__input" formControlName="accountType">
+            @for (option of accountTypeOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="accounts-form__row">
+          <div class="accounts-form__field">
+            <label class="accounts-form__label" for="account-balance">Starting balance</label>
+            <input
+              id="account-balance"
+              class="accounts-form__input"
+              type="number"
+              min="0"
+              step="0.01"
+              formControlName="currentBalance"
+            />
+            @if (createFormSubmitted && createAccountForm.controls.currentBalance.invalid) {
+              <span class="accounts-form__error">Balance must be zero or greater.</span>
+            }
+          </div>
+
+          <div class="accounts-form__field">
+            <label class="accounts-form__label" for="account-currency">Currency</label>
+            <input
+              id="account-currency"
+              class="accounts-form__input"
+              type="text"
+              maxlength="3"
+              formControlName="currency"
+            />
+            @if (createFormSubmitted && createAccountForm.controls.currency.invalid) {
+              <span class="accounts-form__error">Enter a 3-letter currency code.</span>
+            }
+          </div>
+        </div>
+
+        <button class="accounts-form__submit" type="submit" [disabled]="createRequestInFlight">
+          {{ createRequestInFlight ? 'Creating...' : 'Create account' }}
+        </button>
+      </form>
+    </section>
+  }
+
+  <section class="accounts-page__table-card">
+    @if (accountsLoading) {
+      <p class="accounts-page__status">Loading accounts...</p>
+    } @else if (accounts.length === 0) {
+      <p class="accounts-page__status">No accounts yet. Create your first account to get started.</p>
+    } @else {
+      <table class="accounts-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Balance</th>
+            <th>Currency</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (account of accounts; track account.id) {
+            <tr>
+              <td>{{ account.name }}</td>
+              <td>{{ getAccountTypeLabel(account.accountType) }}</td>
+              <td>{{ account.currentBalance | currency: account.currency }}</td>
+              <td>{{ account.currency }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+</div>

@@ -1,0 +1,190 @@
+@use '../../../../styles/variables' as *;
+
+.accounts-page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
+}
+
+.accounts-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-md;
+}
+
+.accounts-page__title {
+  margin: 0 0 $space-xs;
+  font-size: 28px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.accounts-page__subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.accounts-page__create-btn,
+.accounts-form__submit {
+  padding: 10px 16px;
+  border: none;
+  border-radius: $radius-button;
+  background: $color-primary;
+  color: $text-primary;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+}
+
+.accounts-page__alert {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.accounts-page__alert--error {
+  background: rgba($color-error, 0.12);
+  color: $color-error;
+}
+
+.accounts-page__panel,
+.accounts-page__table-card {
+  padding: $space-lg;
+  border-radius: $radius-card;
+  background: $bg-secondary;
+  box-shadow: $shadow-card;
+}
+
+.accounts-page__panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $space-md;
+}
+
+.accounts-page__panel-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.accounts-page__panel-close {
+  padding: 6px 10px;
+  border: 1px solid rgba($text-secondary, 0.35);
+  border-radius: 8px;
+  background: transparent;
+  color: $text-secondary;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover {
+    color: $text-primary;
+    background: $bg-elevated;
+  }
+}
+
+.accounts-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.accounts-form__row {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: $space-md;
+}
+
+.accounts-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.accounts-form__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: $text-secondary;
+}
+
+.accounts-form__input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba($text-secondary, 0.25);
+  background: $bg-primary;
+  color: $text-primary;
+  font-size: 14px;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+  }
+}
+
+.accounts-form__error {
+  font-size: 12px;
+  color: $color-error;
+}
+
+.accounts-page__status {
+  margin: 0;
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.accounts-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.accounts-table th,
+.accounts-table td {
+  padding: 12px 10px;
+  text-align: left;
+  border-bottom: 1px solid rgba($text-secondary, 0.15);
+}
+
+.accounts-table th {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $text-secondary;
+}
+
+.accounts-table td {
+  font-size: 14px;
+  color: $text-primary;
+}
+
+.accounts-table tbody tr:hover {
+  background: $bg-elevated;
+}
+
+.accounts-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+@media (max-width: 720px) {
+  .accounts-page__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .accounts-form__row {
+    grid-template-columns: 1fr;
+  }
+}

@@ -164,6 +164,7 @@ Secure the API with JWT auth and password hashing.
 - Part 3 complete: `AuthService`, `authInterceptor`, `authGuard`
 - Part 4 complete: auth + main layouts, sidebar nav, route structure
 - Part 5 complete: login + register forms wired to API, logout, error handling
+- Part 6 complete: accounts list + create account UI
 
 ---
 
