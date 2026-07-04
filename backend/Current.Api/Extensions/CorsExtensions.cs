@@ -4,15 +4,28 @@ public static class CorsExtensions
 {
     public const string FrontendPolicy = "Frontend";
 
-    public static IServiceCollection AddFrontendCors(this IServiceCollection services)
+    public static IServiceCollection AddFrontendCors(
+        this IServiceCollection services,
+        IWebHostEnvironment environment)
     {
         services.AddCors(options =>
         {
             options.AddPolicy(FrontendPolicy, policy =>
             {
-                policy.WithOrigins("http://localhost:4200")
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
+                if (environment.IsDevelopment())
+                {
+                    policy.SetIsOriginAllowed(origin =>
+                            Uri.TryCreate(origin, UriKind.Absolute, out var originUri) &&
+                            originUri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase))
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                }
+                else
+                {
+                    policy.WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                }
             });
         });
 

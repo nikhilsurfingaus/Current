@@ -1,5 +1,5 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -18,13 +18,13 @@ import {
   styleUrl: './accounts.scss',
 })
 export class AccountsComponent implements OnInit {
-  accounts: Account[] = [];
-  accountsLoading = false;
-  accountsLoadError = '';
-  createPanelOpen = false;
-  createFormSubmitted = false;
-  createRequestInFlight = false;
-  createErrorMessage = '';
+  accounts = signal<Account[]>([]);
+  accountsLoading = signal(false);
+  accountsLoadError = signal('');
+  createPanelOpen = signal(false);
+  createFormSubmitted = signal(false);
+  createRequestInFlight = signal(false);
+  createErrorMessage = signal('');
 
   readonly accountTypeOptions = ACCOUNT_TYPE_OPTIONS;
   readonly getAccountTypeLabel = getAccountTypeLabel;
@@ -55,25 +55,27 @@ export class AccountsComponent implements OnInit {
   }
 
   loadAccounts(): void {
-    this.accountsLoading = true;
-    this.accountsLoadError = '';
+    this.accountsLoading.set(true);
+    this.accountsLoadError.set('');
 
     this.accountService.getAllAccounts().subscribe({
       next: (accounts) => {
-        this.accounts = accounts;
-        this.accountsLoading = false;
+        this.accounts.set(accounts);
+        this.accountsLoading.set(false);
       },
       error: (error: HttpErrorResponse) => {
-        this.accountsLoading = false;
-        this.accountsLoadError = this.resolveErrorMessage(error, 'Unable to load accounts.');
+        this.accountsLoading.set(false);
+        this.accountsLoadError.set(
+          this.resolveErrorMessage(error, 'Unable to load accounts.'),
+        );
       },
     });
   }
 
   openCreatePanel(): void {
-    this.createPanelOpen = true;
-    this.createFormSubmitted = false;
-    this.createErrorMessage = '';
+    this.createPanelOpen.set(true);
+    this.createFormSubmitted.set(false);
+    this.createErrorMessage.set('');
     this.createAccountForm.reset({
       name: '',
       accountType: AccountType.Everyday,
@@ -83,14 +85,14 @@ export class AccountsComponent implements OnInit {
   }
 
   closeCreatePanel(): void {
-    this.createPanelOpen = false;
-    this.createFormSubmitted = false;
-    this.createErrorMessage = '';
+    this.createPanelOpen.set(false);
+    this.createFormSubmitted.set(false);
+    this.createErrorMessage.set('');
   }
 
   onCreateAccount(): void {
-    this.createFormSubmitted = true;
-    this.createErrorMessage = '';
+    this.createFormSubmitted.set(true);
+    this.createErrorMessage.set('');
 
     if (this.createAccountForm.invalid) {
       return;
@@ -104,21 +106,22 @@ export class AccountsComponent implements OnInit {
       currency: formValues.currency.trim().toUpperCase(),
     };
 
-    this.createRequestInFlight = true;
+    this.createRequestInFlight.set(true);
 
     this.accountService.createAccount(createAccountRequest).subscribe({
       next: (createdAccount) => {
-        this.createRequestInFlight = false;
-        this.accounts = [...this.accounts, createdAccount].sort((left, right) =>
-          left.name.localeCompare(right.name),
+        this.createRequestInFlight.set(false);
+        this.accounts.set(
+          [...this.accounts(), createdAccount].sort((left, right) =>
+            left.name.localeCompare(right.name),
+          ),
         );
         this.closeCreatePanel();
       },
       error: (error: HttpErrorResponse) => {
-        this.createRequestInFlight = false;
-        this.createErrorMessage = this.resolveErrorMessage(
-          error,
-          'Unable to create account.',
+        this.createRequestInFlight.set(false);
+        this.createErrorMessage.set(
+          this.resolveErrorMessage(error, 'Unable to create account.'),
         );
       },
     });

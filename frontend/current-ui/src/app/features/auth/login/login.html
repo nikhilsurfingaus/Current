@@ -2,8 +2,8 @@
   <h1 class="auth-form__title">Welcome back</h1>
   <p class="auth-form__subtitle">Log in to your Current account</p>
 
-  @if (loginErrorMessage) {
-    <div class="auth-form__alert">{{ loginErrorMessage }}</div>
+  @if (loginErrorMessage()) {
+    <div class="auth-form__alert">{{ loginErrorMessage() }}</div>
   }
 
   <div class="auth-form__field">
@@ -11,15 +11,15 @@
     <input
       id="login-email"
       class="auth-form__input"
-      [class.auth-form__input--invalid]="loginFormSubmitted && loginForm.controls.email.invalid"
+      [class.auth-form__input--invalid]="loginFormSubmitted() && loginForm.controls.email.invalid"
       type="email"
       formControlName="email"
       autocomplete="email"
     />
-    @if (loginFormSubmitted && loginForm.controls.email.hasError('required')) {
+    @if (loginFormSubmitted() && loginForm.controls.email.hasError('required')) {
       <span class="auth-form__error">Email is required.</span>
     }
-    @if (loginFormSubmitted && loginForm.controls.email.hasError('email')) {
+    @if (loginFormSubmitted() && loginForm.controls.email.hasError('email')) {
       <span class="auth-form__error">Enter a valid email address.</span>
     }
   </div>
@@ -29,21 +29,21 @@
     <input
       id="login-password"
       class="auth-form__input"
-      [class.auth-form__input--invalid]="loginFormSubmitted && loginForm.controls.password.invalid"
+      [class.auth-form__input--invalid]="loginFormSubmitted() && loginForm.controls.password.invalid"
       type="password"
       formControlName="password"
       autocomplete="current-password"
     />
-    @if (loginFormSubmitted && loginForm.controls.password.hasError('required')) {
+    @if (loginFormSubmitted() && loginForm.controls.password.hasError('required')) {
       <span class="auth-form__error">Password is required.</span>
     }
-    @if (loginFormSubmitted && loginForm.controls.password.hasError('minlength')) {
+    @if (loginFormSubmitted() && loginForm.controls.password.hasError('minlength')) {
       <span class="auth-form__error">Password must be at least 8 characters.</span>
     }
   </div>
 
-  <button class="auth-form__submit" type="submit" [disabled]="loginRequestInFlight">
-    {{ loginRequestInFlight ? 'Logging in...' : 'Log in' }}
+  <button class="auth-form__submit" type="submit" [disabled]="loginRequestInFlight()">
+    {{ loginRequestInFlight() ? 'Logging in...' : 'Log in' }}
   </button>
 
   <p class="auth-form__footer">

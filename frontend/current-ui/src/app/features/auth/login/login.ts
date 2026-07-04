@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -14,9 +14,9 @@ import { ApiError } from '../../../shared/models';
   styleUrl: './login.scss',
 })
 export class LoginComponent {
-  loginFormSubmitted = false;
-  loginErrorMessage = '';
-  loginRequestInFlight = false;
+  loginFormSubmitted = signal(false);
+  loginErrorMessage = signal('');
+  loginRequestInFlight = signal(false);
 
   loginForm = new FormGroup({
     email: new FormControl('', {
@@ -35,24 +35,24 @@ export class LoginComponent {
   ) {}
 
   onSubmit(): void {
-    this.loginFormSubmitted = true;
-    this.loginErrorMessage = '';
+    this.loginFormSubmitted.set(true);
+    this.loginErrorMessage.set('');
 
     if (this.loginForm.invalid) {
       return;
     }
 
     const loginRequest = this.loginForm.getRawValue();
-    this.loginRequestInFlight = true;
+    this.loginRequestInFlight.set(true);
 
     this.authService.login(loginRequest).subscribe({
       next: () => {
-        this.loginRequestInFlight = false;
+        this.loginRequestInFlight.set(false);
         this.router.navigate(['/dashboard']);
       },
       error: (error: HttpErrorResponse) => {
-        this.loginRequestInFlight = false;
-        this.loginErrorMessage = this.resolveLoginErrorMessage(error);
+        this.loginRequestInFlight.set(false);
+        this.loginErrorMessage.set(this.resolveLoginErrorMessage(error));
       },
     });
   }

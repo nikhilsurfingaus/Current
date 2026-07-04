@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -20,9 +20,9 @@ import { passwordMatchValidator } from './password-match.validator';
   styleUrl: './register.scss',
 })
 export class RegisterComponent {
-  registerFormSubmitted = false;
-  registerErrorMessage = '';
-  registerRequestInFlight = false;
+  registerFormSubmitted = signal(false);
+  registerErrorMessage = signal('');
+  registerRequestInFlight = signal(false);
 
   registerForm = new FormGroup({
     firstName: new FormControl('', {
@@ -53,8 +53,8 @@ export class RegisterComponent {
   ) {}
 
   onSubmit(): void {
-    this.registerFormSubmitted = true;
-    this.registerErrorMessage = '';
+    this.registerFormSubmitted.set(true);
+    this.registerErrorMessage.set('');
 
     if (this.registerForm.invalid) {
       return;
@@ -68,16 +68,16 @@ export class RegisterComponent {
       password: registerFormValues.password,
     };
 
-    this.registerRequestInFlight = true;
+    this.registerRequestInFlight.set(true);
 
     this.authService.register(registerRequest).subscribe({
       next: () => {
-        this.registerRequestInFlight = false;
+        this.registerRequestInFlight.set(false);
         this.router.navigate(['/dashboard']);
       },
       error: (error: HttpErrorResponse) => {
-        this.registerRequestInFlight = false;
-        this.registerErrorMessage = this.resolveRegisterErrorMessage(error);
+        this.registerRequestInFlight.set(false);
+        this.registerErrorMessage.set(this.resolveRegisterErrorMessage(error));
       },
     });
   }
