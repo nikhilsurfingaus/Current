@@ -1,5 +1,5 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 
 import { AccountService } from '../../../core/services/account.service';
 import { TransactionService } from '../../../core/services/transaction.service';
@@ -21,7 +22,7 @@ import { differentAccountsValidator } from './different-accounts.validator';
   templateUrl: './transfer.html',
   styleUrl: './transfer.scss',
 })
-export class TransferComponent implements OnInit {
+export class TransferComponent implements OnInit, OnDestroy {
   accounts = signal<Account[]>([]);
   accountsLoading = signal(false);
   accountsLoadError = signal('');
@@ -29,6 +30,8 @@ export class TransferComponent implements OnInit {
   transferRequestInFlight = signal(false);
   transferErrorMessage = signal('');
   transferSuccessMessage = signal('');
+
+  private transferFormSubscriptions = new Subscription();
 
   transferForm = new FormGroup(
     {
@@ -59,6 +62,21 @@ export class TransferComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadAccounts();
+    this.setupAccountSelectionGuards();
+  }
+
+  ngOnDestroy(): void {
+    this.transferFormSubscriptions.unsubscribe();
+  }
+
+  getFromAccountOptions(): Account[] {
+    const toAccountId = this.transferForm.controls.toAccountId.value;
+    return this.accounts().filter((account) => account.id !== toAccountId);
+  }
+
+  getToAccountOptions(): Account[] {
+    const fromAccountId = this.transferForm.controls.fromAccountId.value;
+    return this.accounts().filter((account) => account.id !== fromAccountId);
   }
 
   get selectedFromAccount(): Account | undefined {
@@ -129,6 +147,26 @@ export class TransferComponent implements OnInit {
     return (
       this.transferFormSubmitted() &&
       this.transferForm.hasError('sameAccount')
+    );
+  }
+
+  private setupAccountSelectionGuards(): void {
+    const { fromAccountId, toAccountId } = this.transferForm.controls;
+
+    this.transferFormSubscriptions.add(
+      fromAccountId.valueChanges.subscribe((selectedFromId) => {
+        if (selectedFromId && selectedFromId === toAccountId.value) {
+          toAccountId.setValue('', { emitEvent: false });
+        }
+      }),
+    );
+
+    this.transferFormSubscriptions.add(
+      toAccountId.valueChanges.subscribe((selectedToId) => {
+        if (selectedToId && selectedToId === fromAccountId.value) {
+          fromAccountId.setValue('', { emitEvent: false });
+        }
+      }),
     );
   }
 

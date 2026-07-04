@@ -150,10 +150,35 @@
 
 .transactions-table__ledger-item {
   display: grid;
-  grid-template-columns: 1fr 80px 120px;
+  grid-template-columns: 1fr 100px 140px;
   gap: $space-md;
+  align-items: center;
   font-size: 13px;
   color: $text-primary;
+}
+
+.transactions-table__ledger-account {
+  font-weight: 500;
+}
+
+.transactions-table__ledger-type,
+.transactions-table__ledger-amount {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.transactions-table__ledger-type--debit,
+.transactions-table__ledger-amount--debit {
+  color: $color-error;
+}
+
+.transactions-table__ledger-type--credit,
+.transactions-table__ledger-amount--credit {
+  color: $color-success;
+}
+
+.transactions-table__ledger-amount {
+  text-align: right;
 }
 
 @media (max-width: 900px) {

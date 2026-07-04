@@ -93,6 +93,14 @@ export class TransactionsComponent implements OnInit {
     return this.expandedTransactionId() === transactionId;
   }
 
+  getLedgerEntrySign(entryType: LedgerEntryType): string {
+    return entryType === LedgerEntryType.Debit ? '−' : '+';
+  }
+
+  isLedgerDebit(entryType: LedgerEntryType): boolean {
+    return entryType === LedgerEntryType.Debit;
+  }
+
   private resolveErrorMessage(error: HttpErrorResponse, fallbackMessage: string): string {
     const apiError = error.error as ApiError | undefined;
     if (apiError?.message) {

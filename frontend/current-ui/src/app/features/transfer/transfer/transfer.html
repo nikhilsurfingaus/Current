@@ -35,7 +35,7 @@
           <label class="transfer-form__label" for="transfer-from">From account</label>
           <select id="transfer-from" class="transfer-form__input" formControlName="fromAccountId">
             <option value="" disabled>Select account</option>
-            @for (account of accounts(); track account.id) {
+            @for (account of getFromAccountOptions(); track account.id) {
               <option [value]="account.id">
                 {{ account.name }} ({{ account.currentBalance | currency: account.currency }})
               </option>
@@ -50,7 +50,7 @@
           <label class="transfer-form__label" for="transfer-to">To account</label>
           <select id="transfer-to" class="transfer-form__input" formControlName="toAccountId">
             <option value="" disabled>Select account</option>
-            @for (account of accounts(); track account.id) {
+            @for (account of getToAccountOptions(); track account.id) {
               <option [value]="account.id">
                 {{ account.name }} ({{ account.currentBalance | currency: account.currency }})
               </option>

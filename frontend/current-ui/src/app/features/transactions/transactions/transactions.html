@@ -75,10 +75,23 @@
                       <ul class="transactions-table__ledger-list">
                         @for (entry of transaction.ledgerEntries; track entry.id) {
                           <li class="transactions-table__ledger-item">
-                            <span>{{ getAccountName(entry.accountId) }}</span>
-                            <span>{{ entry.entryType === LedgerEntryType.Debit ? 'Debit' : 'Credit' }}</span>
-                            <span>
-                              {{ entry.amount | currency: getAccountCurrency(entry.accountId) }}
+                            <span class="transactions-table__ledger-account">
+                              {{ getAccountName(entry.accountId) }}
+                            </span>
+                            <span
+                              class="transactions-table__ledger-type"
+                              [class.transactions-table__ledger-type--debit]="isLedgerDebit(entry.entryType)"
+                              [class.transactions-table__ledger-type--credit]="!isLedgerDebit(entry.entryType)"
+                            >
+                              {{ getLedgerEntrySign(entry.entryType) }}
+                              {{ isLedgerDebit(entry.entryType) ? 'Debit' : 'Credit' }}
+                            </span>
+                            <span
+                              class="transactions-table__ledger-amount"
+                              [class.transactions-table__ledger-amount--debit]="isLedgerDebit(entry.entryType)"
+                              [class.transactions-table__ledger-amount--credit]="!isLedgerDebit(entry.entryType)"
+                            >
+                              {{ getLedgerEntrySign(entry.entryType) }}{{ entry.amount | currency: getAccountCurrency(entry.accountId) }}
                             </span>
                           </li>
                         }
