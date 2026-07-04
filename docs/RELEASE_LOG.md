@@ -161,6 +161,7 @@ Secure the API with JWT auth and password hashing.
 ### Notes
 - Part 1 complete: scaffold, theme shell, CORS, folder structure
 - Part 2 complete: shared models, `ApiService`, `HttpClient` in `app.config`
+- Part 3 complete: `AuthService`, `authInterceptor`, `authGuard`
 
 ---
 
