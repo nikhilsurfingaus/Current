@@ -151,6 +151,8 @@ Secure the API with JWT auth and password hashing.
 - [x] Feature-based structure (`core/`, `shared/`, `features/`, `layouts/`)
 - [x] Deep ocean design tokens (`src/styles/_variables.scss`)
 - [x] Environment config (`apiUrl` → `http://localhost:5231`)
+- [x] TypeScript models aligned with API DTOs
+- [x] `ApiService` + `HttpClient` wired in `app.config`
 - [x] Brand assets (`brand/`, `public/brand/`)
 - [x] CORS for `http://localhost:4200`
 - [ ] Auth, dashboard, accounts, transactions pages
@@ -158,6 +160,7 @@ Secure the API with JWT auth and password hashing.
 
 ### Notes
 - Part 1 complete: scaffold, theme shell, CORS, folder structure
+- Part 2 complete: shared models, `ApiService`, `HttpClient` in `app.config`
 
 ---
 
