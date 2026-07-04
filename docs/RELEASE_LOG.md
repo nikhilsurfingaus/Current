@@ -155,8 +155,8 @@ Secure the API with JWT auth and password hashing.
 - [x] `ApiService` + `HttpClient` wired in `app.config`
 - [x] Brand assets (`brand/`, `public/brand/`)
 - [x] CORS for `http://localhost:4200`
-- [ ] Auth, dashboard, accounts, transactions pages
-- [ ] HttpClient services wired to API
+- [x] Auth, accounts, transfer, transactions pages
+- [x] HttpClient services wired to API
 
 ### Notes
 - Part 1 complete: scaffold, theme shell, CORS, folder structure
@@ -165,6 +165,7 @@ Secure the API with JWT auth and password hashing.
 - Part 4 complete: auth + main layouts, sidebar nav, route structure
 - Part 5 complete: login + register forms wired to API, logout, error handling
 - Part 6 complete: accounts list + create account UI
+- Part 7 complete: transfer form, transactions list, `TransactionService`
 
 ---
 

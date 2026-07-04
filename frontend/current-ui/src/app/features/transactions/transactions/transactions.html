@@ -1,0 +1,96 @@
+<div class="transactions-page">
+  <header class="transactions-page__header">
+    <div>
+      <h1 class="transactions-page__title">Transactions</h1>
+      <p class="transactions-page__subtitle">View your transfer history</p>
+    </div>
+  </header>
+
+  @if (transactionsLoadError()) {
+    <div class="transactions-page__alert transactions-page__alert--error">
+      {{ transactionsLoadError() }}
+    </div>
+  }
+
+  <section class="transactions-page__table-card">
+    @if (transactionsLoading()) {
+      <p class="transactions-page__status">Loading transactions...</p>
+    } @else if (transactions().length === 0) {
+      <p class="transactions-page__status">
+        No transactions yet.
+        <a class="transactions-page__link" routerLink="/transfer">Make a transfer</a>
+      </p>
+    } @else {
+      <table class="transactions-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Amount</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (transaction of transactions(); track transaction.id) {
+            <tr
+              class="transactions-table__row"
+              [class.transactions-table__row--expanded]="isTransactionExpanded(transaction.id)"
+              (click)="toggleTransactionDetails(transaction.id)"
+            >
+              <td>{{ transaction.createdAt | date: 'medium' }}</td>
+              <td>{{ getAccountName(transaction.fromAccountId) }}</td>
+              <td>{{ getAccountName(transaction.toAccountId) }}</td>
+              <td>
+                {{ transaction.amount | currency: getAccountCurrency(transaction.fromAccountId) }}
+              </td>
+              <td>{{ transaction.description || '—' }}</td>
+              <td>
+                <span
+                  class="transactions-table__status"
+                  [class.transactions-table__status--completed]="
+                    transaction.status === TransactionStatus.Completed
+                  "
+                  [class.transactions-table__status--failed]="
+                    transaction.status === TransactionStatus.Failed
+                  "
+                >
+                  {{ getTransactionStatusLabel(transaction.status) }}
+                </span>
+              </td>
+              <td class="transactions-table__expand">
+                {{ isTransactionExpanded(transaction.id) ? '−' : '+' }}
+              </td>
+            </tr>
+            @if (isTransactionExpanded(transaction.id)) {
+              <tr class="transactions-table__details-row">
+                <td colspan="7">
+                  <div class="transactions-table__details">
+                    <h3 class="transactions-table__details-title">Ledger entries</h3>
+                    @if (transaction.ledgerEntries.length === 0) {
+                      <p class="transactions-table__details-empty">No ledger entries.</p>
+                    } @else {
+                      <ul class="transactions-table__ledger-list">
+                        @for (entry of transaction.ledgerEntries; track entry.id) {
+                          <li class="transactions-table__ledger-item">
+                            <span>{{ getAccountName(entry.accountId) }}</span>
+                            <span>{{ entry.entryType === LedgerEntryType.Debit ? 'Debit' : 'Credit' }}</span>
+                            <span>
+                              {{ entry.amount | currency: getAccountCurrency(entry.accountId) }}
+                            </span>
+                          </li>
+                        }
+                      </ul>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+</div>

@@ -5,6 +5,8 @@ import { guestGuard } from './core/guards/guest.guard';
 import { AccountsComponent } from './features/accounts/accounts/accounts';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
+import { TransferComponent } from './features/transfer/transfer/transfer';
+import { TransactionsComponent } from './features/transactions/transactions/transactions';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout';
 import { FeaturePlaceholderComponent } from './shared/components/feature-placeholder/feature-placeholder';
@@ -41,19 +43,11 @@ export const routes: Routes = [
       },
       {
         path: 'transfer',
-        component: FeaturePlaceholderComponent,
-        data: {
-          pageTitle: 'Transfer',
-          pageSubtitle: 'Move money between accounts — Part 7',
-        },
+        component: TransferComponent,
       },
       {
         path: 'transactions',
-        component: FeaturePlaceholderComponent,
-        data: {
-          pageTitle: 'Transactions',
-          pageSubtitle: 'View transaction history — Part 7',
-        },
+        component: TransactionsComponent,
       },
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
     ],

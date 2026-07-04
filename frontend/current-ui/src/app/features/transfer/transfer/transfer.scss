@@ -1,0 +1,133 @@
+@use '../../../../styles/variables' as *;
+
+.transfer-page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
+}
+
+.transfer-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-md;
+}
+
+.transfer-page__title {
+  margin: 0 0 $space-xs;
+  font-size: 28px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.transfer-page__subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.transfer-page__card {
+  max-width: 520px;
+  padding: $space-lg;
+  border-radius: $radius-card;
+  background: $bg-secondary;
+  box-shadow: $shadow-card;
+}
+
+.transfer-page__alert {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.transfer-page__alert--error {
+  background: rgba($color-error, 0.12);
+  color: $color-error;
+}
+
+.transfer-page__alert--success {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  background: rgba($color-success, 0.12);
+  color: $color-success;
+}
+
+.transfer-page__link {
+  color: $color-accent;
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.transfer-page__status {
+  margin: 0;
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.transfer-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.transfer-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.transfer-form__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: $text-secondary;
+}
+
+.transfer-form__input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba($text-secondary, 0.25);
+  background: $bg-primary;
+  color: $text-primary;
+  font-size: 14px;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+  }
+}
+
+.transfer-form__error {
+  font-size: 12px;
+  color: $color-error;
+}
+
+.transfer-form__hint {
+  font-size: 12px;
+  color: $text-secondary;
+}
+
+.transfer-form__submit {
+  padding: 10px 16px;
+  border: none;
+  border-radius: $radius-button;
+  background: $color-primary;
+  color: $text-primary;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+}

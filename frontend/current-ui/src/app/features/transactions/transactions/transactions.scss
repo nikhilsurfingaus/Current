@@ -1,0 +1,175 @@
+@use '../../../../styles/variables' as *;
+
+.transactions-page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
+}
+
+.transactions-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-md;
+}
+
+.transactions-page__title {
+  margin: 0 0 $space-xs;
+  font-size: 28px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.transactions-page__subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.transactions-page__table-card {
+  padding: $space-lg;
+  border-radius: $radius-card;
+  background: $bg-secondary;
+  box-shadow: $shadow-card;
+  overflow-x: auto;
+}
+
+.transactions-page__alert {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.transactions-page__alert--error {
+  background: rgba($color-error, 0.12);
+  color: $color-error;
+}
+
+.transactions-page__status {
+  margin: 0;
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.transactions-page__link {
+  color: $color-accent;
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transactions-table th,
+.transactions-table td {
+  padding: 12px 10px;
+  text-align: left;
+  border-bottom: 1px solid rgba($text-secondary, 0.15);
+}
+
+.transactions-table th {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $text-secondary;
+}
+
+.transactions-table td {
+  font-size: 14px;
+  color: $text-primary;
+}
+
+.transactions-table__row {
+  cursor: pointer;
+
+  &:hover {
+    background: $bg-elevated;
+  }
+}
+
+.transactions-table__row--expanded {
+  background: $bg-elevated;
+}
+
+.transactions-table__expand {
+  width: 32px;
+  text-align: center;
+  color: $text-secondary;
+  font-weight: 600;
+}
+
+.transactions-table__status {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba($text-secondary, 0.15);
+  color: $text-secondary;
+}
+
+.transactions-table__status--completed {
+  background: rgba($color-success, 0.15);
+  color: $color-success;
+}
+
+.transactions-table__status--failed {
+  background: rgba($color-error, 0.15);
+  color: $color-error;
+}
+
+.transactions-table__details-row td {
+  padding: 0;
+  border-bottom: 1px solid rgba($text-secondary, 0.15);
+}
+
+.transactions-table__details {
+  padding: $space-md $space-lg $space-lg;
+  background: $bg-primary;
+}
+
+.transactions-table__details-title {
+  margin: 0 0 $space-sm;
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.transactions-table__details-empty {
+  margin: 0;
+  font-size: 13px;
+  color: $text-secondary;
+}
+
+.transactions-table__ledger-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+}
+
+.transactions-table__ledger-item {
+  display: grid;
+  grid-template-columns: 1fr 80px 120px;
+  gap: $space-md;
+  font-size: 13px;
+  color: $text-primary;
+}
+
+@media (max-width: 900px) {
+  .transactions-table__ledger-item {
+    grid-template-columns: 1fr;
+    gap: $space-xs;
+  }
+}

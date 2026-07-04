@@ -1,0 +1,105 @@
+<div class="transfer-page">
+  <header class="transfer-page__header">
+    <div>
+      <h1 class="transfer-page__title">Transfer</h1>
+      <p class="transfer-page__subtitle">Move money between your accounts</p>
+    </div>
+  </header>
+
+  @if (accountsLoadError()) {
+    <div class="transfer-page__alert transfer-page__alert--error">{{ accountsLoadError() }}</div>
+  }
+
+  @if (transferSuccessMessage()) {
+    <div class="transfer-page__alert transfer-page__alert--success">
+      {{ transferSuccessMessage() }}
+      <a class="transfer-page__link" routerLink="/transactions">View transactions</a>
+    </div>
+  }
+
+  <section class="transfer-page__card">
+    @if (accountsLoading()) {
+      <p class="transfer-page__status">Loading accounts...</p>
+    } @else if (accounts().length < 2) {
+      <p class="transfer-page__status">
+        You need at least two accounts to make a transfer.
+        <a class="transfer-page__link" routerLink="/accounts">Create another account</a>
+      </p>
+    } @else {
+      @if (transferErrorMessage()) {
+        <div class="transfer-page__alert transfer-page__alert--error">{{ transferErrorMessage() }}</div>
+      }
+
+      <form class="transfer-form" [formGroup]="transferForm" (ngSubmit)="onSubmitTransfer()">
+        <div class="transfer-form__field">
+          <label class="transfer-form__label" for="transfer-from">From account</label>
+          <select id="transfer-from" class="transfer-form__input" formControlName="fromAccountId">
+            <option value="" disabled>Select account</option>
+            @for (account of accounts(); track account.id) {
+              <option [value]="account.id">
+                {{ account.name }} ({{ account.currentBalance | currency: account.currency }})
+              </option>
+            }
+          </select>
+          @if (transferFormSubmitted() && transferForm.controls.fromAccountId.invalid) {
+            <span class="transfer-form__error">Select a source account.</span>
+          }
+        </div>
+
+        <div class="transfer-form__field">
+          <label class="transfer-form__label" for="transfer-to">To account</label>
+          <select id="transfer-to" class="transfer-form__input" formControlName="toAccountId">
+            <option value="" disabled>Select account</option>
+            @for (account of accounts(); track account.id) {
+              <option [value]="account.id">
+                {{ account.name }} ({{ account.currentBalance | currency: account.currency }})
+              </option>
+            }
+          </select>
+          @if (transferFormSubmitted() && transferForm.controls.toAccountId.invalid) {
+            <span class="transfer-form__error">Select a destination account.</span>
+          }
+          @if (hasSameAccountError()) {
+            <span class="transfer-form__error">Source and destination must be different.</span>
+          }
+        </div>
+
+        <div class="transfer-form__field">
+          <label class="transfer-form__label" for="transfer-amount">Amount</label>
+          <input
+            id="transfer-amount"
+            class="transfer-form__input"
+            type="number"
+            min="0.01"
+            step="0.01"
+            formControlName="amount"
+          />
+          @if (transferFormSubmitted() && transferForm.controls.amount.invalid) {
+            <span class="transfer-form__error">Enter an amount greater than zero.</span>
+          }
+          @if (selectedFromAccount) {
+            <span class="transfer-form__hint">
+              Available: {{ selectedFromAccount.currentBalance | currency: selectedFromAccount.currency }}
+            </span>
+          }
+        </div>
+
+        <div class="transfer-form__field">
+          <label class="transfer-form__label" for="transfer-description">Description (optional)</label>
+          <input
+            id="transfer-description"
+            class="transfer-form__input"
+            type="text"
+            formControlName="description"
+            placeholder="e.g. Rent payment"
+            maxlength="200"
+          />
+        </div>
+
+        <button class="transfer-form__submit" type="submit" [disabled]="transferRequestInFlight()">
+          {{ transferRequestInFlight() ? 'Transferring...' : 'Transfer funds' }}
+        </button>
+      </form>
+    }
+  </section>
+</div>
