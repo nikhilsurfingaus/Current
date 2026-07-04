@@ -1,0 +1,40 @@
+@use '../../../styles/variables' as *;
+
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $space-lg;
+  padding: $space-lg;
+  background: $bg-primary;
+}
+
+.auth-layout__brand {
+  text-align: center;
+}
+
+.auth-layout__logo {
+  width: 180px;
+  height: auto;
+  margin-bottom: $space-sm;
+}
+
+.auth-layout__tagline {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $color-accent;
+}
+
+.auth-layout__card {
+  width: 100%;
+  max-width: 420px;
+  padding: $space-xl $space-lg;
+  border-radius: $radius-card;
+  background: $bg-secondary;
+  box-shadow: $shadow-card;
+}

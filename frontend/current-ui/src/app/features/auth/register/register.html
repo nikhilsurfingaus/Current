@@ -1,0 +1,101 @@
+<form class="auth-form" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+  <h1 class="auth-form__title">Create account</h1>
+  <p class="auth-form__subtitle">Start managing your money with Current</p>
+
+  @if (registerErrorMessage) {
+    <div class="auth-form__alert">{{ registerErrorMessage }}</div>
+  }
+
+  <div class="auth-form__field">
+    <label class="auth-form__label" for="register-first-name">First name</label>
+    <input
+      id="register-first-name"
+      class="auth-form__input"
+      [class.auth-form__input--invalid]="registerFormSubmitted && registerForm.controls.firstName.invalid"
+      type="text"
+      formControlName="firstName"
+      autocomplete="given-name"
+    />
+    @if (registerFormSubmitted && registerForm.controls.firstName.hasError('required')) {
+      <span class="auth-form__error">First name is required.</span>
+    }
+  </div>
+
+  <div class="auth-form__field">
+    <label class="auth-form__label" for="register-last-name">Last name</label>
+    <input
+      id="register-last-name"
+      class="auth-form__input"
+      [class.auth-form__input--invalid]="registerFormSubmitted && registerForm.controls.lastName.invalid"
+      type="text"
+      formControlName="lastName"
+      autocomplete="family-name"
+    />
+    @if (registerFormSubmitted && registerForm.controls.lastName.hasError('required')) {
+      <span class="auth-form__error">Last name is required.</span>
+    }
+  </div>
+
+  <div class="auth-form__field">
+    <label class="auth-form__label" for="register-email">Email</label>
+    <input
+      id="register-email"
+      class="auth-form__input"
+      [class.auth-form__input--invalid]="registerFormSubmitted && registerForm.controls.email.invalid"
+      type="email"
+      formControlName="email"
+      autocomplete="email"
+    />
+    @if (registerFormSubmitted && registerForm.controls.email.hasError('required')) {
+      <span class="auth-form__error">Email is required.</span>
+    }
+    @if (registerFormSubmitted && registerForm.controls.email.hasError('email')) {
+      <span class="auth-form__error">Enter a valid email address.</span>
+    }
+  </div>
+
+  <div class="auth-form__field">
+    <label class="auth-form__label" for="register-password">Password</label>
+    <input
+      id="register-password"
+      class="auth-form__input"
+      [class.auth-form__input--invalid]="registerFormSubmitted && registerForm.controls.password.invalid"
+      type="password"
+      formControlName="password"
+      autocomplete="new-password"
+    />
+    @if (registerFormSubmitted && registerForm.controls.password.hasError('required')) {
+      <span class="auth-form__error">Password is required.</span>
+    }
+    @if (registerFormSubmitted && registerForm.controls.password.hasError('minlength')) {
+      <span class="auth-form__error">Password must be at least 8 characters.</span>
+    }
+  </div>
+
+  <div class="auth-form__field">
+    <label class="auth-form__label" for="register-confirm-password">Confirm password</label>
+    <input
+      id="register-confirm-password"
+      class="auth-form__input"
+      [class.auth-form__input--invalid]="registerFormSubmitted && registerForm.controls.confirmPassword.invalid"
+      type="password"
+      formControlName="confirmPassword"
+      autocomplete="new-password"
+    />
+    @if (registerFormSubmitted && registerForm.controls.confirmPassword.hasError('required')) {
+      <span class="auth-form__error">Please confirm your password.</span>
+    }
+    @if (registerFormSubmitted && registerForm.controls.confirmPassword.hasError('passwordMismatch')) {
+      <span class="auth-form__error">Passwords do not match.</span>
+    }
+  </div>
+
+  <button class="auth-form__submit" type="submit" [disabled]="registerRequestInFlight">
+    {{ registerRequestInFlight ? 'Creating account...' : 'Register' }}
+  </button>
+
+  <p class="auth-form__footer">
+    Already have an account?
+    <a class="auth-form__link" routerLink="/login">Log in</a>
+  </p>
+</form>
