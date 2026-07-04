@@ -140,8 +140,9 @@ Secure the API with JWT auth and password hashing.
 
 ## Phase 4 — Angular Frontend
 
-**Status:** In progress  
-**Date started:** 2026-07-04
+**Status:** Complete  
+**Date started:** 2026-07-04  
+**Date completed:** 2026-07-05
 
 ### Goal
 `current-ui` Angular app: login, dashboard, accounts, transfers, transactions.
@@ -155,7 +156,7 @@ Secure the API with JWT auth and password hashing.
 - [x] `ApiService` + `HttpClient` wired in `app.config`
 - [x] Brand assets (`brand/`, `public/brand/`)
 - [x] CORS for `http://localhost:4200`
-- [x] Auth, accounts, transfer, transactions pages
+- [x] Dashboard overview page
 - [x] HttpClient services wired to API
 
 ### Notes
@@ -166,6 +167,11 @@ Secure the API with JWT auth and password hashing.
 - Part 5 complete: login + register forms wired to API, logout, error handling
 - Part 6 complete: accounts list + create account UI
 - Part 7 complete: transfer form, transactions list, `TransactionService`
+- Part 8a complete: dashboard (balance summary, accounts, recent activity)
+- Part 8b complete: light split auth layout, form polish (icons, password toggle)
+- Part 8c complete: removed `FeaturePlaceholderComponent`, auth mark + input polish
+- Light app shell: unified design tokens, sidebar + dashboard mock styling across Phase 4 pages
+- Phase 4 complete: full UI flow without Swagger
 
 ---
 

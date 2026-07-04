@@ -1,0 +1,85 @@
+@use 'variables' as *;
+
+@mixin app-card {
+  padding: $space-lg;
+  border-radius: $radius-card;
+  background: $bg-secondary;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-card;
+}
+
+@mixin app-input {
+  padding: 11px 12px;
+  border-radius: $radius-button;
+  border: 1px solid $border-color;
+  background: $bg-secondary;
+  color: $text-primary;
+  font-size: 14px;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px rgba($color-primary, 0.12);
+  }
+}
+
+@mixin app-primary-button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: $radius-button;
+  background: $color-primary;
+  color: $text-on-primary;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    background: $color-primary-hover;
+  }
+}
+
+@mixin app-page-header {
+  margin: 0 0 $space-xs;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: $text-primary;
+}
+
+@mixin app-outline-button {
+  padding: 10px 16px;
+  border: 1px solid #bfdbfe;
+  border-radius: $radius-button;
+  background: $bg-secondary;
+  color: $color-primary;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    background: $bg-active;
+    border-color: $color-primary;
+  }
+}
+
+@mixin app-link {
+  color: $color-primary;
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

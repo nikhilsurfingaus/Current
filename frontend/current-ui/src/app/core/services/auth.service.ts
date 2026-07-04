@@ -3,6 +3,7 @@ import { Observable, tap } from 'rxjs';
 
 import { API_PATHS } from '../config/api-paths';
 import { ApiService } from '../services/api.service';
+import { UserService } from '../services/user.service';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../../shared/models';
 import { AUTH_STORAGE_KEY } from '../auth/auth.constants';
 
@@ -10,7 +11,10 @@ import { AUTH_STORAGE_KEY } from '../auth/auth.constants';
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private userService: UserService,
+  ) {}
 
   login(loginRequest: LoginRequest): Observable<AuthResponse> {
     return this.apiService
@@ -26,6 +30,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem(AUTH_STORAGE_KEY);
+    this.userService.clearCurrentUser();
   }
 
   getToken(): string | null {

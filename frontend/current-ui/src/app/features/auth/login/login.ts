@@ -4,12 +4,14 @@ import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
+import { AuthMarkComponent } from '../../../shared/components/auth-mark/auth-mark';
 import { ApiError } from '../../../shared/models';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, AuthMarkComponent],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
@@ -17,6 +19,7 @@ export class LoginComponent {
   loginFormSubmitted = signal(false);
   loginErrorMessage = signal('');
   loginRequestInFlight = signal(false);
+  passwordVisible = signal(false);
 
   loginForm = new FormGroup({
     email: new FormControl('', {
@@ -31,8 +34,13 @@ export class LoginComponent {
 
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private router: Router,
   ) {}
+
+  togglePasswordVisible(): void {
+    this.passwordVisible.update((visible) => !visible);
+  }
 
   onSubmit(): void {
     this.loginFormSubmitted.set(true);
@@ -48,7 +56,10 @@ export class LoginComponent {
     this.authService.login(loginRequest).subscribe({
       next: () => {
         this.loginRequestInFlight.set(false);
-        this.router.navigate(['/dashboard']);
+        this.userService.loadCurrentUser().subscribe({
+          next: () => this.router.navigate(['/dashboard']),
+          error: () => this.router.navigate(['/dashboard']),
+        });
       },
       error: (error: HttpErrorResponse) => {
         this.loginRequestInFlight.set(false);

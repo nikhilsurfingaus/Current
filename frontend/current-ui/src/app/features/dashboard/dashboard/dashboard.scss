@@ -1,0 +1,297 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
+}
+
+.dashboard-page__alert {
+  padding: 10px 12px;
+  border-radius: $radius-button;
+  font-size: 13px;
+}
+
+.dashboard-page__alert--error {
+  background: rgba($color-error, 0.08);
+  color: $color-error;
+  border: 1px solid rgba($color-error, 0.15);
+}
+
+.dashboard-page__status,
+.dashboard-page__empty {
+  margin: 0;
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.dashboard-page__inline-link,
+.dashboard-page__card-link,
+.dashboard-stat-card__link {
+  @include app-link;
+}
+
+.dashboard-page__card-link,
+.dashboard-stat-card__link {
+  font-size: 13px;
+}
+
+.dashboard-page__top-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-md;
+}
+
+.dashboard-hero-card,
+.dashboard-stat-card,
+.dashboard-quick-card,
+.dashboard-page__card {
+  @include app-card;
+}
+
+.dashboard-hero-card__label,
+.dashboard-quick-card__label {
+  margin: 0 0 $space-sm;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $text-secondary;
+}
+
+.dashboard-hero-card__body {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: $space-md;
+}
+
+.dashboard-hero-card__value {
+  margin: 0;
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: $text-primary;
+}
+
+.dashboard-hero-card__meta {
+  margin: $space-xs 0 0;
+  font-size: 13px;
+  color: $text-secondary;
+}
+
+.dashboard-hero-card__chart {
+  flex-shrink: 0;
+  width: 120px;
+  height: 48px;
+  overflow: hidden;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.dashboard-stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dashboard-stat-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: $space-xs;
+  border-radius: 10px;
+  background: $bg-active;
+  color: $color-primary;
+}
+
+.dashboard-stat-card__value {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: $text-primary;
+}
+
+.dashboard-stat-card__label {
+  margin: 0 0 $space-sm;
+  font-size: 13px;
+  color: $text-secondary;
+}
+
+.dashboard-stat-card__link {
+  margin-top: auto;
+}
+
+.dashboard-quick-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+}
+
+.dashboard-quick-action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: $radius-button;
+  background: $bg-active;
+  color: $color-primary;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 150ms ease;
+
+  &:visited {
+    color: $color-primary;
+  }
+
+  &:hover {
+    background: #dbeafe;
+    text-decoration: none;
+  }
+}
+
+.dashboard-quick-action__icon {
+  display: inline-flex;
+}
+
+.dashboard-page__columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $space-md;
+}
+
+.dashboard-page__card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-md;
+  margin-bottom: $space-md;
+}
+
+.dashboard-page__card-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.dashboard-account-list,
+.dashboard-activity-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-account-list__item,
+.dashboard-activity-list__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-md;
+  padding: 14px 0;
+  border-bottom: 1px solid $border-color;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  &:first-child {
+    padding-top: 0;
+  }
+}
+
+.dashboard-account-list__leading,
+.dashboard-activity-list__leading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.dashboard-account-list__trailing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.dashboard-account-list__icon,
+.dashboard-activity-list__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: $bg-active;
+  color: $color-primary;
+  flex-shrink: 0;
+}
+
+.dashboard-account-list__name,
+.dashboard-activity-list__description {
+  margin: 0 0 2px;
+  font-size: 14px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.dashboard-account-list__type,
+.dashboard-activity-list__meta {
+  margin: 0;
+  font-size: 12px;
+  color: $text-secondary;
+}
+
+.dashboard-account-list__balance,
+.dashboard-activity-list__amount {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: $text-primary;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.dashboard-account-list__chevron {
+  font-size: 18px;
+  color: $text-secondary;
+  line-height: 1;
+}
+
+.dashboard-activity-list__amount-block {
+  text-align: right;
+}
+
+.dashboard-activity-list__status {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba($color-success, 0.12);
+  color: $color-success;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-page__top-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 960px) {
+  .dashboard-page__columns {
+    grid-template-columns: 1fr;
+  }
+}

@@ -7,30 +7,34 @@
 }
 
 .sidebar {
-  width: 240px;
+  width: $sidebar-width;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: $space-lg;
   padding: $space-lg $space-md;
   background: $bg-secondary;
-  border-right: 1px solid rgba($text-secondary, 0.15);
+  border-right: 1px solid $border-color;
 }
 
 .sidebar__logo {
-  width: 140px;
+  width: 132px;
   height: auto;
+  margin-bottom: $space-xl;
 }
 
 .sidebar__nav {
   display: flex;
   flex-direction: column;
   gap: $space-xs;
+  flex: 1;
 }
 
 .sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: $radius-button;
   color: $text-secondary;
   font-size: 14px;
   font-weight: 500;
@@ -44,10 +48,63 @@
 }
 
 .sidebar__link--active {
-  background: rgba($color-primary, 0.15);
+  background: $bg-active;
+  color: $color-primary;
+
+  .sidebar__icon {
+    color: $color-primary;
+  }
+}
+
+.sidebar__icon {
+  display: inline-flex;
+  color: $text-secondary;
+}
+
+.sidebar__user {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  margin-top: $space-lg;
+  padding-top: $space-lg;
+  border-top: 1px solid $border-color;
+}
+
+.sidebar__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: $text-primary;
+  color: $text-on-primary;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.sidebar__user-text {
+  min-width: 0;
+}
+
+.sidebar__user-name {
+  margin: 0 0 2px;
+  font-size: 13px;
+  font-weight: 600;
   color: $text-primary;
-  border-left: 3px solid $color-primary;
-  padding-left: 9px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar__user-email {
+  margin: 0;
+  font-size: 11px;
+  color: $text-secondary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .main-layout__content {
@@ -59,35 +116,122 @@
 
 .topbar {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: $space-md;
-  padding: $space-md $space-lg;
-  border-bottom: 1px solid rgba($text-secondary, 0.15);
+  padding: $space-lg $space-xl $space-md;
+  background: $bg-primary;
+  border-bottom: 1px solid $border-color;
 }
 
-.topbar__email {
+.topbar__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.topbar__title {
+  margin: 0;
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: $text-primary;
+}
+
+.topbar__subtitle {
+  margin: 0;
   font-size: 14px;
   color: $text-secondary;
 }
 
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
 .topbar__logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 8px 14px;
+  border: 1px solid $border-color;
   border-radius: $radius-button;
-  border: 1px solid rgba($text-secondary, 0.35);
-  background: transparent;
-  color: $text-primary;
+  background: $bg-secondary;
+  color: $text-secondary;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 150ms ease;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+
+  svg {
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
 
   &:hover {
     background: $bg-elevated;
+    color: $text-primary;
+    border-color: #d1d5db;
   }
 }
 
 .page {
   flex: 1;
-  padding: $space-lg;
+  padding: 0 $space-xl $space-lg;
+}
+
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: $space-md $space-xl $space-lg;
+  font-size: 12px;
+  color: $text-secondary;
+  position: relative;
+}
+
+.app-footer__dot {
+  opacity: 0.6;
+}
+
+.app-footer__copy {
+  position: absolute;
+  right: $space-xl;
+}
+
+@media (max-width: 900px) {
+  .main-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid $border-color;
+  }
+
+  .sidebar__nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex: none;
+  }
+
+  .sidebar__user {
+    display: none;
+  }
+
+  .topbar,
+  .page {
+    padding-left: $space-lg;
+    padding-right: $space-lg;
+  }
+
+  .app-footer__copy {
+    position: static;
+    margin-left: auto;
+  }
 }

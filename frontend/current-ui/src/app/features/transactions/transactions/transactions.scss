@@ -1,4 +1,6 @@
 @use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+@use '../../../../styles/page-shell' as shell;
 
 .transactions-page {
   display: flex;
@@ -14,35 +16,28 @@
 }
 
 .transactions-page__title {
-  margin: 0 0 $space-xs;
-  font-size: 28px;
-  font-weight: 600;
-  color: $text-primary;
+  @include shell.page-title;
 }
 
 .transactions-page__subtitle {
-  margin: 0;
-  font-size: 14px;
-  color: $text-secondary;
+  @include shell.page-subtitle;
 }
 
 .transactions-page__table-card {
-  padding: $space-lg;
-  border-radius: $radius-card;
-  background: $bg-secondary;
-  box-shadow: $shadow-card;
+  @include app-card;
   overflow-x: auto;
 }
 
 .transactions-page__alert {
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: $radius-button;
   font-size: 13px;
 }
 
 .transactions-page__alert--error {
-  background: rgba($color-error, 0.12);
+  background: rgba($color-error, 0.08);
   color: $color-error;
+  border: 1px solid rgba($color-error, 0.15);
 }
 
 .transactions-page__status {
@@ -52,13 +47,7 @@
 }
 
 .transactions-page__link {
-  color: $color-accent;
-  text-decoration: none;
-  font-weight: 500;
-
-  &:hover {
-    text-decoration: underline;
-  }
+  @include app-link;
 }
 
 .transactions-table {
@@ -68,9 +57,9 @@
 
 .transactions-table th,
 .transactions-table td {
-  padding: 12px 10px;
+  padding: 14px 10px;
   text-align: left;
-  border-bottom: 1px solid rgba($text-secondary, 0.15);
+  border-bottom: 1px solid $border-color;
 }
 
 .transactions-table th {
@@ -110,24 +99,24 @@
   padding: 2px 8px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 500;
-  background: rgba($text-secondary, 0.15);
+  font-weight: 600;
+  background: $bg-elevated;
   color: $text-secondary;
 }
 
 .transactions-table__status--completed {
-  background: rgba($color-success, 0.15);
+  background: rgba($color-success, 0.12);
   color: $color-success;
 }
 
 .transactions-table__status--failed {
-  background: rgba($color-error, 0.15);
+  background: rgba($color-error, 0.12);
   color: $color-error;
 }
 
 .transactions-table__details-row td {
   padding: 0;
-  border-bottom: 1px solid rgba($text-secondary, 0.15);
+  border-bottom: 1px solid $border-color;
 }
 
 .transactions-table__details {

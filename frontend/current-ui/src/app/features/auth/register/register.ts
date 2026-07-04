@@ -9,13 +9,15 @@ import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
+import { AuthMarkComponent } from '../../../shared/components/auth-mark/auth-mark';
 import { ApiError } from '../../../shared/models';
 import { passwordMatchValidator } from './password-match.validator';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, AuthMarkComponent],
   templateUrl: './register.html',
   styleUrl: './register.scss',
 })
@@ -23,6 +25,8 @@ export class RegisterComponent {
   registerFormSubmitted = signal(false);
   registerErrorMessage = signal('');
   registerRequestInFlight = signal(false);
+  passwordVisible = signal(false);
+  confirmPasswordVisible = signal(false);
 
   registerForm = new FormGroup({
     firstName: new FormControl('', {
@@ -49,8 +53,17 @@ export class RegisterComponent {
 
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private router: Router,
   ) {}
+
+  togglePasswordVisible(): void {
+    this.passwordVisible.update((visible) => !visible);
+  }
+
+  toggleConfirmPasswordVisible(): void {
+    this.confirmPasswordVisible.update((visible) => !visible);
+  }
 
   onSubmit(): void {
     this.registerFormSubmitted.set(true);
@@ -73,7 +86,10 @@ export class RegisterComponent {
     this.authService.register(registerRequest).subscribe({
       next: () => {
         this.registerRequestInFlight.set(false);
-        this.router.navigate(['/dashboard']);
+        this.userService.loadCurrentUser().subscribe({
+          next: () => this.router.navigate(['/dashboard']),
+          error: () => this.router.navigate(['/dashboard']),
+        });
       },
       error: (error: HttpErrorResponse) => {
         this.registerRequestInFlight.set(false);

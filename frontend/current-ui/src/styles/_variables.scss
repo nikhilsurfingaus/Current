@@ -1,22 +1,28 @@
-// Current — Deep Ocean palette
+// Current — Light app shell (matches auth + dashboard mock)
 
-$bg-primary: #08131f;
-$bg-secondary: #10263f;
-$bg-elevated: #152d4a;
+$bg-primary: #f9fafb;
+$bg-secondary: #ffffff;
+$bg-elevated: #f3f4f6;
+$bg-active: #eff6ff;
+
+$border-color: #e5e7eb;
+$border-color-strong: #d1d5db;
 
 $color-primary: #2f80ed;
-$color-accent: #4cc9f0;
+$color-primary-hover: #2563eb;
+$color-accent: #2f80ed;
 
-$color-success: #22c55e;
-$color-error: #ef4444;
+$color-success: #16a34a;
+$color-error: #dc2626;
 
-$text-primary: #f8fafc;
-$text-secondary: #94a3b8;
+$text-primary: #0f172a;
+$text-secondary: #64748b;
+$text-on-primary: #ffffff;
 
-$radius-card: 12px;
-$radius-button: 12px;
+$radius-card: 14px;
+$radius-button: 10px;
 
-$shadow-card: 0 4px 24px rgba(0, 0, 0, 0.25);
+$shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06);
 
 $font-family: 'Inter', system-ui, -apple-system, sans-serif;
 
@@ -25,3 +31,5 @@ $space-sm: 8px;
 $space-md: 16px;
 $space-lg: 24px;
 $space-xl: 32px;
+
+$sidebar-width: 248px;

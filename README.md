@@ -13,7 +13,7 @@ A full-stack personal finance platform built with Angular and ASP.NET Core.
 ## Status
 
 **Phase 3:** Authentication — complete  
-**Phase 4:** Angular frontend — in progress (Part 1 complete)
+**Phase 4:** Angular frontend — complete
 
 See [Release Log](docs/RELEASE_LOG.md) for full phase-by-phase progress.
 

@@ -1,0 +1,155 @@
+<div class="dashboard-page">
+  @if (dashboardLoadError()) {
+    <div class="dashboard-page__alert dashboard-page__alert--error">{{ dashboardLoadError() }}</div>
+  }
+
+  @if (dashboardLoading()) {
+    <p class="dashboard-page__status">Loading dashboard...</p>
+  } @else {
+    <section class="dashboard-page__top-grid">
+      @if (currencyBalanceTotals().length > 0) {
+        <article class="dashboard-hero-card">
+          <p class="dashboard-hero-card__label">Total balance</p>
+          <div class="dashboard-hero-card__body">
+            <div>
+              <p class="dashboard-hero-card__value">
+                {{ currencyBalanceTotals()[0].totalBalance | currency: currencyBalanceTotals()[0].currency }}
+              </p>
+              <p class="dashboard-hero-card__meta">
+                Across {{ accounts().length }} {{ accounts().length === 1 ? 'account' : 'accounts' }}
+              </p>
+            </div>
+            <div class="dashboard-hero-card__chart" aria-hidden="true">
+              <svg width="120" height="48" viewBox="0 0 120 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M2 38 L22 30 L42 34 L62 20 L82 24 L102 14 L118 10"
+                  stroke="#2F80ED"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  fill="none"
+                />
+              </svg>
+            </div>
+          </div>
+        </article>
+      }
+
+      <article class="dashboard-stat-card">
+        <span class="dashboard-stat-card__icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+        </span>
+        <p class="dashboard-stat-card__value">{{ accounts().length }}</p>
+        <p class="dashboard-stat-card__label">Total accounts</p>
+        <a class="dashboard-stat-card__link" routerLink="/accounts">View all accounts →</a>
+      </article>
+
+      <article class="dashboard-quick-card">
+        <p class="dashboard-quick-card__label">Quick actions</p>
+        <div class="dashboard-quick-card__actions">
+          <a class="dashboard-quick-action" routerLink="/transfer">
+            <span class="dashboard-quick-action__icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M7 8l5-4 5 4M7 16l5 4 5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+            </span>
+            Transfer money
+          </a>
+          <a class="dashboard-quick-action" routerLink="/accounts">
+            <span class="dashboard-quick-action__icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+            </span>
+            Add account
+          </a>
+        </div>
+      </article>
+    </section>
+
+    <div class="dashboard-page__columns">
+      <section class="dashboard-page__card">
+        <div class="dashboard-page__card-header">
+          <h2 class="dashboard-page__card-title">Your accounts</h2>
+          <a class="dashboard-page__card-link" routerLink="/accounts">Manage</a>
+        </div>
+
+        @if (accounts().length === 0) {
+          <p class="dashboard-page__empty">
+            No accounts yet.
+            <a class="dashboard-page__inline-link" routerLink="/accounts">Create your first account</a>
+          </p>
+        } @else {
+          <ul class="dashboard-account-list">
+            @for (account of accounts(); track account.id) {
+              <li class="dashboard-account-list__item">
+                <div class="dashboard-account-list__leading">
+                  <span class="dashboard-account-list__icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.5" />
+                    </svg>
+                  </span>
+                  <div>
+                    <p class="dashboard-account-list__name">{{ account.name }}</p>
+                    <p class="dashboard-account-list__type">{{ getAccountTypeLabel(account.accountType) }}</p>
+                  </div>
+                </div>
+                <div class="dashboard-account-list__trailing">
+                  <p class="dashboard-account-list__balance">
+                    {{ account.currentBalance | currency: account.currency }}
+                  </p>
+                  <span class="dashboard-account-list__chevron" aria-hidden="true">›</span>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="dashboard-page__card">
+        <div class="dashboard-page__card-header">
+          <h2 class="dashboard-page__card-title">Recent activity</h2>
+          <a class="dashboard-page__card-link" routerLink="/transactions">View all</a>
+        </div>
+
+        @if (recentTransactions().length === 0) {
+          <p class="dashboard-page__empty">
+            No transactions yet.
+            <a class="dashboard-page__inline-link" routerLink="/transfer">Make a transfer</a>
+          </p>
+        } @else {
+          <ul class="dashboard-activity-list">
+            @for (transaction of recentTransactions(); track transaction.id) {
+              <li class="dashboard-activity-list__item">
+                <div class="dashboard-activity-list__leading">
+                  <span class="dashboard-activity-list__icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path d="M7 8l5-4 5 4M7 16l5 4 5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                  </span>
+                  <div>
+                    <p class="dashboard-activity-list__description">
+                      {{ transaction.description || 'Transfer' }}
+                    </p>
+                    <p class="dashboard-activity-list__meta">
+                      {{ getAccountName(transaction.fromAccountId) }} →
+                      {{ getAccountName(transaction.toAccountId) }}
+                    </p>
+                  </div>
+                </div>
+                <div class="dashboard-activity-list__amount-block">
+                  <p class="dashboard-activity-list__amount">
+                    {{ transaction.amount | currency: getAccountCurrency(transaction.fromAccountId) }}
+                  </p>
+                  <span class="dashboard-activity-list__status">{{ getTransactionStatusLabel(transaction.status) }}</span>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    </div>
+  }
+</div>

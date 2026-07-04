@@ -1,4 +1,6 @@
 @use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+@use '../../../../styles/page-shell' as shell;
 
 .transfer-page {
   display: flex;
@@ -14,53 +16,41 @@
 }
 
 .transfer-page__title {
-  margin: 0 0 $space-xs;
-  font-size: 28px;
-  font-weight: 600;
-  color: $text-primary;
+  @include shell.page-title;
 }
 
 .transfer-page__subtitle {
-  margin: 0;
-  font-size: 14px;
-  color: $text-secondary;
+  @include shell.page-subtitle;
 }
 
 .transfer-page__card {
   max-width: 520px;
-  padding: $space-lg;
-  border-radius: $radius-card;
-  background: $bg-secondary;
-  box-shadow: $shadow-card;
+  @include app-card;
 }
 
 .transfer-page__alert {
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: $radius-button;
   font-size: 13px;
 }
 
 .transfer-page__alert--error {
-  background: rgba($color-error, 0.12);
+  background: rgba($color-error, 0.08);
   color: $color-error;
+  border: 1px solid rgba($color-error, 0.15);
 }
 
 .transfer-page__alert--success {
   display: flex;
   align-items: center;
   gap: $space-sm;
-  background: rgba($color-success, 0.12);
+  background: rgba($color-success, 0.08);
   color: $color-success;
+  border: 1px solid rgba($color-success, 0.15);
 }
 
 .transfer-page__link {
-  color: $color-accent;
-  text-decoration: none;
-  font-weight: 500;
-
-  &:hover {
-    text-decoration: underline;
-  }
+  @include app-link;
 }
 
 .transfer-page__status {
@@ -84,21 +74,11 @@
 .transfer-form__label {
   font-size: 13px;
   font-weight: 500;
-  color: $text-secondary;
+  color: $text-primary;
 }
 
 .transfer-form__input {
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba($text-secondary, 0.25);
-  background: $bg-primary;
-  color: $text-primary;
-  font-size: 14px;
-
-  &:focus {
-    outline: none;
-    border-color: $color-primary;
-  }
+  @include app-input;
 }
 
 .transfer-form__error {
@@ -112,22 +92,5 @@
 }
 
 .transfer-form__submit {
-  padding: 10px 16px;
-  border: none;
-  border-radius: $radius-button;
-  background: $color-primary;
-  color: $text-primary;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 150ms ease;
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  &:hover:not(:disabled) {
-    opacity: 0.9;
-  }
+  @include app-primary-button;
 }

@@ -1,13 +1,14 @@
 <div class="accounts-page">
   <header class="accounts-page__header">
-    <div>
-      <h1 class="accounts-page__title">Accounts</h1>
-      <p class="accounts-page__subtitle">View and manage your accounts</p>
-    </div>
+    <h1 class="accounts-page__title">Accounts</h1>
+  </header>
+
+  <div class="accounts-page__intro">
+    <p class="accounts-page__subtitle">View and manage your accounts</p>
     <button class="accounts-page__create-btn" type="button" (click)="openCreatePanel()">
       Create account
     </button>
-  </header>
+  </div>
 
   @if (accountsLoadError()) {
     <div class="accounts-page__alert accounts-page__alert--error">{{ accountsLoadError() }}</div>
