@@ -5,20 +5,22 @@ A full-stack personal finance platform built with Angular and ASP.NET Core.
 ## Structure
 
 - `backend/` — ASP.NET Core API
-- `frontend/` — Angular UI (Phase 4+)
+- `frontend/current-ui/` — Angular app (`current-ui`)
+- `brand/` — Logo source files
 - `database/` — SQL scripts and seeds
 - `docs/` — Project documentation
 
 ## Status
 
 **Phase 3:** Authentication — complete  
-**Phase 4:** Angular frontend — next
+**Phase 4:** Angular frontend — in progress (Part 1 complete)
 
 See [Release Log](docs/RELEASE_LOG.md) for full phase-by-phase progress.
 
 ## Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [Node.js 20+](https://nodejs.org/) (Angular CLI via `npm` in `frontend/current-ui`)
 - [PostgreSQL 17](https://formulae.brew.sh/formula/postgresql@17) via Homebrew
 
 ```bash
@@ -53,6 +55,22 @@ Swagger: http://localhost:5231/swagger
 
 Protected endpoints require a JWT. In Swagger: `POST /auth/login` → copy `token` → **Authorize** → `Bearer <token>`.
 
+### Frontend (Phase 4)
+
+From the project root:
+
+```bash
+make ui
+```
+
+UI: http://localhost:4200
+
+Install dependencies first (once):
+
+```bash
+cd frontend/current-ui && npm install
+```
+
 ### Other commands
 
 | Command | Description |
@@ -62,6 +80,8 @@ Protected endpoints require a JWT. In Swagger: `POST /auth/login` → copy `toke
 | `make db-down` | Stop Postgres background service |
 | `make migrate` | Apply pending EF migrations |
 | `make build` | Build the API |
+| `make ui` | Run Angular dev server |
+| `make build-ui` | Build Angular app |
 
 ## API endpoints
 

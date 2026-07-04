@@ -1,0 +1,8 @@
+@use 'styles/variables' as *;
+@use 'styles/typography';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}

@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerDocumentation();
+builder.Services.AddFrontendCors();
 builder.Services.AddApplicationServices(builder.Configuration);
 
 var app = builder.Build();
@@ -18,6 +19,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors(CorsExtensions.FrontendPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

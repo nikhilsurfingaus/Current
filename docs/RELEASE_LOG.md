@@ -140,19 +140,24 @@ Secure the API with JWT auth and password hashing.
 
 ## Phase 4 — Angular Frontend
 
-**Status:** Not started
+**Status:** In progress  
+**Date started:** 2026-07-04
 
 ### Goal
 `current-ui` Angular app: login, dashboard, accounts, transfers, transactions.
 
 ### Delivered
-- [ ] Angular app (`ng new current-ui --style=scss`)
-- [ ] Feature-based structure (`core/`, `shared/`, `features/`, `layouts/`)
+- [x] Angular app (`ng new current-ui --style=scss`)
+- [x] Feature-based structure (`core/`, `shared/`, `features/`, `layouts/`)
+- [x] Deep ocean design tokens (`src/styles/_variables.scss`)
+- [x] Environment config (`apiUrl` → `http://localhost:5231`)
+- [x] Brand assets (`brand/`, `public/brand/`)
+- [x] CORS for `http://localhost:4200`
 - [ ] Auth, dashboard, accounts, transactions pages
 - [ ] HttpClient services wired to API
 
 ### Notes
-—
+- Part 1 complete: scaffold, theme shell, CORS, folder structure
 
 ---
 

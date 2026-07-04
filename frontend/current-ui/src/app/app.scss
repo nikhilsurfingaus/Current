@@ -1,0 +1,61 @@
+@use '../styles/variables' as *;
+
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-lg;
+  background: $bg-primary;
+}
+
+.shell-card {
+  width: 100%;
+  max-width: 420px;
+  padding: $space-xl $space-lg;
+  border-radius: $radius-card;
+  background: $bg-secondary;
+  box-shadow: $shadow-card;
+  text-align: center;
+}
+
+.logo {
+  width: 200px;
+  height: auto;
+  margin: 0 auto $space-lg;
+  display: block;
+}
+
+.tagline {
+  margin-bottom: $space-sm;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $color-accent;
+}
+
+.heading {
+  margin-bottom: $space-sm;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.subtitle {
+  margin-bottom: $space-lg;
+  color: $text-secondary;
+}
+
+.status {
+  display: inline-block;
+  padding: $space-sm $space-md;
+  border-radius: $radius-button;
+  border: 1px solid rgba($color-primary, 0.35);
+  color: $text-secondary;
+  font-size: 13px;
+}
