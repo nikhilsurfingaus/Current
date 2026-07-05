@@ -20,3 +20,15 @@ export enum LedgerEntryType {
   Debit = 0,
   Credit = 1,
 }
+
+export enum GoalStatus {
+  Active = 0,
+  Completed = 1,
+  Cancelled = 2,
+}
+
+export enum ContributionType {
+  Deposit = 0,
+  Withdrawal = 1,
+  Adjustment = 2,
+}

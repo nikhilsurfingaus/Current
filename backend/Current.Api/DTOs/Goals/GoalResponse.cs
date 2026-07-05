@@ -30,6 +30,8 @@ public class GoalResponse
 
     public GoalStatus Status { get; set; }
 
+    public string IconKey { get; set; } = string.Empty;
+
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }

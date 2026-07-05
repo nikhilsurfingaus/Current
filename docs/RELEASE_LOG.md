@@ -210,6 +210,7 @@ Savings goals and contributions with ledger-backed allocations.
 ### Notes
 - Part 1 complete: schema, DTOs, mappings, migration
 - Part 2 complete: goal service, controller, transfers + contribution history in one DB transaction
+- `IconKey` on goals: preset keys (`default`, `vacation`, `home`, `emergency`, `car`, `gaming`, `investment`, `education`); frontend `GoalIconComponent` + `goal-icon-options.ts`
 
 ---
 

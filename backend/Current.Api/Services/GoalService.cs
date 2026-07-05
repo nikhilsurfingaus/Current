@@ -1,3 +1,4 @@
+using Current.Api.Common.Constants;
 using Current.Api.Common.Enums;
 using Current.Api.Data;
 using Current.Api.DTOs.Goals;
@@ -93,6 +94,7 @@ public class GoalService : IGoalService
             Currency = goalCurrency,
             TargetDate = request.TargetDate,
             Status = GoalStatus.Active,
+            IconKey = GoalIconKeys.Normalize(request.IconKey),
             CreatedAt = utcNow,
             UpdatedAt = utcNow
         };
@@ -134,6 +136,11 @@ public class GoalService : IGoalService
         goal.TargetAmount = request.TargetAmount;
         goal.TargetDate = request.TargetDate;
         goal.Status = request.Status;
+        if (request.IconKey is not null)
+        {
+            goal.IconKey = GoalIconKeys.Normalize(request.IconKey);
+        }
+
         goal.UpdatedAt = DateTime.UtcNow;
 
         var goalAccount = await _dbContext.Accounts

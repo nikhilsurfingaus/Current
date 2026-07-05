@@ -13,4 +13,6 @@ public class CreateGoalRequest
     public Guid SourceAccountId { get; set; }
 
     public DateOnly? TargetDate { get; set; }
+
+    public string? IconKey { get; set; }
 }

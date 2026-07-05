@@ -13,4 +13,6 @@ public class UpdateGoalRequest
     public DateOnly? TargetDate { get; set; }
 
     public GoalStatus Status { get; set; }
+
+    public string? IconKey { get; set; }
 }

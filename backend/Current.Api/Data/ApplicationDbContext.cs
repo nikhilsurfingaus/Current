@@ -158,6 +158,10 @@ public class ApplicationDbContext : DbContext
                 .HasMaxLength(50)
                 .IsRequired();
 
+            entity.Property(goal => goal.IconKey)
+                .HasMaxLength(50)
+                .IsRequired();
+
             entity.HasOne(goal => goal.User)
                 .WithMany(user => user.Goals)
                 .HasForeignKey(goal => goal.UserId)

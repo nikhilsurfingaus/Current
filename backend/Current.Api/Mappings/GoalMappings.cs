@@ -27,6 +27,7 @@ public static class GoalMappings
             Currency = goal.Currency,
             TargetDate = goal.TargetDate,
             Status = goal.Status,
+            IconKey = goal.IconKey,
             CreatedAt = goal.CreatedAt,
             UpdatedAt = goal.UpdatedAt
         };
