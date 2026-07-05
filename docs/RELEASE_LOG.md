@@ -190,13 +190,26 @@ Savings goals and contributions with ledger-backed allocations.
 - [x] Goal DTOs (`Create`, `Update`, `Contribute`, `Withdraw`, responses)
 - [x] `GoalMappings` and `GoalContributionMappings`
 - [x] `AddGoalsAndGoalContributions` migration
-- [ ] Goals CRUD + contribute endpoints (Part 2)
+- [x] `IGoalService` / `GoalService` with ledger-backed contribute & withdraw
+- [x] `GoalsController` — CRUD, contribute, withdraw, history
+- [x] Goal create auto-provisions linked `GoalAccount` (Savings)
 - [ ] Goals UI (list, detail, progress) (Part 3–4)
+
+### Endpoints
+| Method | Route | Status |
+|--------|-------|--------|
+| GET | `/goals` | ✅ |
+| GET | `/goals/{id}` | ✅ |
+| POST | `/goals` | ✅ |
+| PUT | `/goals/{id}` | ✅ |
+| DELETE | `/goals/{id}` | ✅ (soft cancel) |
+| POST | `/goals/{id}/contribute` | ✅ |
+| POST | `/goals/{id}/withdraw` | ✅ |
+| GET | `/goals/{id}/history` | ✅ |
 
 ### Notes
 - Part 1 complete: schema, DTOs, mappings, migration
-- `CurrentAmount` cached on `Goal`; contributions table is audit source of truth (reconciled in Part 2)
-- Soft cancel via `GoalStatus.Cancelled` (no physical delete)
+- Part 2 complete: goal service, controller, transfers + contribution history in one DB transaction
 
 ---
 
