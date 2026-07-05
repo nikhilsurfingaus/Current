@@ -32,6 +32,7 @@ export class DashboardComponent implements OnInit {
 
   readonly getAccountTypeLabel = getAccountTypeLabel;
   readonly getTransactionStatusLabel = getTransactionStatusLabel;
+  readonly goalStatus = GoalStatus;
 
   userFacingAccounts = computed(() => filterNonGoalAccounts(this.accounts(), this.goals()));
 

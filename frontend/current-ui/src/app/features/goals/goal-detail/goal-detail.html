@@ -90,6 +90,7 @@
         <div class="goal-detail-page__progress-track">
           <div
             class="goal-detail-page__progress-fill"
+            [class.goal-detail-page__progress-fill--completed]="currentGoal.status === goalStatus.Completed"
             [style.width.%]="currentGoal.progressPercent"
           ></div>
         </div>
@@ -99,7 +100,17 @@
       </div>
 
       <div class="goal-detail-page__meta">
-        <span>Funding account: {{ sourceAccountName() }}</span>
+        <span class="goal-detail-page__meta-item">
+          Funding account:
+          @if (fundingAccount(); as account) {
+            {{ account.name }}
+            <strong class="goal-detail-page__meta-balance">
+              ({{ account.currentBalance | currency: account.currency }} available)
+            </strong>
+          } @else {
+            Unknown account
+          }
+        </span>
         @if (currentGoal.targetDate) {
           <span>Target date: {{ currentGoal.targetDate | date: 'mediumDate' }}</span>
         }
@@ -116,6 +127,13 @@
         </div>
 
         <form class="goal-detail-form" [formGroup]="contributeForm" (ngSubmit)="onContribute()">
+          @if (fundingAccount(); as account) {
+            <p class="goal-detail-form__hint">
+              Available in {{ account.name }}:
+              <strong>{{ account.currentBalance | currency: account.currency }}</strong>
+            </p>
+          }
+
           <div class="goal-detail-form__field">
             <label class="goal-detail-form__label" for="contribute-amount">Amount</label>
             <input

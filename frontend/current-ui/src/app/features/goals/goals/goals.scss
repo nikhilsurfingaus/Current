@@ -216,13 +216,15 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: $space-md;
+  align-items: stretch;
 }
 
 .goal-card {
   @include app-card;
   display: flex;
   flex-direction: column;
-  gap: $space-md;
+  gap: $space-sm;
+  height: 100%;
   text-decoration: none;
   color: inherit;
   transition: box-shadow 150ms ease, transform 150ms ease;
@@ -238,6 +240,7 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
+  min-height: 52px;
 }
 
 .goal-card__heading {
@@ -252,6 +255,10 @@
   font-size: 16px;
   font-weight: 700;
   color: $text-primary;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .goal-card__status {
@@ -279,9 +286,23 @@
 
 .goal-card__description {
   margin: 0;
+  min-height: 2.6em;
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.3;
   color: $text-secondary;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  &:empty::before {
+    content: '\00a0';
+  }
+}
+
+.goal-card__progress {
+  display: flex;
+  flex-direction: column;
 }
 
 .goal-card__progress-track {
@@ -295,7 +316,11 @@
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, $color-primary, #60a5fa);
-  transition: width 300ms ease;
+  transition: width 300ms ease, background 300ms ease;
+}
+
+.goal-card__progress-fill--completed {
+  background: linear-gradient(90deg, $color-success, #34d399);
 }
 
 .goal-card__progress-meta {
@@ -310,9 +335,17 @@
 .goal-card__footer {
   display: flex;
   justify-content: space-between;
+  align-items: flex-end;
   gap: $space-sm;
+  margin-top: auto;
+  min-height: 1.2em;
   font-size: 12px;
   color: $text-secondary;
+}
+
+.goal-card__target-date {
+  text-align: right;
+  white-space: nowrap;
 }
 
 @media (max-width: 720px) {

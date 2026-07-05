@@ -13,12 +13,12 @@ import {
 } from '../../../shared/constants/goal-icon-options';
 import {
   Account,
-  ApiError,
   CreateGoalRequest,
   Goal,
   GoalStatus,
 } from '../../../shared/models';
 import { filterNonGoalAccounts } from '../../../shared/utils/goal-account.utils';
+import { resolveApiErrorMessage } from '../../../shared/utils/http-error.utils';
 import {
   GOAL_STATUS_FILTER_OPTIONS,
   getGoalStatusLabel,
@@ -44,6 +44,7 @@ export class GoalsComponent implements OnInit {
 
   readonly goalIconOptions = GOAL_ICON_OPTIONS;
   readonly statusFilterOptions = GOAL_STATUS_FILTER_OPTIONS;
+  readonly goalStatus = GoalStatus;
   readonly getGoalStatusLabel = getGoalStatusLabel;
 
   filteredGoals = computed(() => {
@@ -224,11 +225,6 @@ export class GoalsComponent implements OnInit {
   }
 
   private resolveErrorMessage(error: HttpErrorResponse, fallbackMessage: string): string {
-    const apiError = error.error as ApiError | undefined;
-    if (apiError?.message) {
-      return apiError.message;
-    }
-
-    return fallbackMessage;
+    return resolveApiErrorMessage(error, fallbackMessage);
   }
 }

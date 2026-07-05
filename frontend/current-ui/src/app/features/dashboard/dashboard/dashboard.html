@@ -109,6 +109,7 @@
                   <div class="dashboard-goals-list__track">
                     <div
                       class="dashboard-goals-list__fill"
+                      [class.dashboard-goals-list__fill--completed]="goal.status === goalStatus.Completed"
                       [style.width.%]="goal.progressPercent"
                     ></div>
                   </div>

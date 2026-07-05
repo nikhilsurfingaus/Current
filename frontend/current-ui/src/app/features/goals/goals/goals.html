@@ -182,14 +182,13 @@
             </div>
           </div>
 
-          @if (goal.description) {
-            <p class="goal-card__description">{{ goal.description }}</p>
-          }
+          <p class="goal-card__description">{{ goal.description || ' ' }}</p>
 
           <div class="goal-card__progress">
             <div class="goal-card__progress-track">
               <div
                 class="goal-card__progress-fill"
+                [class.goal-card__progress-fill--completed]="goal.status === goalStatus.Completed"
                 [style.width.%]="goal.progressPercent"
               ></div>
             </div>
@@ -201,9 +200,11 @@
 
           <div class="goal-card__footer">
             <span>Target {{ goal.targetAmount | currency: goal.currency }}</span>
-            @if (goal.targetDate) {
-              <span>By {{ goal.targetDate | date: 'mediumDate' }}</span>
-            }
+            <span class="goal-card__target-date">
+              @if (goal.targetDate) {
+                By {{ goal.targetDate | date: 'mediumDate' }}
+              }
+            </span>
           </div>
         </a>
       }

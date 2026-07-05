@@ -41,7 +41,7 @@ export class GoalDetailComponent implements OnInit {
   goal = signal<Goal | null>(null);
   contributionHistory = signal<GoalContribution[]>([]);
   destinationAccounts = signal<Account[]>([]);
-  sourceAccountName = signal('');
+  fundingAccount = signal<Account | null>(null);
   pageLoading = signal(false);
   pageLoadError = signal('');
   historyLoading = signal(false);
@@ -234,6 +234,7 @@ export class GoalDetailComponent implements OnInit {
         this.goal.set(updatedGoal);
         this.closeActionPanels();
         this.loadContributionHistory(this.goalId);
+        this.reloadFundingAccount();
         this.toastService.showSuccess('Contribution added successfully.');
       },
       error: (error: HttpErrorResponse) => {
@@ -266,6 +267,7 @@ export class GoalDetailComponent implements OnInit {
         this.goal.set(updatedGoal);
         this.closeActionPanels();
         this.loadContributionHistory(this.goalId);
+        this.reloadFundingAccount();
         this.toastService.showSuccess('Withdrawal completed successfully.');
       },
       error: (error: HttpErrorResponse) => {
@@ -376,9 +378,7 @@ export class GoalDetailComponent implements OnInit {
             this.destinationAccounts.set(
               nonGoalAccounts.filter((account) => account.currency === goal.currency),
             );
-            this.sourceAccountName.set(
-              accounts.find((account) => account.id === goal.sourceAccountId)?.name ?? 'Unknown account',
-            );
+            this.updateFundingAccount(accounts, goal);
             this.pageLoading.set(false);
           },
           error: (error: HttpErrorResponse) => {
@@ -392,6 +392,26 @@ export class GoalDetailComponent implements OnInit {
         this.pageLoadError.set(this.resolveErrorMessage(error, 'Unable to load accounts.'));
       },
     });
+  }
+
+  private reloadFundingAccount(): void {
+    const currentGoal = this.goal();
+    if (!currentGoal) {
+      return;
+    }
+
+    this.accountService.getAllAccounts().subscribe({
+      next: (accounts) => {
+        this.updateFundingAccount(accounts, currentGoal);
+      },
+    });
+  }
+
+  private updateFundingAccount(accounts: Account[], goal: Goal): void {
+    const matchedFundingAccount =
+      accounts.find((account) => account.id === goal.sourceAccountId) ?? null;
+
+    this.fundingAccount.set(matchedFundingAccount);
   }
 
   private resolveErrorMessage(error: HttpErrorResponse, fallbackMessage: string): string {

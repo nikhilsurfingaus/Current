@@ -1,16 +1,26 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 
 import { API_PATHS } from '../config/api-paths';
-import { ApiService } from '../services/api.service';
-import { UserService } from '../services/user.service';
+import { ApiService } from './api.service';
+import { ToastService } from './toast.service';
+import { UserService } from './user.service';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../../shared/models';
 import { AUTH_STORAGE_KEY } from '../auth/auth.constants';
+import { SESSION_EXPIRED_MESSAGE } from '../../shared/utils/http-error.utils';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  private router = inject(Router);
+  private toastService = inject(ToastService);
+
+  private sessionExpiryTimer: ReturnType<typeof setTimeout> | null = null;
+  private sessionExpiredInProgress = false;
+  private focusListenerRegistered = false;
+
   constructor(
     private apiService: ApiService,
     private userService: UserService,
@@ -28,7 +38,39 @@ export class AuthService {
       .pipe(tap((authResponse) => this.persistAuth(authResponse)));
   }
 
+  initializeSession(): void {
+    const storedAuth = this.getStoredAuth();
+
+    if (!storedAuth) {
+      return;
+    }
+
+    if (this.isTokenExpired(storedAuth.expiresAt)) {
+      this.handleSessionExpired();
+      return;
+    }
+
+    this.scheduleSessionExpiry(storedAuth.expiresAt);
+    this.registerFocusSessionCheck();
+  }
+
+  handleSessionExpired(): void {
+    if (this.sessionExpiredInProgress) {
+      return;
+    }
+
+    this.sessionExpiredInProgress = true;
+    this.clearSessionExpiryTimer();
+    this.logout();
+    this.toastService.showError(SESSION_EXPIRED_MESSAGE);
+
+    void this.router.navigate(['/login']).finally(() => {
+      this.sessionExpiredInProgress = false;
+    });
+  }
+
   logout(): void {
+    this.clearSessionExpiryTimer();
     localStorage.removeItem(AUTH_STORAGE_KEY);
     this.userService.clearCurrentUser();
   }
@@ -40,7 +82,7 @@ export class AuthService {
     }
 
     if (this.isTokenExpired(storedAuth.expiresAt)) {
-      this.logout();
+      this.handleSessionExpired();
       return null;
     }
 
@@ -48,7 +90,12 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return this.getToken() !== null;
+    const storedAuth = this.getStoredAuth();
+    if (!storedAuth) {
+      return false;
+    }
+
+    return !this.isTokenExpired(storedAuth.expiresAt);
   }
 
   getAuthResponse(): AuthResponse | null {
@@ -62,6 +109,44 @@ export class AuthService {
 
   private persistAuth(authResponse: AuthResponse): void {
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authResponse));
+    this.scheduleSessionExpiry(authResponse.expiresAt);
+    this.registerFocusSessionCheck();
+  }
+
+  private scheduleSessionExpiry(expiresAt: string): void {
+    this.clearSessionExpiryTimer();
+
+    const expiryDelayMs = new Date(expiresAt).getTime() - Date.now();
+    if (expiryDelayMs <= 0) {
+      this.handleSessionExpired();
+      return;
+    }
+
+    this.sessionExpiryTimer = setTimeout(() => this.handleSessionExpired(), expiryDelayMs);
+  }
+
+  private clearSessionExpiryTimer(): void {
+    if (!this.sessionExpiryTimer) {
+      return;
+    }
+
+    clearTimeout(this.sessionExpiryTimer);
+    this.sessionExpiryTimer = null;
+  }
+
+  private registerFocusSessionCheck(): void {
+    if (this.focusListenerRegistered || typeof window === 'undefined') {
+      return;
+    }
+
+    this.focusListenerRegistered = true;
+
+    window.addEventListener('focus', () => {
+      const storedAuth = this.getStoredAuth();
+      if (storedAuth && this.isTokenExpired(storedAuth.expiresAt)) {
+        this.handleSessionExpired();
+      }
+    });
   }
 
   private getStoredAuth(): AuthResponse | null {

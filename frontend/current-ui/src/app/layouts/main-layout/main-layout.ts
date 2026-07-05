@@ -67,6 +67,7 @@ export class MainLayoutComponent implements OnInit {
   isDashboardRoute = computed(() => this.currentUrl().startsWith('/dashboard'));
 
   ngOnInit(): void {
+    this.authService.initializeSession();
     this.userService.loadCurrentUser().subscribe();
   }
 
