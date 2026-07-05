@@ -10,13 +10,6 @@
     <div class="transfer-page__alert transfer-page__alert--error">{{ accountsLoadError() }}</div>
   }
 
-  @if (transferSuccessMessage()) {
-    <div class="transfer-page__alert transfer-page__alert--success">
-      {{ transferSuccessMessage() }}
-      <a class="transfer-page__link" routerLink="/transactions">View transactions</a>
-    </div>
-  }
-
   <section class="transfer-page__card">
     @if (accountsLoading()) {
       <p class="transfer-page__status">Loading accounts...</p>

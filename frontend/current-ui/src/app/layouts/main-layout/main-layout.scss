@@ -124,6 +124,10 @@
   border-bottom: 1px solid $border-color;
 }
 
+.topbar--with-subtitle {
+  padding-bottom: $space-lg;
+}
+
 .topbar__heading {
   display: flex;
   flex-direction: column;
@@ -140,6 +144,7 @@
 
 .topbar__subtitle {
   margin: 0;
+  padding-bottom: $space-xs;
   font-size: 14px;
   color: $text-secondary;
 }
@@ -180,7 +185,7 @@
 
 .page {
   flex: 1;
-  padding: 0 $space-xl $space-lg;
+  padding: $space-lg $space-xl $space-lg;
 }
 
 .app-footer {

@@ -11,6 +11,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 
 import { AccountService } from '../../../core/services/account.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { Account, ApiError, TransferRequest } from '../../../shared/models';
 import { differentAccountsValidator } from './different-accounts.validator';
@@ -29,7 +30,6 @@ export class TransferComponent implements OnInit, OnDestroy {
   transferFormSubmitted = signal(false);
   transferRequestInFlight = signal(false);
   transferErrorMessage = signal('');
-  transferSuccessMessage = signal('');
 
   private transferFormSubscriptions = new Subscription();
 
@@ -58,6 +58,7 @@ export class TransferComponent implements OnInit, OnDestroy {
   constructor(
     private accountService: AccountService,
     private transactionService: TransactionService,
+    private toastService: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -105,7 +106,6 @@ export class TransferComponent implements OnInit, OnDestroy {
   onSubmitTransfer(): void {
     this.transferFormSubmitted.set(true);
     this.transferErrorMessage.set('');
-    this.transferSuccessMessage.set('');
 
     if (this.transferForm.invalid) {
       return;
@@ -124,7 +124,10 @@ export class TransferComponent implements OnInit, OnDestroy {
     this.transactionService.transferFunds(transferRequest).subscribe({
       next: () => {
         this.transferRequestInFlight.set(false);
-        this.transferSuccessMessage.set('Transfer completed successfully.');
+        this.toastService.showSuccess('Transfer completed successfully.', {
+          label: 'View transactions',
+          route: '/transactions',
+        });
         this.transferFormSubmitted.set(false);
         this.transferForm.reset({
           fromAccountId: '',

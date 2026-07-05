@@ -51,7 +51,7 @@
   </aside>
 
   <div class="main-layout__content">
-    <header class="topbar">
+    <header class="topbar" [class.topbar--with-subtitle]="isDashboardRoute()">
       <div class="topbar__heading">
         <h1 class="topbar__title">{{ greetingLabel() }}</h1>
         @if (isDashboardRoute()) {
