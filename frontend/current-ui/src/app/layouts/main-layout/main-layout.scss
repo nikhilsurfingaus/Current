@@ -16,10 +16,45 @@
   border-right: 1px solid $border-color;
 }
 
-.sidebar__logo {
-  width: 132px;
-  height: auto;
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: $space-xl;
+  padding: 2px 4px;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 150ms ease;
+
+  &:hover {
+    opacity: 0.88;
+    text-decoration: none;
+  }
+}
+
+.sidebar__brand-mark {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.sidebar__brand-name {
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  color: #0f172a;
+  background: linear-gradient(120deg, #0f172a 0%, #1e40af 55%, $color-primary 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .sidebar__nav {

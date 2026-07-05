@@ -2,7 +2,7 @@
   <header class="auth-form__header">
     <app-auth-mark />
     <h1 class="auth-form__title">Welcome back</h1>
-    <p class="auth-form__subtitle">Log in to your Current account</p>
+    <p class="auth-form__subtitle">Log on to your Current account</p>
   </header>
 
   @if (loginErrorMessage()) {
@@ -100,7 +100,13 @@
 
   <div class="auth-form__actions">
     <button class="auth-form__submit" type="submit" [disabled]="loginRequestInFlight()">
-      {{ loginRequestInFlight() ? 'Logging in...' : 'Log in' }}
+      @if (!loginRequestInFlight()) {
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.8" />
+          <path d="M8 11V8a4 4 0 1 1 8 0v3" stroke="currentColor" stroke-width="1.8" />
+        </svg>
+      }
+      {{ loginRequestInFlight() ? 'Logging on...' : 'Log on' }}
     </button>
 
     <div class="auth-form__divider">

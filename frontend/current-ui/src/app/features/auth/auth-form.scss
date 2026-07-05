@@ -159,6 +159,10 @@
 }
 
 .auth-form__submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   padding: 13px 16px;
   border: none;
   border-radius: 10px;

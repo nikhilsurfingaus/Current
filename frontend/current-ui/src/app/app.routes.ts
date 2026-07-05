@@ -20,7 +20,7 @@ export const routes: Routes = [
     component: AuthLayoutComponent,
     canActivate: [guestGuard],
     data: { [AUTH_TITLE_ROUTE_DATA_KEY]: true },
-    children: [{ path: '', component: LoginComponent, title: 'Log in' }],
+    children: [{ path: '', component: LoginComponent, title: 'Log on' }],
   },
   {
     path: 'register',
