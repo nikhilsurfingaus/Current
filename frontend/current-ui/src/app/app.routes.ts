@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
+import { AUTH_TITLE_ROUTE_DATA_KEY } from './core/routing/app-title.constants';
 import { AccountsComponent } from './features/accounts/accounts/accounts';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
@@ -16,13 +17,15 @@ export const routes: Routes = [
     path: 'login',
     component: AuthLayoutComponent,
     canActivate: [guestGuard],
-    children: [{ path: '', component: LoginComponent }],
+    data: { [AUTH_TITLE_ROUTE_DATA_KEY]: true },
+    children: [{ path: '', component: LoginComponent, title: 'Log in' }],
   },
   {
     path: 'register',
     component: AuthLayoutComponent,
     canActivate: [guestGuard],
-    children: [{ path: '', component: RegisterComponent }],
+    data: { [AUTH_TITLE_ROUTE_DATA_KEY]: true },
+    children: [{ path: '', component: RegisterComponent, title: 'Create account' }],
   },
   {
     path: '',
@@ -32,18 +35,22 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         component: DashboardComponent,
+        title: 'Dashboard',
       },
       {
         path: 'accounts',
         component: AccountsComponent,
+        title: 'Accounts',
       },
       {
         path: 'transfer',
         component: TransferComponent,
+        title: 'Transfer',
       },
       {
         path: 'transactions',
         component: TransactionsComponent,
+        title: 'Transactions',
       },
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
     ],

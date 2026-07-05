@@ -5,7 +5,8 @@ Source-of-truth files for logos and palette references.
 | File | Use |
 |------|-----|
 | `current-logo-lockup.png` | Full logo with wordmark + tagline |
-| `current-icon.png` | Icon only (add when available) |
+| `current-icon.svg` | Favicon / tab icon (wave mark on white, ANZ-style) |
+| `current-icon-180.png` | Apple touch icon + PNG favicon fallback |
 
 ## Copies
 
