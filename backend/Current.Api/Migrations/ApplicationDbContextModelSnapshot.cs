@@ -90,7 +90,7 @@ namespace Current.Api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<Guid>("PotAccountId")
+                    b.Property<Guid>("GoalAccountId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("SourceAccountId")
@@ -116,7 +116,7 @@ namespace Current.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PotAccountId");
+                    b.HasIndex("GoalAccountId");
 
                     b.HasIndex("SourceAccountId");
 
@@ -293,9 +293,9 @@ namespace Current.Api.Migrations
 
             modelBuilder.Entity("Current.Api.Entities.Goal", b =>
                 {
-                    b.HasOne("Current.Api.Entities.Account", "PotAccount")
+                    b.HasOne("Current.Api.Entities.Account", "GoalAccount")
                         .WithMany()
-                        .HasForeignKey("PotAccountId")
+                        .HasForeignKey("GoalAccountId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -311,7 +311,7 @@ namespace Current.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PotAccount");
+                    b.Navigation("GoalAccount");
 
                     b.Navigation("SourceAccount");
 

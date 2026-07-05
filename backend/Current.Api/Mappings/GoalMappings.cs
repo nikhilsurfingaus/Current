@@ -17,7 +17,7 @@ public static class GoalMappings
             Id = goal.Id,
             UserId = goal.UserId,
             SourceAccountId = goal.SourceAccountId,
-            PotAccountId = goal.PotAccountId,
+            GoalAccountId = goal.GoalAccountId,
             Name = goal.Name,
             Description = goal.Description,
             TargetAmount = goal.TargetAmount,

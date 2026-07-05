@@ -168,9 +168,9 @@ public class ApplicationDbContext : DbContext
                 .HasForeignKey(goal => goal.SourceAccountId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasOne(goal => goal.PotAccount)
+            entity.HasOne(goal => goal.GoalAccount)
                 .WithMany()
-                .HasForeignKey(goal => goal.PotAccountId)
+                .HasForeignKey(goal => goal.GoalAccountId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 

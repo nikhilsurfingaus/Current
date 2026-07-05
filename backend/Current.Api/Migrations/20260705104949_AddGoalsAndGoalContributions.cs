@@ -18,7 +18,7 @@ namespace Current.Api.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     SourceAccountId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PotAccountId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GoalAccountId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     TargetAmount = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
@@ -33,8 +33,8 @@ namespace Current.Api.Migrations
                 {
                     table.PrimaryKey("PK_Goals", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Goals_Accounts_PotAccountId",
-                        column: x => x.PotAccountId,
+                        name: "FK_Goals_Accounts_GoalAccountId",
+                        column: x => x.GoalAccountId,
                         principalTable: "Accounts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -92,9 +92,9 @@ namespace Current.Api.Migrations
                 column: "TransactionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Goals_PotAccountId",
+                name: "IX_Goals_GoalAccountId",
                 table: "Goals",
-                column: "PotAccountId");
+                column: "GoalAccountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Goals_SourceAccountId",

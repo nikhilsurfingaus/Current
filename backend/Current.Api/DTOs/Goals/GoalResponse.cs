@@ -10,7 +10,7 @@ public class GoalResponse
 
     public Guid SourceAccountId { get; set; }
 
-    public Guid PotAccountId { get; set; }
+    public Guid GoalAccountId { get; set; }
 
     public string Name { get; set; } = string.Empty;
 

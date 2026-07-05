@@ -186,7 +186,7 @@ Savings goals and contributions with ledger-backed allocations.
 ### Delivered
 - [x] `GoalStatus` and `ContributionType` enums
 - [x] `Goal` and `GoalContribution` entities
-- [x] `SourceAccountId` + `PotAccountId` on goals (pot account created in Part 2)
+- [x] `SourceAccountId` + `GoalAccountId` on goals (goal account created in Part 2)
 - [x] Goal DTOs (`Create`, `Update`, `Contribute`, `Withdraw`, responses)
 - [x] `GoalMappings` and `GoalContributionMappings`
 - [x] `AddGoalsAndGoalContributions` migration

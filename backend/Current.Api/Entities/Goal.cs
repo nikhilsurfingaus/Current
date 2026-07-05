@@ -10,7 +10,7 @@ public class Goal
 
     public Guid SourceAccountId { get; set; }
 
-    public Guid PotAccountId { get; set; }
+    public Guid GoalAccountId { get; set; }
 
     public string Name { get; set; } = string.Empty;
 
@@ -34,7 +34,7 @@ public class Goal
 
     public Account SourceAccount { get; set; } = null!;
 
-    public Account PotAccount { get; set; } = null!;
+    public Account GoalAccount { get; set; } = null!;
 
     public ICollection<GoalContribution> Contributions { get; set; } = new List<GoalContribution>();
 }
