@@ -66,6 +66,7 @@ public class TransactionService : ITransactionService
                 ToAccountId = request.ToAccountId,
                 Amount = transferAmount,
                 Description = request.Description.Trim(),
+                Category = TransactionCategory.Transfer,
                 Status = TransactionStatus.Completed,
                 CreatedAt = utcNow
             };

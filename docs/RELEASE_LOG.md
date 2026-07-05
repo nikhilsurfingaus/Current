@@ -220,20 +220,35 @@ Savings goals and contributions with ledger-backed allocations.
 
 ## Phase 6 — Analytics
 
-**Status:** Not started
+**Status:** In progress  
+**Date started:** 2026-07-06
 
 ### Goal
 Financial reporting and charts.
 
 ### Delivered
-- [ ] `GET /analytics/net-worth`
-- [ ] `GET /analytics/spending`
-- [ ] `GET /analytics/cashflow`
-- [ ] `GET /analytics/balance-history`
-- [ ] Dashboard charts and widgets
+- [x] `TransactionCategory` enum (Income, Transfer, Housing, Groceries, etc.)
+- [x] `Category`, `Merchant`, `Reference` on `Transactions`
+- [x] `AddTransactionAnalyticsFields` migration (existing rows → `Transfer`)
+- [x] `IAnalyticsService` / `AnalyticsService` + `AnalyticsController`
+- [x] Analytics DTOs (overview, cashflow, net worth history, categories, goals, monthly summary)
+- [ ] Full aggregation queries (cashflow, categories, net worth history, monthly summary)
+- [ ] `GET /analytics/net-worth` (legacy name — use `networth-history`)
+- [ ] Dashboard charts and `/analytics` UI (Chart.js)
+
+### Endpoints
+| Method | Route | Status |
+|--------|-------|--------|
+| GET | `/analytics/overview` | ✅ (balance + goals; income/expenses stubbed) |
+| GET | `/analytics/cashflow` | ✅ shell |
+| GET | `/analytics/networth-history` | ✅ shell |
+| GET | `/analytics/categories` | ✅ shell |
+| GET | `/analytics/goals` | ✅ |
+| GET | `/analytics/monthly-summary` | ✅ shell |
 
 ### Notes
-—
+- Part 1 complete: schema, migration, analytics service + controller shell
+- New transfers default to `Category = Transfer`; income/expense reporting in Part 2
 
 ---
 

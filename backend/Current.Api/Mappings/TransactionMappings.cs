@@ -14,6 +14,9 @@ public static class TransactionMappings
             ToAccountId = transaction.ToAccountId,
             Amount = transaction.Amount,
             Description = transaction.Description,
+            Category = transaction.Category,
+            Merchant = transaction.Merchant,
+            Reference = transaction.Reference,
             Status = transaction.Status,
             CreatedAt = transaction.CreatedAt,
             LedgerEntries = transaction.LedgerEntries

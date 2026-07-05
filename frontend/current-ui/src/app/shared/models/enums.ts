@@ -32,3 +32,20 @@ export enum ContributionType {
   Withdrawal = 1,
   Adjustment = 2,
 }
+
+export enum TransactionCategory {
+  Income = 0,
+  Transfer = 1,
+  Housing = 2,
+  Groceries = 3,
+  Fuel = 4,
+  Food = 5,
+  Shopping = 6,
+  Entertainment = 7,
+  Bills = 8,
+  Investment = 9,
+  Travel = 10,
+  Health = 11,
+  Education = 12,
+  Other = 13,
+}

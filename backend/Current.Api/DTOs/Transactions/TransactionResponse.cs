@@ -14,6 +14,12 @@ public class TransactionResponse
 
     public string Description { get; set; } = string.Empty;
 
+    public TransactionCategory Category { get; set; }
+
+    public string? Merchant { get; set; }
+
+    public string? Reference { get; set; }
+
     public TransactionStatus Status { get; set; }
 
     public DateTime CreatedAt { get; set; }

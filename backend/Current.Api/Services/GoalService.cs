@@ -435,6 +435,7 @@ public class GoalService : IGoalService
             ToAccountId = toAccount.Id,
             Amount = amount,
             Description = description,
+            Category = TransactionCategory.Transfer,
             Status = TransactionStatus.Completed,
             CreatedAt = utcNow
         };

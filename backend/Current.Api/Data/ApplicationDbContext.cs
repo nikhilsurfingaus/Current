@@ -93,6 +93,17 @@ public class ApplicationDbContext : DbContext
                 .HasMaxLength(500)
                 .IsRequired();
 
+            entity.Property(transaction => transaction.Category)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(transaction => transaction.Merchant)
+                .HasMaxLength(200);
+
+            entity.Property(transaction => transaction.Reference)
+                .HasMaxLength(100);
+
             entity.Property(transaction => transaction.Status)
                 .HasConversion<string>()
                 .HasMaxLength(50)
