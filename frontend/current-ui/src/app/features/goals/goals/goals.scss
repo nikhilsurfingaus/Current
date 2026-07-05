@@ -1,0 +1,323 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+@use '../../../../styles/page-shell' as shell;
+
+.goals-page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
+}
+
+.goals-page__header {
+  margin: 0;
+}
+
+.goals-page__title {
+  @include shell.page-title;
+}
+
+.goals-page__intro {
+  @include shell.page-intro;
+  margin-top: -$space-sm;
+}
+
+.goals-page__subtitle {
+  @include shell.page-subtitle;
+}
+
+.goals-page__create-btn,
+.goals-form__submit {
+  @include app-primary-button;
+}
+
+.goals-page__alert {
+  padding: 10px 12px;
+  border-radius: $radius-button;
+  font-size: 13px;
+}
+
+.goals-page__alert--error {
+  background: rgba($color-error, 0.08);
+  color: $color-error;
+  border: 1px solid rgba($color-error, 0.15);
+}
+
+.goals-page__panel,
+.goals-page__empty-card {
+  @include app-card;
+}
+
+.goals-page__panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $space-md;
+}
+
+.goals-page__panel-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.goals-page__panel-close {
+  padding: 6px 10px;
+  border: 1px solid $border-color;
+  border-radius: $radius-button;
+  background: $bg-secondary;
+  color: $text-secondary;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover {
+    color: $text-primary;
+    background: $bg-elevated;
+  }
+}
+
+.goals-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.goals-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-md;
+}
+
+.goals-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.goals-form__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: $text-primary;
+}
+
+.goals-form__input {
+  @include app-input;
+}
+
+.goals-form__textarea {
+  resize: vertical;
+  min-height: 72px;
+}
+
+.goals-form__error {
+  font-size: 12px;
+  color: $color-error;
+}
+
+.goals-form__icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: $space-sm;
+}
+
+.goals-form__icon-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 8px;
+  border: 1px solid $border-color;
+  border-radius: $radius-button;
+  background: $bg-secondary;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+
+  &:hover {
+    background: $bg-elevated;
+  }
+}
+
+.goals-form__icon-option--selected {
+  border-color: $color-primary;
+  background: $bg-active;
+}
+
+.goals-form__icon-label {
+  font-size: 11px;
+  color: $text-secondary;
+}
+
+.goals-page__summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-md;
+}
+
+.goals-summary-card {
+  @include app-card;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.goals-summary-card__label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $text-secondary;
+}
+
+.goals-summary-card__value {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: $text-primary;
+}
+
+.goals-page__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-sm;
+}
+
+.goals-page__tab {
+  padding: 8px 14px;
+  border: 1px solid $border-color;
+  border-radius: 999px;
+  background: $bg-secondary;
+  color: $text-secondary;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+
+  &:hover {
+    color: $text-primary;
+    background: $bg-elevated;
+  }
+}
+
+.goals-page__tab--active {
+  border-color: $color-primary;
+  background: $bg-active;
+  color: $color-primary;
+}
+
+.goals-page__status {
+  margin: 0;
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.goals-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: $space-md;
+}
+
+.goal-card {
+  @include app-card;
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 150ms ease, transform 150ms ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    text-decoration: none;
+  }
+}
+
+.goal-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.goal-card__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.goal-card__name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.goal-card__status {
+  align-self: flex-start;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.goal-card__status--0 {
+  background: rgba($color-primary, 0.12);
+  color: $color-primary;
+}
+
+.goal-card__status--1 {
+  background: rgba($color-success, 0.12);
+  color: $color-success;
+}
+
+.goal-card__status--2 {
+  background: rgba($text-secondary, 0.12);
+  color: $text-secondary;
+}
+
+.goal-card__description {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: $text-secondary;
+}
+
+.goal-card__progress-track {
+  height: 8px;
+  border-radius: 999px;
+  background: $bg-active;
+  overflow: hidden;
+}
+
+.goal-card__progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, $color-primary, #60a5fa);
+  transition: width 300ms ease;
+}
+
+.goal-card__progress-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.goal-card__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: $space-sm;
+  font-size: 12px;
+  color: $text-secondary;
+}
+
+@media (max-width: 720px) {
+  .goals-form__row,
+  .goals-page__summary-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -92,7 +92,7 @@
   <section class="accounts-page__table-card">
     @if (accountsLoading()) {
       <p class="accounts-page__status">Loading accounts...</p>
-    } @else if (accounts().length === 0) {
+    } @else if (userFacingAccounts().length === 0) {
       <p class="accounts-page__status">No accounts yet. Create your first account to get started.</p>
     } @else {
       <table class="accounts-table">
@@ -105,7 +105,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (account of accounts(); track account.id) {
+          @for (account of userFacingAccounts(); track account.id) {
             <tr>
               <td>{{ account.name }}</td>
               <td>{{ getAccountTypeLabel(account.accountType) }}</td>

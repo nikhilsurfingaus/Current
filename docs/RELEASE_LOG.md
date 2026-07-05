@@ -177,8 +177,9 @@ Secure the API with JWT auth and password hashing.
 
 ## Phase 5 — Goals
 
-**Status:** In progress  
-**Date started:** 2026-07-05
+**Status:** Complete  
+**Date started:** 2026-07-05  
+**Date completed:** 2026-07-05
 
 ### Goal
 Savings goals and contributions with ledger-backed allocations.
@@ -193,7 +194,9 @@ Savings goals and contributions with ledger-backed allocations.
 - [x] `IGoalService` / `GoalService` with ledger-backed contribute & withdraw
 - [x] `GoalsController` — CRUD, contribute, withdraw, history
 - [x] Goal create auto-provisions linked `GoalAccount` (Savings)
-- [ ] Goals UI (list, detail, progress) (Part 3–4)
+- [x] Goals UI — list, create, detail, contribute, withdraw, history
+- [x] Dashboard goals widget with active goal progress
+- [x] Goal-linked savings accounts hidden from accounts list
 
 ### Endpoints
 | Method | Route | Status |
@@ -211,6 +214,7 @@ Savings goals and contributions with ledger-backed allocations.
 - Part 1 complete: schema, DTOs, mappings, migration
 - Part 2 complete: goal service, controller, transfers + contribution history in one DB transaction
 - `IconKey` on goals: preset keys (`default`, `vacation`, `home`, `emergency`, `car`, `gaming`, `investment`, `education`); frontend `GoalIconComponent` + `goal-icon-options.ts`
+- Part 3–4 complete: `/goals` list + detail pages, sidebar nav, dashboard widget, goal account filtering
 
 ---
 

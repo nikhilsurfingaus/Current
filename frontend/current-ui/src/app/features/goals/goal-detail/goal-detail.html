@@ -1,0 +1,311 @@
+<div class="goal-detail-page">
+  <a class="goal-detail-page__back" routerLink="/goals">← Back to goals</a>
+
+  @if (pageLoadError()) {
+    <div class="goal-detail-page__alert goal-detail-page__alert--error">{{ pageLoadError() }}</div>
+  }
+
+  @if (pageLoading()) {
+    <p class="goal-detail-page__status">Loading goal...</p>
+  } @else if (goal(); as currentGoal) {
+    <header class="goal-detail-page__header">
+      <div class="goal-detail-page__leading">
+        <app-goal-icon [iconKey]="currentGoal.iconKey" />
+        <div>
+          <h1 class="goal-detail-page__title">{{ currentGoal.name }}</h1>
+          <span class="goal-detail-page__status goal-detail-page__status--{{ currentGoal.status }}">
+            {{ getGoalStatusLabel(currentGoal.status) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="goal-detail-page__actions">
+        @if (canContribute()) {
+          <button class="goal-detail-page__action-btn" type="button" (click)="openContributePanel()">
+            Contribute
+          </button>
+        }
+        @if (canWithdraw()) {
+          <button
+            class="goal-detail-page__action-btn goal-detail-page__action-btn--secondary"
+            type="button"
+            (click)="openWithdrawPanel()"
+          >
+            Withdraw
+          </button>
+        }
+        @if (canEdit()) {
+          <button
+            class="goal-detail-page__action-btn goal-detail-page__action-btn--secondary"
+            type="button"
+            (click)="openEditPanel()"
+          >
+            Edit
+          </button>
+        }
+        @if (canCancel()) {
+          <button
+            class="goal-detail-page__action-btn goal-detail-page__action-btn--danger"
+            type="button"
+            [disabled]="cancelRequestInFlight()"
+            (click)="onCancelGoal()"
+          >
+            {{ cancelRequestInFlight() ? 'Cancelling...' : 'Cancel goal' }}
+          </button>
+        }
+      </div>
+    </header>
+
+    @if (actionErrorMessage()) {
+      <div class="goal-detail-page__alert goal-detail-page__alert--error">{{ actionErrorMessage() }}</div>
+    }
+
+    <section class="goal-detail-page__hero-card">
+      @if (currentGoal.description) {
+        <p class="goal-detail-page__description">{{ currentGoal.description }}</p>
+      }
+
+      <div class="goal-detail-page__amounts">
+        <div>
+          <p class="goal-detail-page__amount-label">Saved</p>
+          <p class="goal-detail-page__amount-value">
+            {{ currentGoal.currentAmount | currency: currentGoal.currency }}
+          </p>
+        </div>
+        <div>
+          <p class="goal-detail-page__amount-label">Target</p>
+          <p class="goal-detail-page__amount-value">
+            {{ currentGoal.targetAmount | currency: currentGoal.currency }}
+          </p>
+        </div>
+        <div>
+          <p class="goal-detail-page__amount-label">Remaining</p>
+          <p class="goal-detail-page__amount-value">
+            {{ currentGoal.remainingAmount | currency: currentGoal.currency }}
+          </p>
+        </div>
+      </div>
+
+      <div class="goal-detail-page__progress">
+        <div class="goal-detail-page__progress-track">
+          <div
+            class="goal-detail-page__progress-fill"
+            [style.width.%]="currentGoal.progressPercent"
+          ></div>
+        </div>
+        <p class="goal-detail-page__progress-label">
+          {{ currentGoal.progressPercent / 100 | percent: '1.0-1' }} complete
+        </p>
+      </div>
+
+      <div class="goal-detail-page__meta">
+        <span>Funding account: {{ sourceAccountName() }}</span>
+        @if (currentGoal.targetDate) {
+          <span>Target date: {{ currentGoal.targetDate | date: 'mediumDate' }}</span>
+        }
+      </div>
+    </section>
+
+    @if (contributePanelOpen()) {
+      <section class="goal-detail-page__panel">
+        <div class="goal-detail-page__panel-header">
+          <h2 class="goal-detail-page__panel-title">Contribute</h2>
+          <button class="goal-detail-page__panel-close" type="button" (click)="closeActionPanels()">
+            Close
+          </button>
+        </div>
+
+        <form class="goal-detail-form" [formGroup]="contributeForm" (ngSubmit)="onContribute()">
+          <div class="goal-detail-form__field">
+            <label class="goal-detail-form__label" for="contribute-amount">Amount</label>
+            <input
+              id="contribute-amount"
+              class="goal-detail-form__input"
+              type="number"
+              min="0.01"
+              step="0.01"
+              formControlName="amount"
+            />
+            @if (contributeFormSubmitted() && contributeForm.controls.amount.invalid) {
+              <span class="goal-detail-form__error">Enter an amount greater than zero.</span>
+            }
+          </div>
+
+          <div class="goal-detail-form__field">
+            <label class="goal-detail-form__label" for="contribute-note">Note (optional)</label>
+            <input id="contribute-note" class="goal-detail-form__input" type="text" formControlName="note" />
+          </div>
+
+          <button class="goal-detail-form__submit" type="submit" [disabled]="contributeRequestInFlight()">
+            {{ contributeRequestInFlight() ? 'Contributing...' : 'Add contribution' }}
+          </button>
+        </form>
+      </section>
+    }
+
+    @if (withdrawPanelOpen()) {
+      <section class="goal-detail-page__panel">
+        <div class="goal-detail-page__panel-header">
+          <h2 class="goal-detail-page__panel-title">Withdraw</h2>
+          <button class="goal-detail-page__panel-close" type="button" (click)="closeActionPanels()">
+            Close
+          </button>
+        </div>
+
+        <form class="goal-detail-form" [formGroup]="withdrawForm" (ngSubmit)="onWithdraw()">
+          <div class="goal-detail-form__field">
+            <label class="goal-detail-form__label" for="withdraw-amount">Amount</label>
+            <input
+              id="withdraw-amount"
+              class="goal-detail-form__input"
+              type="number"
+              min="0.01"
+              step="0.01"
+              formControlName="amount"
+            />
+            @if (withdrawFormSubmitted() && withdrawForm.controls.amount.invalid) {
+              <span class="goal-detail-form__error">Enter an amount greater than zero.</span>
+            }
+          </div>
+
+          <div class="goal-detail-form__field">
+            <label class="goal-detail-form__label" for="withdraw-destination">Destination account</label>
+            <select
+              id="withdraw-destination"
+              class="goal-detail-form__input"
+              formControlName="destinationAccountId"
+            >
+              @if (destinationAccounts().length === 0) {
+                <option value="">No accounts available</option>
+              } @else {
+                @for (account of destinationAccounts(); track account.id) {
+                  <option [ngValue]="account.id">
+                    {{ account.name }} ({{ account.currentBalance | currency: account.currency }})
+                  </option>
+                }
+              }
+            </select>
+            @if (withdrawFormSubmitted() && withdrawForm.controls.destinationAccountId.invalid) {
+              <span class="goal-detail-form__error">Select a destination account.</span>
+            }
+          </div>
+
+          <div class="goal-detail-form__field">
+            <label class="goal-detail-form__label" for="withdraw-note">Note (optional)</label>
+            <input id="withdraw-note" class="goal-detail-form__input" type="text" formControlName="note" />
+          </div>
+
+          <button
+            class="goal-detail-form__submit"
+            type="submit"
+            [disabled]="withdrawRequestInFlight() || destinationAccounts().length === 0"
+          >
+            {{ withdrawRequestInFlight() ? 'Withdrawing...' : 'Withdraw funds' }}
+          </button>
+        </form>
+      </section>
+    }
+
+    @if (editPanelOpen()) {
+      <section class="goal-detail-page__panel">
+        <div class="goal-detail-page__panel-header">
+          <h2 class="goal-detail-page__panel-title">Edit goal</h2>
+          <button class="goal-detail-page__panel-close" type="button" (click)="closeActionPanels()">
+            Close
+          </button>
+        </div>
+
+        <form class="goal-detail-form" [formGroup]="editGoalForm" (ngSubmit)="onEditGoal()">
+          <div class="goal-detail-form__field">
+            <label class="goal-detail-form__label" for="edit-goal-name">Goal name</label>
+            <input id="edit-goal-name" class="goal-detail-form__input" type="text" formControlName="name" />
+            @if (editFormSubmitted() && editGoalForm.controls.name.invalid) {
+              <span class="goal-detail-form__error">Goal name is required.</span>
+            }
+          </div>
+
+          <div class="goal-detail-form__field">
+            <label class="goal-detail-form__label" for="edit-goal-description">Description</label>
+            <textarea
+              id="edit-goal-description"
+              class="goal-detail-form__input goal-detail-form__textarea"
+              rows="2"
+              formControlName="description"
+            ></textarea>
+          </div>
+
+          <div class="goal-detail-form__row">
+            <div class="goal-detail-form__field">
+              <label class="goal-detail-form__label" for="edit-goal-target">Target amount</label>
+              <input
+                id="edit-goal-target"
+                class="goal-detail-form__input"
+                type="number"
+                min="0.01"
+                step="0.01"
+                formControlName="targetAmount"
+              />
+            </div>
+
+            <div class="goal-detail-form__field">
+              <label class="goal-detail-form__label" for="edit-goal-date">Target date</label>
+              <input id="edit-goal-date" class="goal-detail-form__input" type="date" formControlName="targetDate" />
+            </div>
+          </div>
+
+          <div class="goal-detail-form__field">
+            <span class="goal-detail-form__label">Icon</span>
+            <div class="goal-detail-form__icon-grid">
+              @for (option of goalIconOptions; track option.key) {
+                <button
+                  class="goal-detail-form__icon-option"
+                  [class.goal-detail-form__icon-option--selected]="isEditIconSelected(option.key)"
+                  type="button"
+                  (click)="selectEditIcon(option.key)"
+                >
+                  <app-goal-icon [iconKey]="option.key" />
+                  <span class="goal-detail-form__icon-label">{{ option.label }}</span>
+                </button>
+              }
+            </div>
+          </div>
+
+          <button class="goal-detail-form__submit" type="submit" [disabled]="editRequestInFlight()">
+            {{ editRequestInFlight() ? 'Saving...' : 'Save changes' }}
+          </button>
+        </form>
+      </section>
+    }
+
+    <section class="goal-detail-page__history-card">
+      <h2 class="goal-detail-page__history-title">Contribution history</h2>
+
+      @if (historyLoading()) {
+        <p class="goal-detail-page__status">Loading history...</p>
+      } @else if (contributionHistory().length === 0) {
+        <p class="goal-detail-page__status">No contributions yet.</p>
+      } @else {
+        <table class="goal-history-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (entry of contributionHistory(); track entry.id) {
+              <tr>
+                <td>{{ entry.createdAt | date: 'medium' }}</td>
+                <td>{{ getContributionTypeLabel(entry.contributionType) }}</td>
+                <td>{{ entry.amount | currency: currentGoal.currency }}</td>
+                <td>{{ entry.note || '—' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </section>
+  }
+</div>

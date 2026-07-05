@@ -4,23 +4,28 @@ import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { AccountService } from '../../../core/services/account.service';
+import { GoalService } from '../../../core/services/goal.service';
 import { TransactionService } from '../../../core/services/transaction.service';
-import { Account, ApiError, Transaction } from '../../../shared/models';
+import { GoalIconComponent } from '../../../shared/components/goal-icon/goal-icon';
+import { Account, ApiError, Goal, GoalStatus, Transaction } from '../../../shared/models';
+import { filterNonGoalAccounts } from '../../../shared/utils/goal-account.utils';
 import { getAccountTypeLabel } from '../../../shared/utils/account-type.utils';
 import { buildCurrencyBalanceTotals } from '../../../shared/utils/currency-balance.utils';
 import { getTransactionStatusLabel } from '../../../shared/utils/transaction-status.utils';
 
 const RECENT_TRANSACTION_LIMIT = 5;
+const DASHBOARD_GOALS_LIMIT = 3;
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CurrencyPipe, RouterLink],
+  imports: [CurrencyPipe, RouterLink, GoalIconComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
 export class DashboardComponent implements OnInit {
   accounts = signal<Account[]>([]);
+  goals = signal<Goal[]>([]);
   recentTransactions = signal<Transaction[]>([]);
   dashboardLoading = signal(false);
   dashboardLoadError = signal('');
@@ -28,10 +33,20 @@ export class DashboardComponent implements OnInit {
   readonly getAccountTypeLabel = getAccountTypeLabel;
   readonly getTransactionStatusLabel = getTransactionStatusLabel;
 
-  currencyBalanceTotals = computed(() => buildCurrencyBalanceTotals(this.accounts()));
+  userFacingAccounts = computed(() => filterNonGoalAccounts(this.accounts(), this.goals()));
+
+  currencyBalanceTotals = computed(() => buildCurrencyBalanceTotals(this.userFacingAccounts()));
+
+  activeGoalsPreview = computed(() =>
+    this.goals()
+      .filter((goal) => goal.status === GoalStatus.Active)
+      .sort((left, right) => right.progressPercent - left.progressPercent)
+      .slice(0, DASHBOARD_GOALS_LIMIT),
+  );
 
   constructor(
     private accountService: AccountService,
+    private goalService: GoalService,
     private transactionService: TransactionService,
   ) {}
 
@@ -46,12 +61,27 @@ export class DashboardComponent implements OnInit {
     this.accountService.getAllAccounts().subscribe({
       next: (accounts) => {
         this.accounts.set(accounts);
-        this.loadRecentTransactions();
+        this.loadGoals();
       },
       error: (error: HttpErrorResponse) => {
         this.dashboardLoading.set(false);
         this.dashboardLoadError.set(
           this.resolveErrorMessage(error, 'Unable to load dashboard.'),
+        );
+      },
+    });
+  }
+
+  loadGoals(): void {
+    this.goalService.getAllGoals().subscribe({
+      next: (goals) => {
+        this.goals.set(goals);
+        this.loadRecentTransactions();
+      },
+      error: (error: HttpErrorResponse) => {
+        this.dashboardLoading.set(false);
+        this.dashboardLoadError.set(
+          this.resolveErrorMessage(error, 'Unable to load goals.'),
         );
       },
     });

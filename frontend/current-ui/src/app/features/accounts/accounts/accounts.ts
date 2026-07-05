@@ -1,14 +1,16 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { AccountService } from '../../../core/services/account.service';
-import { Account, AccountType, ApiError, CreateAccountRequest } from '../../../shared/models';
+import { GoalService } from '../../../core/services/goal.service';
+import { Account, AccountType, ApiError, CreateAccountRequest, Goal } from '../../../shared/models';
 import {
   ACCOUNT_TYPE_OPTIONS,
   getAccountTypeLabel,
 } from '../../../shared/utils/account-type.utils';
+import { filterNonGoalAccounts } from '../../../shared/utils/goal-account.utils';
 
 @Component({
   selector: 'app-accounts',
@@ -19,6 +21,7 @@ import {
 })
 export class AccountsComponent implements OnInit {
   accounts = signal<Account[]>([]);
+  goals = signal<Goal[]>([]);
   accountsLoading = signal(false);
   accountsLoadError = signal('');
   createPanelOpen = signal(false);
@@ -28,6 +31,8 @@ export class AccountsComponent implements OnInit {
 
   readonly accountTypeOptions = ACCOUNT_TYPE_OPTIONS;
   readonly getAccountTypeLabel = getAccountTypeLabel;
+
+  userFacingAccounts = computed(() => filterNonGoalAccounts(this.accounts(), this.goals()));
 
   createAccountForm = new FormGroup({
     name: new FormControl('', {
@@ -48,7 +53,10 @@ export class AccountsComponent implements OnInit {
     }),
   });
 
-  constructor(private accountService: AccountService) {}
+  constructor(
+    private accountService: AccountService,
+    private goalService: GoalService,
+  ) {}
 
   ngOnInit(): void {
     this.loadAccounts();
@@ -61,7 +69,18 @@ export class AccountsComponent implements OnInit {
     this.accountService.getAllAccounts().subscribe({
       next: (accounts) => {
         this.accounts.set(accounts);
-        this.accountsLoading.set(false);
+        this.goalService.getAllGoals().subscribe({
+          next: (goals) => {
+            this.goals.set(goals);
+            this.accountsLoading.set(false);
+          },
+          error: (error: HttpErrorResponse) => {
+            this.accountsLoading.set(false);
+            this.accountsLoadError.set(
+              this.resolveErrorMessage(error, 'Unable to load goals.'),
+            );
+          },
+        });
       },
       error: (error: HttpErrorResponse) => {
         this.accountsLoading.set(false);
@@ -111,12 +130,8 @@ export class AccountsComponent implements OnInit {
     this.accountService.createAccount(createAccountRequest).subscribe({
       next: (createdAccount) => {
         this.createRequestInFlight.set(false);
-        this.accounts.set(
-          [...this.accounts(), createdAccount].sort((left, right) =>
-            left.name.localeCompare(right.name),
-          ),
-        );
         this.closeCreatePanel();
+        this.loadAccounts();
       },
       error: (error: HttpErrorResponse) => {
         this.createRequestInFlight.set(false);

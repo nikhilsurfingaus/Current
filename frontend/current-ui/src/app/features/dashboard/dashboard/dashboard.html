@@ -16,7 +16,8 @@
                 {{ currencyBalanceTotals()[0].totalBalance | currency: currencyBalanceTotals()[0].currency }}
               </p>
               <p class="dashboard-hero-card__meta">
-                Across {{ accounts().length }} {{ accounts().length === 1 ? 'account' : 'accounts' }}
+                Across {{ userFacingAccounts().length }}
+                {{ userFacingAccounts().length === 1 ? 'account' : 'accounts' }}
               </p>
             </div>
             <div class="dashboard-hero-card__chart" aria-hidden="true">
@@ -41,7 +42,7 @@
             <rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.5" />
           </svg>
         </span>
-        <p class="dashboard-stat-card__value">{{ accounts().length }}</p>
+        <p class="dashboard-stat-card__value">{{ userFacingAccounts().length }}</p>
         <p class="dashboard-stat-card__label">Total accounts</p>
         <a class="dashboard-stat-card__link" routerLink="/accounts">View all accounts →</a>
       </article>
@@ -57,6 +58,15 @@
             </span>
             Transfer money
           </a>
+          <a class="dashboard-quick-action" routerLink="/goals">
+            <span class="dashboard-quick-action__icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5" />
+                <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.5" />
+              </svg>
+            </span>
+            View goals
+          </a>
           <a class="dashboard-quick-action" routerLink="/accounts">
             <span class="dashboard-quick-action__icon" aria-hidden="true">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -69,6 +79,48 @@
       </article>
     </section>
 
+    <section class="dashboard-page__card dashboard-goals-card">
+      <div class="dashboard-page__card-header">
+        <h2 class="dashboard-page__card-title">Savings goals</h2>
+        <a class="dashboard-page__card-link" routerLink="/goals">View all</a>
+      </div>
+
+      @if (activeGoalsPreview().length === 0) {
+        <p class="dashboard-page__empty">
+          No active goals yet.
+          <a class="dashboard-page__inline-link" routerLink="/goals">Create a goal</a>
+        </p>
+      } @else {
+        <ul class="dashboard-goals-list">
+          @for (goal of activeGoalsPreview(); track goal.id) {
+            <li>
+              <a class="dashboard-goals-list__item" [routerLink]="['/goals', goal.id]">
+                <div class="dashboard-goals-list__leading">
+                  <app-goal-icon [iconKey]="goal.iconKey" />
+                  <div>
+                    <p class="dashboard-goals-list__name">{{ goal.name }}</p>
+                    <p class="dashboard-goals-list__amounts">
+                      {{ goal.currentAmount | currency: goal.currency }} of
+                      {{ goal.targetAmount | currency: goal.currency }}
+                    </p>
+                  </div>
+                </div>
+                <div class="dashboard-goals-list__progress">
+                  <div class="dashboard-goals-list__track">
+                    <div
+                      class="dashboard-goals-list__fill"
+                      [style.width.%]="goal.progressPercent"
+                    ></div>
+                  </div>
+                  <span class="dashboard-goals-list__percent">{{ goal.progressPercent }}%</span>
+                </div>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
     <div class="dashboard-page__columns">
       <section class="dashboard-page__card">
         <div class="dashboard-page__card-header">
@@ -76,14 +128,14 @@
           <a class="dashboard-page__card-link" routerLink="/accounts">Manage</a>
         </div>
 
-        @if (accounts().length === 0) {
+        @if (userFacingAccounts().length === 0) {
           <p class="dashboard-page__empty">
             No accounts yet.
             <a class="dashboard-page__inline-link" routerLink="/accounts">Create your first account</a>
           </p>
         } @else {
           <ul class="dashboard-account-list">
-            @for (account of accounts(); track account.id) {
+            @for (account of userFacingAccounts(); track account.id) {
               <li class="dashboard-account-list__item">
                 <div class="dashboard-account-list__leading">
                   <span class="dashboard-account-list__icon" aria-hidden="true">

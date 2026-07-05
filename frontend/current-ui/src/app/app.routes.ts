@@ -9,6 +9,8 @@ import { RegisterComponent } from './features/auth/register/register';
 import { DashboardComponent } from './features/dashboard/dashboard/dashboard';
 import { TransferComponent } from './features/transfer/transfer/transfer';
 import { TransactionsComponent } from './features/transactions/transactions/transactions';
+import { GoalsComponent } from './features/goals/goals/goals';
+import { GoalDetailComponent } from './features/goals/goal-detail/goal-detail';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout';
 
@@ -51,6 +53,16 @@ export const routes: Routes = [
         path: 'transactions',
         component: TransactionsComponent,
         title: 'Transactions',
+      },
+      {
+        path: 'goals',
+        component: GoalsComponent,
+        title: 'Goals',
+      },
+      {
+        path: 'goals/:id',
+        component: GoalDetailComponent,
+        title: 'Goal',
       },
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
     ],

@@ -16,4 +16,11 @@ export const API_PATHS = {
     byId: (transactionId: string) => `/transactions/${transactionId}`,
     transfer: '/transactions/transfer',
   },
+  goals: {
+    list: '/goals',
+    byId: (goalId: string) => `/goals/${goalId}`,
+    contribute: (goalId: string) => `/goals/${goalId}/contribute`,
+    withdraw: (goalId: string) => `/goals/${goalId}/withdraw`,
+    history: (goalId: string) => `/goals/${goalId}/history`,
+  },
 } as const;

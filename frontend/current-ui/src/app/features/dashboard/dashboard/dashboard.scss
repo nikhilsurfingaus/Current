@@ -163,6 +163,90 @@
   display: inline-flex;
 }
 
+.dashboard-goals-card {
+  margin-bottom: 0;
+}
+
+.dashboard-goals-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-goals-list__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-md;
+  padding: 14px 0;
+  border-bottom: 1px solid $border-color;
+  text-decoration: none;
+  color: inherit;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.dashboard-goals-list li:last-child .dashboard-goals-list__item {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.dashboard-goals-list li:first-child .dashboard-goals-list__item {
+  padding-top: 0;
+}
+
+.dashboard-goals-list__leading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.dashboard-goals-list__name {
+  margin: 0 0 2px;
+  font-size: 14px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.dashboard-goals-list__amounts {
+  margin: 0;
+  font-size: 12px;
+  color: $text-secondary;
+}
+
+.dashboard-goals-list__progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  min-width: 140px;
+}
+
+.dashboard-goals-list__track {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: $bg-active;
+  overflow: hidden;
+}
+
+.dashboard-goals-list__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, $color-primary, #60a5fa);
+}
+
+.dashboard-goals-list__percent {
+  font-size: 12px;
+  font-weight: 600;
+  color: $text-primary;
+  min-width: 36px;
+  text-align: right;
+}
+
 .dashboard-page__columns {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

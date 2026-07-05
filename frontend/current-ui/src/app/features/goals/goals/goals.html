@@ -1,0 +1,212 @@
+<div class="goals-page">
+  <header class="goals-page__header">
+    <h1 class="goals-page__title">Goals</h1>
+  </header>
+
+  <div class="goals-page__intro">
+    <p class="goals-page__subtitle">Track savings goals and watch your progress grow</p>
+    <button class="goals-page__create-btn" type="button" (click)="openCreatePanel()">
+      Create goal
+    </button>
+  </div>
+
+  @if (goalsLoadError()) {
+    <div class="goals-page__alert goals-page__alert--error">{{ goalsLoadError() }}</div>
+  }
+
+  @if (createPanelOpen()) {
+    <section class="goals-page__panel">
+      <div class="goals-page__panel-header">
+        <h2 class="goals-page__panel-title">Create goal</h2>
+        <button class="goals-page__panel-close" type="button" (click)="closeCreatePanel()">
+          Close
+        </button>
+      </div>
+
+      @if (createErrorMessage()) {
+        <div class="goals-page__alert goals-page__alert--error">{{ createErrorMessage() }}</div>
+      }
+
+      <form class="goals-form" [formGroup]="createGoalForm" (ngSubmit)="onCreateGoal()">
+        <div class="goals-form__field">
+          <label class="goals-form__label" for="goal-name">Goal name</label>
+          <input
+            id="goal-name"
+            class="goals-form__input"
+            type="text"
+            formControlName="name"
+            placeholder="Holiday fund"
+          />
+          @if (createFormSubmitted() && createGoalForm.controls.name.invalid) {
+            <span class="goals-form__error">Goal name is required.</span>
+          }
+        </div>
+
+        <div class="goals-form__field">
+          <label class="goals-form__label" for="goal-description">Description (optional)</label>
+          <textarea
+            id="goal-description"
+            class="goals-form__input goals-form__textarea"
+            rows="2"
+            formControlName="description"
+            placeholder="What are you saving for?"
+          ></textarea>
+        </div>
+
+        <div class="goals-form__row">
+          <div class="goals-form__field">
+            <label class="goals-form__label" for="goal-target">Target amount</label>
+            <input
+              id="goal-target"
+              class="goals-form__input"
+              type="number"
+              min="0.01"
+              step="0.01"
+              formControlName="targetAmount"
+            />
+            @if (createFormSubmitted() && createGoalForm.controls.targetAmount.invalid) {
+              <span class="goals-form__error">Target must be greater than zero.</span>
+            }
+          </div>
+
+          <div class="goals-form__field">
+            <label class="goals-form__label" for="goal-target-date">Target date (optional)</label>
+            <input id="goal-target-date" class="goals-form__input" type="date" formControlName="targetDate" />
+          </div>
+        </div>
+
+        <div class="goals-form__field">
+          <label class="goals-form__label" for="goal-source-account">Funding account</label>
+          <select
+            id="goal-source-account"
+            class="goals-form__input"
+            formControlName="sourceAccountId"
+            (change)="onSourceAccountChange()"
+          >
+            @if (fundingAccounts().length === 0) {
+              <option value="">No accounts available</option>
+            } @else {
+              @for (account of fundingAccounts(); track account.id) {
+                <option [ngValue]="account.id">
+                  {{ account.name }} ({{ account.currentBalance | currency: account.currency }})
+                </option>
+              }
+            }
+          </select>
+          @if (createFormSubmitted() && createGoalForm.controls.sourceAccountId.invalid) {
+            <span class="goals-form__error">Select a funding account.</span>
+          }
+        </div>
+
+        <div class="goals-form__field">
+          <span class="goals-form__label">Icon</span>
+          <div class="goals-form__icon-grid">
+            @for (option of goalIconOptions; track option.key) {
+              <button
+                class="goals-form__icon-option"
+                [class.goals-form__icon-option--selected]="isCreateIconSelected(option.key)"
+                type="button"
+                (click)="selectCreateIcon(option.key)"
+              >
+                <app-goal-icon [iconKey]="option.key" />
+                <span class="goals-form__icon-label">{{ option.label }}</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        <button
+          class="goals-form__submit"
+          type="submit"
+          [disabled]="createRequestInFlight() || fundingAccounts().length === 0"
+        >
+          {{ createRequestInFlight() ? 'Creating...' : 'Create goal' }}
+        </button>
+      </form>
+    </section>
+  }
+
+  <section class="goals-page__summary-grid">
+    <article class="goals-summary-card">
+      <p class="goals-summary-card__label">Total saved</p>
+      <p class="goals-summary-card__value">
+        {{ totalSavedAmount() | currency: summaryCurrency() }}
+      </p>
+    </article>
+    <article class="goals-summary-card">
+      <p class="goals-summary-card__label">Active goals</p>
+      <p class="goals-summary-card__value">{{ activeGoalsCount() }}</p>
+    </article>
+    <article class="goals-summary-card">
+      <p class="goals-summary-card__label">Completed</p>
+      <p class="goals-summary-card__value">{{ completedGoalsCount() }}</p>
+    </article>
+  </section>
+
+  <div class="goals-page__tabs">
+    @for (option of statusFilterOptions; track option.label) {
+      <button
+        class="goals-page__tab"
+        [class.goals-page__tab--active]="isStatusFilterActive(option.value)"
+        type="button"
+        (click)="setStatusFilter(option.value)"
+      >
+        {{ option.label }}
+      </button>
+    }
+  </div>
+
+  @if (goalsLoading()) {
+    <p class="goals-page__status">Loading goals...</p>
+  } @else if (filteredGoals().length === 0) {
+    <section class="goals-page__empty-card">
+      <p class="goals-page__status">
+        @if (goals().length === 0) {
+          No goals yet. Create your first savings goal to get started.
+        } @else {
+          No goals match this filter.
+        }
+      </p>
+    </section>
+  } @else {
+    <section class="goals-page__grid">
+      @for (goal of filteredGoals(); track goal.id) {
+        <a class="goal-card" [routerLink]="['/goals', goal.id]">
+          <div class="goal-card__header">
+            <app-goal-icon [iconKey]="goal.iconKey" />
+            <div class="goal-card__heading">
+              <h2 class="goal-card__name">{{ goal.name }}</h2>
+              <span class="goal-card__status goal-card__status--{{ goal.status }}">
+                {{ getGoalStatusLabel(goal.status) }}
+              </span>
+            </div>
+          </div>
+
+          @if (goal.description) {
+            <p class="goal-card__description">{{ goal.description }}</p>
+          }
+
+          <div class="goal-card__progress">
+            <div class="goal-card__progress-track">
+              <div
+                class="goal-card__progress-fill"
+                [style.width.%]="goal.progressPercent"
+              ></div>
+            </div>
+            <div class="goal-card__progress-meta">
+              <span>{{ goal.currentAmount | currency: goal.currency }}</span>
+              <span>{{ goal.progressPercent / 100 | percent: '1.0-0' }}</span>
+            </div>
+          </div>
+
+          <div class="goal-card__footer">
+            <span>Target {{ goal.targetAmount | currency: goal.currency }}</span>
+            @if (goal.targetDate) {
+              <span>By {{ goal.targetDate | date: 'mediumDate' }}</span>
+            }
+          </div>
+        </a>
+      }
+    </section>
+  }
+</div>
