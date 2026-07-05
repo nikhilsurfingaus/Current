@@ -19,6 +19,10 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<LedgerEntry> LedgerEntries => Set<LedgerEntry>();
 
+    public DbSet<Goal> Goals => Set<Goal>();
+
+    public DbSet<GoalContribution> GoalContributions => Set<GoalContribution>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(entity =>
@@ -126,6 +130,74 @@ public class ApplicationDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(ledgerEntry => ledgerEntry.AccountId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Goal>(entity =>
+        {
+            entity.HasKey(goal => goal.Id);
+
+            entity.Property(goal => goal.Name)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.Property(goal => goal.Description)
+                .HasMaxLength(500);
+
+            entity.Property(goal => goal.TargetAmount)
+                .HasPrecision(18, 2);
+
+            entity.Property(goal => goal.CurrentAmount)
+                .HasPrecision(18, 2);
+
+            entity.Property(goal => goal.Currency)
+                .HasMaxLength(3)
+                .IsRequired();
+
+            entity.Property(goal => goal.Status)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.HasOne(goal => goal.User)
+                .WithMany(user => user.Goals)
+                .HasForeignKey(goal => goal.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(goal => goal.SourceAccount)
+                .WithMany()
+                .HasForeignKey(goal => goal.SourceAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(goal => goal.PotAccount)
+                .WithMany()
+                .HasForeignKey(goal => goal.PotAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<GoalContribution>(entity =>
+        {
+            entity.HasKey(contribution => contribution.Id);
+
+            entity.Property(contribution => contribution.Amount)
+                .HasPrecision(18, 2);
+
+            entity.Property(contribution => contribution.ContributionType)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(contribution => contribution.Note)
+                .HasMaxLength(500);
+
+            entity.HasOne(contribution => contribution.Goal)
+                .WithMany(goal => goal.Contributions)
+                .HasForeignKey(contribution => contribution.GoalId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(contribution => contribution.Transaction)
+                .WithMany()
+                .HasForeignKey(contribution => contribution.TransactionId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
 }

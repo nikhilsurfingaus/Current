@@ -20,5 +20,7 @@ public class User
 
     public DateTime UpdatedAt { get; set; }
 
-    public ICollection<Account> Accounts { get; set; } = new List<Account>(); // EF navigation property
+    public ICollection<Account> Accounts { get; set; } = new List<Account>();
+
+    public ICollection<Goal> Goals { get; set; } = new List<Goal>();
 }

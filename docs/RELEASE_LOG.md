@@ -177,18 +177,26 @@ Secure the API with JWT auth and password hashing.
 
 ## Phase 5 — Goals
 
-**Status:** Not started
+**Status:** In progress  
+**Date started:** 2026-07-05
 
 ### Goal
-Savings goals and contributions.
+Savings goals and contributions with ledger-backed allocations.
 
 ### Delivered
-- [ ] `Goal` and `GoalContribution` entities
-- [ ] Goals CRUD + contribute endpoints
-- [ ] Goals UI (list, detail, progress)
+- [x] `GoalStatus` and `ContributionType` enums
+- [x] `Goal` and `GoalContribution` entities
+- [x] `SourceAccountId` + `PotAccountId` on goals (pot account created in Part 2)
+- [x] Goal DTOs (`Create`, `Update`, `Contribute`, `Withdraw`, responses)
+- [x] `GoalMappings` and `GoalContributionMappings`
+- [x] `AddGoalsAndGoalContributions` migration
+- [ ] Goals CRUD + contribute endpoints (Part 2)
+- [ ] Goals UI (list, detail, progress) (Part 3–4)
 
 ### Notes
-—
+- Part 1 complete: schema, DTOs, mappings, migration
+- `CurrentAmount` cached on `Goal`; contributions table is audit source of truth (reconciled in Part 2)
+- Soft cancel via `GoalStatus.Cancelled` (no physical delete)
 
 ---
 
