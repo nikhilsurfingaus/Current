@@ -232,23 +232,24 @@ Financial reporting and charts.
 - [x] `AddTransactionAnalyticsFields` migration (existing rows → `Transfer`)
 - [x] `IAnalyticsService` / `AnalyticsService` + `AnalyticsController`
 - [x] Analytics DTOs (overview, cashflow, net worth history, categories, goals, monthly summary)
-- [ ] Full aggregation queries (cashflow, categories, net worth history, monthly summary)
+- [x] Full aggregation queries (cashflow, categories, net worth history, monthly summary)
 - [ ] `GET /analytics/net-worth` (legacy name — use `networth-history`)
 - [ ] Dashboard charts and `/analytics` UI (Chart.js)
 
 ### Endpoints
 | Method | Route | Status |
 |--------|-------|--------|
-| GET | `/analytics/overview` | ✅ (balance + goals; income/expenses stubbed) |
-| GET | `/analytics/cashflow` | ✅ shell |
-| GET | `/analytics/networth-history` | ✅ shell |
-| GET | `/analytics/categories` | ✅ shell |
+| GET | `/analytics/overview` | ✅ (real monthly KPI aggregation) |
+| GET | `/analytics/cashflow` | ✅ |
+| GET | `/analytics/networth-history` | ✅ |
+| GET | `/analytics/categories` | ✅ |
 | GET | `/analytics/goals` | ✅ |
-| GET | `/analytics/monthly-summary` | ✅ shell |
+| GET | `/analytics/monthly-summary` | ✅ |
 
 ### Notes
 - Part 1 complete: schema, migration, analytics service + controller shell
-- New transfers default to `Category = Transfer`; income/expense reporting in Part 2
+- Part 2 complete: monthly aggregation logic for overview, cashflow, categories, net worth history, and monthly summary
+- New transfers default to `Category = Transfer`; income/expense ratios depend on category distribution
 
 ---
 
