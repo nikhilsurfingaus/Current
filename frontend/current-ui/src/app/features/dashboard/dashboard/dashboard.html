@@ -20,18 +20,16 @@
                 {{ userFacingAccounts().length === 1 ? 'account' : 'accounts' }}
               </p>
             </div>
-            <div class="dashboard-hero-card__chart" aria-hidden="true">
-              <svg width="120" height="48" viewBox="0 0 120 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M2 38 L22 30 L42 34 L62 20 L82 24 L102 14 L118 10"
-                  stroke="#2F80ED"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  fill="none"
+            @if (netWorthPoints().length > 1) {
+              <div class="dashboard-hero-card__chart" aria-hidden="true">
+                <app-chart
+                  chartType="line"
+                  [chartData]="netWorthSparklineData()"
+                  [chartOptions]="netWorthSparklineOptions"
+                  chartHeight="48px"
                 />
-              </svg>
-            </div>
+              </div>
+            }
           </div>
         </article>
       }

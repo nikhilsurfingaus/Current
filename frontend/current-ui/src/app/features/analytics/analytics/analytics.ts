@@ -1,9 +1,11 @@
-import { CurrencyPipe, DatePipe, PercentPipe } from '@angular/common';
+import { CurrencyPipe, PercentPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
+import { ChartConfiguration, ChartData } from 'chart.js';
 import { forkJoin } from 'rxjs';
 
 import { AnalyticsService } from '../../../core/services/analytics.service';
+import { AppChartComponent } from '../../../shared/components/app-chart/app-chart';
 import {
   AnalyticsOverview,
   CashFlowMonthPoint,
@@ -15,10 +17,27 @@ import {
 import { resolveApiErrorMessage } from '../../../shared/utils/http-error.utils';
 import { getTransactionCategoryLabel } from '../../../shared/utils/transaction-category.utils';
 
+const CHART_PRIMARY = '#2f80ed';
+const CHART_SUCCESS = '#16a34a';
+const CHART_ERROR = '#dc2626';
+const CHART_MUTED = '#94a3b8';
+const CATEGORY_COLORS = [
+  '#2f80ed',
+  '#16a34a',
+  '#f59e0b',
+  '#dc2626',
+  '#8b5cf6',
+  '#06b6d4',
+  '#ec4899',
+  '#64748b',
+  '#84cc16',
+  '#f97316',
+];
+
 @Component({
   selector: 'app-analytics',
   standalone: true,
-  imports: [CurrencyPipe, DatePipe, PercentPipe],
+  imports: [CurrencyPipe, PercentPipe, AppChartComponent],
   templateUrl: './analytics.html',
   styleUrl: './analytics.scss',
 })
@@ -34,6 +53,116 @@ export class AnalyticsComponent implements OnInit {
   monthlySummary = signal<MonthlySummaryResponse | null>(null);
 
   readonly getTransactionCategoryLabel = getTransactionCategoryLabel;
+
+  cashFlowChartData = computed<ChartData>(() => {
+    const months = this.cashFlowMonths();
+    return {
+      labels: months.map((month) => this.formatMonthLabel(month.month)),
+      datasets: [
+        {
+          label: 'Income',
+          data: months.map((month) => month.income),
+          backgroundColor: CHART_SUCCESS,
+          borderRadius: 6,
+          maxBarThickness: 28,
+        },
+        {
+          label: 'Expenses',
+          data: months.map((month) => month.expenses),
+          backgroundColor: CHART_ERROR,
+          borderRadius: 6,
+          maxBarThickness: 28,
+        },
+      ],
+    };
+  });
+
+  cashFlowChartOptions: ChartConfiguration['options'] = {
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { boxWidth: 12, usePointStyle: true },
+      },
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { color: CHART_MUTED },
+      },
+      y: {
+        beginAtZero: true,
+        ticks: {
+          color: CHART_MUTED,
+          callback: (value) => `$${Number(value).toLocaleString()}`,
+        },
+      },
+    },
+  };
+
+  categoryChartData = computed<ChartData>(() => {
+    const categories = this.categoryBreakdown();
+    return {
+      labels: categories.map((item) => getTransactionCategoryLabel(item.category)),
+      datasets: [
+        {
+          data: categories.map((item) => item.amount),
+          backgroundColor: categories.map((_, index) => CATEGORY_COLORS[index % CATEGORY_COLORS.length]),
+          borderWidth: 0,
+          hoverOffset: 4,
+        },
+      ],
+    };
+  });
+
+  categoryChartOptions: ChartConfiguration['options'] = {
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { boxWidth: 12, usePointStyle: true },
+      },
+    },
+  };
+
+  netWorthChartData = computed<ChartData>(() => {
+    const points = this.netWorthPoints();
+    return {
+      labels: points.map((point) => this.formatDayLabel(point.date)),
+      datasets: [
+        {
+          label: 'Net worth',
+          data: points.map((point) => point.balance),
+          borderColor: CHART_PRIMARY,
+          backgroundColor: 'rgba(47, 128, 237, 0.12)',
+          fill: true,
+          tension: 0.35,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          borderWidth: 2,
+        },
+      ],
+    };
+  });
+
+  netWorthChartOptions: ChartConfiguration['options'] = {
+    plugins: {
+      legend: { display: false },
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: {
+          color: CHART_MUTED,
+          maxTicksLimit: 6,
+        },
+      },
+      y: {
+        ticks: {
+          color: CHART_MUTED,
+          callback: (value) => `$${Number(value).toLocaleString()}`,
+        },
+      },
+    },
+  };
 
   ngOnInit(): void {
     this.loadAnalytics();
@@ -70,4 +199,22 @@ export class AnalyticsComponent implements OnInit {
   }
 
   constructor(private analyticsService: AnalyticsService) {}
+
+  private formatMonthLabel(monthValue: string): string {
+    const parsedDate = new Date(`${monthValue}-01T00:00:00`);
+    if (Number.isNaN(parsedDate.getTime())) {
+      return monthValue;
+    }
+
+    return parsedDate.toLocaleDateString(undefined, { month: 'short', year: '2-digit' });
+  }
+
+  private formatDayLabel(dateValue: string): string {
+    const parsedDate = new Date(dateValue);
+    if (Number.isNaN(parsedDate.getTime())) {
+      return dateValue;
+    }
+
+    return parsedDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
 }

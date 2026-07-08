@@ -65,20 +65,12 @@
       @if (cashFlowMonths().length === 0) {
         <p class="analytics-page__empty">No cash flow data yet.</p>
       } @else {
-        <ul class="analytics-list">
-          @for (month of cashFlowMonths(); track month.month) {
-            <li class="analytics-list__item">
-              <span class="analytics-list__key">{{ month.month }}</span>
-              <div class="analytics-list__value-group">
-                <span>In {{ month.income | currency: 'AUD' }}</span>
-                <span>Out {{ month.expenses | currency: 'AUD' }}</span>
-                <strong [class.analytics-list__value--negative]="month.net < 0">
-                  Net {{ month.net | currency: 'AUD' }}
-                </strong>
-              </div>
-            </li>
-          }
-        </ul>
+        <app-chart
+          chartType="bar"
+          [chartData]="cashFlowChartData()"
+          [chartOptions]="cashFlowChartOptions"
+          chartHeight="280px"
+        />
       }
     </section>
 
@@ -90,7 +82,13 @@
         @if (categoryBreakdown().length === 0) {
           <p class="analytics-page__empty">No spending categories yet.</p>
         } @else {
-          <ul class="analytics-list">
+          <app-chart
+            chartType="doughnut"
+            [chartData]="categoryChartData()"
+            [chartOptions]="categoryChartOptions"
+            chartHeight="260px"
+          />
+          <ul class="analytics-list analytics-list--compact">
             @for (categoryItem of categoryBreakdown(); track categoryItem.category) {
               <li class="analytics-list__item">
                 <span class="analytics-list__key">
@@ -141,14 +139,12 @@
       @if (netWorthPoints().length === 0) {
         <p class="analytics-page__empty">No net worth points yet.</p>
       } @else {
-        <ul class="analytics-list">
-          @for (point of netWorthPoints(); track point.date) {
-            <li class="analytics-list__item">
-              <span class="analytics-list__key">{{ point.date | date: 'mediumDate' }}</span>
-              <span>{{ point.balance | currency: 'AUD' }}</span>
-            </li>
-          }
-        </ul>
+        <app-chart
+          chartType="line"
+          [chartData]="netWorthChartData()"
+          [chartOptions]="netWorthChartOptions"
+          chartHeight="280px"
+        />
       }
     </section>
 

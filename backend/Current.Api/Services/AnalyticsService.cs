@@ -157,7 +157,9 @@ public class AnalyticsService : IAnalyticsService
 
         var currentMonthTransactions = await GetUserTransactionsQuery(userAccountIds)
             .Where(transaction => transaction.CreatedAt >= monthStartUtc && transaction.CreatedAt < monthEndUtc)
-            .Where(transaction => IsExpenseCategory(transaction.Category))
+            .Where(transaction =>
+                transaction.Category != TransactionCategory.Income &&
+                transaction.Category != TransactionCategory.Transfer)
             .ToListAsync();
 
         var totalExpenses = currentMonthTransactions.Sum(transaction => transaction.Amount);

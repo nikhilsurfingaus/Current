@@ -220,8 +220,9 @@ Savings goals and contributions with ledger-backed allocations.
 
 ## Phase 6 — Analytics
 
-**Status:** In progress  
-**Date started:** 2026-07-06
+**Status:** Complete  
+**Date started:** 2026-07-06  
+**Date completed:** 2026-07-08
 
 ### Goal
 Financial reporting and charts.
@@ -233,9 +234,9 @@ Financial reporting and charts.
 - [x] `IAnalyticsService` / `AnalyticsService` + `AnalyticsController`
 - [x] Analytics DTOs (overview, cashflow, net worth history, categories, goals, monthly summary)
 - [x] Full aggregation queries (cashflow, categories, net worth history, monthly summary)
-- [ ] `GET /analytics/net-worth` (legacy name — use `networth-history`)
-- [x] `/analytics` route + sidebar nav + analytics overview page (cards + lists)
-- [ ] Dashboard charts and `/analytics` visual charts (Chart.js)
+- [x] `/analytics` route + sidebar nav + analytics overview page
+- [x] Chart.js charts on `/analytics` (cash flow bars, category doughnut, net worth line)
+- [x] Dashboard net-worth sparkline from real `networth-history` data
 
 ### Endpoints
 | Method | Route | Status |
@@ -252,6 +253,8 @@ Financial reporting and charts.
 - Part 2 complete: monthly aggregation logic for overview, cashflow, categories, net worth history, and monthly summary
 - New transfers default to `Category = Transfer`; income/expense ratios depend on category distribution
 - Part 3 complete: Angular analytics feature page wired to all analytics endpoints
+- Part 4 complete: reusable `AppChartComponent`, Chart.js visuals on Analytics + Dashboard sparkline
+- Phase 6 complete
 
 ---
 

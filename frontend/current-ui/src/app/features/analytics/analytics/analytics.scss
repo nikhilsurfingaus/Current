@@ -89,6 +89,10 @@
   list-style: none;
 }
 
+.analytics-list--compact {
+  margin-top: $space-md;
+}
+
 .analytics-list__item {
   display: flex;
   align-items: center;
