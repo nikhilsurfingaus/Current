@@ -234,7 +234,8 @@ Financial reporting and charts.
 - [x] Analytics DTOs (overview, cashflow, net worth history, categories, goals, monthly summary)
 - [x] Full aggregation queries (cashflow, categories, net worth history, monthly summary)
 - [ ] `GET /analytics/net-worth` (legacy name — use `networth-history`)
-- [ ] Dashboard charts and `/analytics` UI (Chart.js)
+- [x] `/analytics` route + sidebar nav + analytics overview page (cards + lists)
+- [ ] Dashboard charts and `/analytics` visual charts (Chart.js)
 
 ### Endpoints
 | Method | Route | Status |
@@ -250,6 +251,7 @@ Financial reporting and charts.
 - Part 1 complete: schema, migration, analytics service + controller shell
 - Part 2 complete: monthly aggregation logic for overview, cashflow, categories, net worth history, and monthly summary
 - New transfers default to `Category = Transfer`; income/expense ratios depend on category distribution
+- Part 3 complete: Angular analytics feature page wired to all analytics endpoints
 
 ---
 

@@ -23,4 +23,12 @@ export const API_PATHS = {
     withdraw: (goalId: string) => `/goals/${goalId}/withdraw`,
     history: (goalId: string) => `/goals/${goalId}/history`,
   },
+  analytics: {
+    overview: '/analytics/overview',
+    cashFlow: '/analytics/cashflow',
+    netWorthHistory: '/analytics/networth-history',
+    categories: '/analytics/categories',
+    goals: '/analytics/goals',
+    monthlySummary: '/analytics/monthly-summary',
+  },
 } as const;

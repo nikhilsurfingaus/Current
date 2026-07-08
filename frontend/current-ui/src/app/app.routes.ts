@@ -7,6 +7,7 @@ import { AccountsComponent } from './features/accounts/accounts/accounts';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
 import { DashboardComponent } from './features/dashboard/dashboard/dashboard';
+import { AnalyticsComponent } from './features/analytics/analytics/analytics';
 import { TransferComponent } from './features/transfer/transfer/transfer';
 import { TransactionsComponent } from './features/transactions/transactions/transactions';
 import { GoalsComponent } from './features/goals/goals/goals';
@@ -53,6 +54,11 @@ export const routes: Routes = [
         path: 'transactions',
         component: TransactionsComponent,
         title: 'Transactions',
+      },
+      {
+        path: 'analytics',
+        component: AnalyticsComponent,
+        title: 'Analytics',
       },
       {
         path: 'goals',
