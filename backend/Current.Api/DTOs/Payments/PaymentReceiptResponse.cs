@@ -1,0 +1,28 @@
+using Current.Api.Common.Enums;
+
+namespace Current.Api.DTOs.Payments;
+
+public class PaymentReceiptResponse
+{
+    public Guid TransactionId { get; set; }
+
+    public Guid FromAccountId { get; set; }
+
+    public Guid RecipientAccountId { get; set; }
+
+    public required string RecipientAccountName { get; set; }
+
+    public required string RecipientName { get; set; }
+
+    public required string RecipientEmail { get; set; }
+
+    public decimal Amount { get; set; }
+
+    public required string Currency { get; set; }
+
+    public string? Reference { get; set; }
+
+    public TransactionStatus Status { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+}
