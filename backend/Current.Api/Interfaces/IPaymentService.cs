@@ -4,5 +4,8 @@ namespace Current.Api.Interfaces;
 
 public interface IPaymentService
 {
-    Task<PaymentReceiptResponse> SendPaymentAsync(SendPaymentRequest request, Guid currentUserId);
+    Task<PaymentReceiptResponse> SendPaymentAsync(
+        SendPaymentRequest request,
+        Guid currentUserId,
+        string idempotencyKey);
 }

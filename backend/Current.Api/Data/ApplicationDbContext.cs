@@ -23,6 +23,8 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<GoalContribution> GoalContributions => Set<GoalContribution>();
 
+    public DbSet<IdempotencyKey> IdempotencyKeys => Set<IdempotencyKey>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(entity =>
@@ -187,6 +189,30 @@ public class ApplicationDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(goal => goal.GoalAccountId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<IdempotencyKey>(entity =>
+        {
+            entity.HasKey(idempotencyKey => idempotencyKey.Id);
+
+            entity.Property(idempotencyKey => idempotencyKey.Key)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.Property(idempotencyKey => idempotencyKey.RequestHash)
+                .HasMaxLength(64)
+                .IsRequired();
+
+            entity.Property(idempotencyKey => idempotencyKey.ResponseJson)
+                .IsRequired();
+
+            entity.HasIndex(idempotencyKey => new { idempotencyKey.UserId, idempotencyKey.Key })
+                .IsUnique();
+
+            entity.HasOne(idempotencyKey => idempotencyKey.User)
+                .WithMany()
+                .HasForeignKey(idempotencyKey => idempotencyKey.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<GoalContribution>(entity =>

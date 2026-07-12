@@ -1,3 +1,4 @@
+using Current.Api.Common.Exceptions;
 using Current.Api.DTOs.Payments;
 using Current.Api.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -22,17 +23,26 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpPost("send")]
-    public async Task<ActionResult<PaymentReceiptResponse>> Send([FromBody] SendPaymentRequest request)
+    public async Task<ActionResult<PaymentReceiptResponse>> Send(
+        [FromBody] SendPaymentRequest request,
+        [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey)
     {
         try
         {
             var currentUserId = _currentUserService.GetCurrentUserId();
-            var receipt = await _paymentService.SendPaymentAsync(request, currentUserId);
+            var receipt = await _paymentService.SendPaymentAsync(
+                request,
+                currentUserId,
+                idempotencyKey ?? string.Empty);
             return Ok(receipt);
         }
-        catch (InvalidOperationException ex)
+        catch (PaymentException ex)
         {
-            return BadRequest(new { message = ex.Message });
+            return BadRequest(new PaymentErrorResponse
+            {
+                Code = ex.Code,
+                Message = ex.Message
+            });
         }
     }
 }
