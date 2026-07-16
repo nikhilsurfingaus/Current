@@ -45,4 +45,42 @@ public class PaymentsController : ControllerBase
             });
         }
     }
+
+    [HttpGet("sent")]
+    public async Task<ActionResult<IReadOnlyList<PaymentHistoryItemResponse>>> GetSent()
+    {
+        var currentUserId = _currentUserService.GetCurrentUserId();
+        var payments = await _paymentService.GetSentPaymentsAsync(currentUserId);
+        return Ok(payments);
+    }
+
+    [HttpGet("received")]
+    public async Task<ActionResult<IReadOnlyList<PaymentHistoryItemResponse>>> GetReceived()
+    {
+        var currentUserId = _currentUserService.GetCurrentUserId();
+        var payments = await _paymentService.GetReceivedPaymentsAsync(currentUserId);
+        return Ok(payments);
+    }
+
+    [HttpGet("history")]
+    public async Task<ActionResult<IReadOnlyList<PaymentHistoryItemResponse>>> GetHistory()
+    {
+        var currentUserId = _currentUserService.GetCurrentUserId();
+        var payments = await _paymentService.GetPaymentHistoryAsync(currentUserId);
+        return Ok(payments);
+    }
+
+    [HttpGet("{transactionId:guid}")]
+    public async Task<ActionResult<PaymentHistoryItemResponse>> GetReceipt(Guid transactionId)
+    {
+        var currentUserId = _currentUserService.GetCurrentUserId();
+        var receipt = await _paymentService.GetPaymentReceiptAsync(transactionId, currentUserId);
+
+        if (receipt is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(receipt);
+    }
 }

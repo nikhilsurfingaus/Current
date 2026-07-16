@@ -258,19 +258,36 @@ Financial reporting and charts.
 
 ---
 
-## Phase 7 — Production Ready
+## Phase 7 — Payments + Security Hardening
 
-**Status:** Not started
+**Status:** In progress  
+**Date started:** 2026-07-09
 
 ### Goal
-Enterprise polish and deployment.
+Safely move money between users with ledger integrity, idempotency, and ownership rules.
 
 ### Delivered
-- [ ] FluentValidation
-- [ ] Serilog + global exception middleware
-- [ ] Pagination and caching
-- [ ] Docker
-- [ ] Deploy: Vercel (frontend), Render (API), Neon (PostgreSQL)
+- [x] User-to-user payments via email (`POST /payments/send`)
+- [x] Ownership, self-pay block, currency match, insufficient funds checks
+- [x] Ledger debit/credit in a DB transaction with rollback
+- [x] `IdempotencyKeys` table + `Idempotency-Key` header (safe retries)
+- [x] Typed payment error codes (`PaymentException` / `PaymentErrorCode`)
+- [x] Payment receipt by id + sent/received/history endpoints
+- [ ] Frontend: Pay Someone, Payment History, Transfer Receipt
+- [ ] Docker (optional wrap for this phase)
+
+### Endpoints
+| Method | Route | Status |
+|--------|-------|--------|
+| POST | `/payments/send` | ✅ (requires `Idempotency-Key`) |
+| GET | `/payments/sent` | ✅ |
+| GET | `/payments/received` | ✅ |
+| GET | `/payments/history` | ✅ |
+| GET | `/payments/{transactionId}` | ✅ (receipt) |
 
 ### Notes
-—
+- Part 1 complete: payment send flow + receipt response
+- Part 2 complete: idempotency + standardized payment errors
+- Part 3 complete: receipt lookup + sent/received/history
+- Cross-user payments identified as transactions where from/to accounts belong to different users
+- Next: Part 4 frontend pages

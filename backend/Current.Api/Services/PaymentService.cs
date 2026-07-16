@@ -289,6 +289,115 @@ public class PaymentService : IPaymentService
         return transaction.ToReceiptResponse(recipientAccount, recipientUser);
     }
 
+    public async Task<PaymentHistoryItemResponse?> GetPaymentReceiptAsync(
+        Guid transactionId,
+        Guid currentUserId)
+    {
+        var userAccountIds = await GetUserAccountIdsAsync(currentUserId);
+
+        var transaction = await _dbContext.Transactions
+            .AsNoTracking()
+            .Include(item => item.FromAccount)
+                .ThenInclude(account => account.User)
+            .Include(item => item.ToAccount)
+                .ThenInclude(account => account.User)
+            .FirstOrDefaultAsync(item => item.Id == transactionId);
+
+        if (transaction is null)
+        {
+            return null;
+        }
+
+        var isSender = userAccountIds.Contains(transaction.FromAccountId);
+        var isRecipient = userAccountIds.Contains(transaction.ToAccountId);
+
+        if (!isSender && !isRecipient)
+        {
+            return null;
+        }
+
+        if (transaction.FromAccount.UserId == transaction.ToAccount.UserId)
+        {
+            return null;
+        }
+
+        var direction = isSender ? PaymentDirection.Sent : PaymentDirection.Received;
+
+        return transaction.ToHistoryItemResponse(
+            transaction.FromAccount,
+            transaction.FromAccount.User,
+            transaction.ToAccount,
+            transaction.ToAccount.User,
+            direction);
+    }
+
+    public async Task<IReadOnlyList<PaymentHistoryItemResponse>> GetSentPaymentsAsync(Guid currentUserId)
+    {
+        return await GetPaymentsByDirectionAsync(currentUserId, PaymentDirection.Sent);
+    }
+
+    public async Task<IReadOnlyList<PaymentHistoryItemResponse>> GetReceivedPaymentsAsync(Guid currentUserId)
+    {
+        return await GetPaymentsByDirectionAsync(currentUserId, PaymentDirection.Received);
+    }
+
+    public async Task<IReadOnlyList<PaymentHistoryItemResponse>> GetPaymentHistoryAsync(Guid currentUserId)
+    {
+        var sentPayments = await GetPaymentsByDirectionAsync(currentUserId, PaymentDirection.Sent);
+        var receivedPayments = await GetPaymentsByDirectionAsync(currentUserId, PaymentDirection.Received);
+
+        return sentPayments
+            .Concat(receivedPayments)
+            .OrderByDescending(payment => payment.CreatedAt)
+            .ToList();
+    }
+
+    private async Task<IReadOnlyList<PaymentHistoryItemResponse>> GetPaymentsByDirectionAsync(
+        Guid currentUserId,
+        PaymentDirection direction)
+    {
+        var userAccountIds = await GetUserAccountIdsAsync(currentUserId);
+
+        var query = _dbContext.Transactions
+            .AsNoTracking()
+            .Include(transaction => transaction.FromAccount)
+                .ThenInclude(account => account.User)
+            .Include(transaction => transaction.ToAccount)
+                .ThenInclude(account => account.User)
+            .Where(transaction => transaction.FromAccount.UserId != transaction.ToAccount.UserId);
+
+        if (direction == PaymentDirection.Sent)
+        {
+            query = query.Where(transaction => userAccountIds.Contains(transaction.FromAccountId));
+        }
+        else
+        {
+            query = query.Where(transaction => userAccountIds.Contains(transaction.ToAccountId));
+        }
+
+        var transactions = await query
+            .OrderByDescending(transaction => transaction.CreatedAt)
+            .ToListAsync();
+
+        return transactions
+            .Select(transaction => transaction.ToHistoryItemResponse(
+                transaction.FromAccount,
+                transaction.FromAccount.User,
+                transaction.ToAccount,
+                transaction.ToAccount.User,
+                direction))
+            .ToList();
+    }
+
+    private async Task<List<Guid>> GetUserAccountIdsAsync(Guid currentUserId)
+    {
+        return await _dbContext.Accounts
+            .AsNoTracking()
+            .Where(account => account.UserId == currentUserId)
+            .Select(account => account.Id)
+            .ToListAsync();
+    }
+
     private static string BuildRequestHash(SendPaymentRequest request)
     {
         var recipientEmail = request.RecipientEmail.Trim().ToLowerInvariant();
