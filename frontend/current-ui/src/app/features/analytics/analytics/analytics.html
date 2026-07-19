@@ -67,10 +67,22 @@
       } @else {
         <app-chart
           chartType="bar"
+          chartLabel="Cash flow for the last six months"
           [chartData]="cashFlowChartData()"
-          [chartOptions]="cashFlowChartOptions"
-          chartHeight="280px"
+          [chartOptions]="cashFlowChartOptions()"
+          [chartHeight]="chartHeight()"
         />
+        <ul class="analytics-list analytics-list--compact analytics-cashflow-summary">
+          @for (month of recentCashFlowMonths(); track month.month) {
+            <li class="analytics-list__item">
+              <span class="analytics-list__key">{{ formatMonthLabelPublic(month.month) }}</span>
+              <div class="analytics-list__value-group">
+                <span>+{{ month.income | currency: 'AUD' }}</span>
+                <span class="analytics-list__value--negative">-{{ month.expenses | currency: 'AUD' }}</span>
+              </div>
+            </li>
+          }
+        </ul>
       }
     </section>
 
@@ -84,9 +96,10 @@
         } @else {
           <app-chart
             chartType="doughnut"
+            chartLabel="Spending categories for this month"
             [chartData]="categoryChartData()"
-            [chartOptions]="categoryChartOptions"
-            chartHeight="260px"
+            [chartOptions]="categoryChartOptions()"
+            [chartHeight]="categoryChartHeight()"
           />
           <ul class="analytics-list analytics-list--compact">
             @for (categoryItem of categoryBreakdown(); track categoryItem.category) {
@@ -141,9 +154,10 @@
       } @else {
         <app-chart
           chartType="line"
+          chartLabel="Net worth history for the last 30 days"
           [chartData]="netWorthChartData()"
-          [chartOptions]="netWorthChartOptions"
-          chartHeight="280px"
+          [chartOptions]="netWorthChartOptions()"
+          [chartHeight]="chartHeight()"
         />
       }
     </section>

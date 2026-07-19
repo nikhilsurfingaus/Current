@@ -44,7 +44,13 @@ Chart.register(
   selector: 'app-chart',
   standalone: true,
   template: `
-    <div class="app-chart" [style.height]="chartHeight()" #chartHost>
+    <div
+      class="app-chart"
+      [style.height]="chartHeight()"
+      [attr.role]="chartLabel() ? 'img' : null"
+      [attr.aria-label]="chartLabel() || null"
+      #chartHost
+    >
       <canvas #chartCanvas></canvas>
     </div>
   `,
@@ -65,6 +71,7 @@ export class AppChartComponent implements OnDestroy {
   chartType = input.required<ChartType>();
   chartData = input.required<ChartData>();
   chartOptions = input<ChartConfiguration['options']>({});
+  chartLabel = input('');
   chartHeight = input('240px');
 
   private chartHost = viewChild.required<ElementRef<HTMLDivElement>>('chartHost');

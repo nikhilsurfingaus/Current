@@ -21,33 +21,112 @@
         <a class="transactions-page__link" routerLink="/transfer">Make a transfer</a>
       </p>
     } @else {
-      <table class="transactions-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>From</th>
-            <th>To</th>
-            <th>Amount</th>
-            <th>Description</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (transaction of transactions(); track transaction.id) {
-            <tr
-              class="transactions-table__row"
-              [class.transactions-table__row--expanded]="isTransactionExpanded(transaction.id)"
+      <div class="transactions-desktop">
+        <table class="transactions-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>From</th>
+              <th>To</th>
+              <th>Amount</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (transaction of transactions(); track transaction.id) {
+              <tr
+                class="transactions-table__row"
+                [class.transactions-table__row--expanded]="isTransactionExpanded(transaction.id)"
+                (click)="toggleTransactionDetails(transaction.id)"
+              >
+                <td>{{ transaction.createdAt | date: 'medium' }}</td>
+                <td>{{ getAccountName(transaction.fromAccountId) }}</td>
+                <td>{{ getAccountName(transaction.toAccountId) }}</td>
+                <td>
+                  {{ transaction.amount | currency: getAccountCurrency(transaction.fromAccountId) }}
+                </td>
+                <td>{{ transaction.description || '—' }}</td>
+                <td>
+                  <span
+                    class="transactions-table__status"
+                    [class.transactions-table__status--completed]="
+                      transaction.status === TransactionStatus.Completed
+                    "
+                    [class.transactions-table__status--failed]="
+                      transaction.status === TransactionStatus.Failed
+                    "
+                  >
+                    {{ getTransactionStatusLabel(transaction.status) }}
+                  </span>
+                </td>
+                <td class="transactions-table__expand">
+                  {{ isTransactionExpanded(transaction.id) ? '−' : '+' }}
+                </td>
+              </tr>
+              @if (isTransactionExpanded(transaction.id)) {
+                <tr class="transactions-table__details-row">
+                  <td colspan="7">
+                    <div class="transactions-table__details">
+                      <h3 class="transactions-table__details-title">Ledger entries</h3>
+                      @if (transaction.ledgerEntries.length === 0) {
+                        <p class="transactions-table__details-empty">No ledger entries.</p>
+                      } @else {
+                        <ul class="transactions-table__ledger-list">
+                          @for (entry of transaction.ledgerEntries; track entry.id) {
+                            <li class="transactions-table__ledger-item">
+                              <span class="transactions-table__ledger-account">
+                                {{ getAccountName(entry.accountId) }}
+                              </span>
+                              <span
+                                class="transactions-table__ledger-type"
+                                [class.transactions-table__ledger-type--debit]="isLedgerDebit(entry.entryType)"
+                                [class.transactions-table__ledger-type--credit]="!isLedgerDebit(entry.entryType)"
+                              >
+                                {{ getLedgerEntrySign(entry.entryType) }}
+                                {{ isLedgerDebit(entry.entryType) ? 'Debit' : 'Credit' }}
+                              </span>
+                              <span
+                                class="transactions-table__ledger-amount"
+                                [class.transactions-table__ledger-amount--debit]="isLedgerDebit(entry.entryType)"
+                                [class.transactions-table__ledger-amount--credit]="!isLedgerDebit(entry.entryType)"
+                              >
+                                {{ getLedgerEntrySign(entry.entryType) }}{{ entry.amount | currency: getAccountCurrency(entry.accountId) }}
+                              </span>
+                            </li>
+                          }
+                        </ul>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <ul class="transactions-cards">
+        @for (transaction of transactions(); track transaction.id) {
+          <li class="transactions-card">
+            <button
+              type="button"
+              class="transactions-card__toggle"
+              [attr.aria-expanded]="isTransactionExpanded(transaction.id)"
               (click)="toggleTransactionDetails(transaction.id)"
             >
-              <td>{{ transaction.createdAt | date: 'medium' }}</td>
-              <td>{{ getAccountName(transaction.fromAccountId) }}</td>
-              <td>{{ getAccountName(transaction.toAccountId) }}</td>
-              <td>
-                {{ transaction.amount | currency: getAccountCurrency(transaction.fromAccountId) }}
-              </td>
-              <td>{{ transaction.description || '—' }}</td>
-              <td>
+              <div class="transactions-card__top">
+                <div class="transactions-card__primary">
+                  <p class="transactions-card__amount">
+                    {{ transaction.amount | currency: getAccountCurrency(transaction.fromAccountId) }}
+                  </p>
+                  <p class="transactions-card__route">
+                    {{ getAccountName(transaction.fromAccountId) }}
+                    →
+                    {{ getAccountName(transaction.toAccountId) }}
+                  </p>
+                </div>
                 <span
                   class="transactions-table__status"
                   [class.transactions-table__status--completed]="
@@ -59,51 +138,52 @@
                 >
                   {{ getTransactionStatusLabel(transaction.status) }}
                 </span>
-              </td>
-              <td class="transactions-table__expand">
-                {{ isTransactionExpanded(transaction.id) ? '−' : '+' }}
-              </td>
-            </tr>
+              </div>
+              <div class="transactions-card__meta">
+                <span>{{ transaction.createdAt | date: 'mediumDate' }}</span>
+                <span>{{ transaction.description || 'No description' }}</span>
+                <span class="transactions-card__expand">
+                  {{ isTransactionExpanded(transaction.id) ? 'Hide ledger' : 'Show ledger' }}
+                </span>
+              </div>
+            </button>
+
             @if (isTransactionExpanded(transaction.id)) {
-              <tr class="transactions-table__details-row">
-                <td colspan="7">
-                  <div class="transactions-table__details">
-                    <h3 class="transactions-table__details-title">Ledger entries</h3>
-                    @if (transaction.ledgerEntries.length === 0) {
-                      <p class="transactions-table__details-empty">No ledger entries.</p>
-                    } @else {
-                      <ul class="transactions-table__ledger-list">
-                        @for (entry of transaction.ledgerEntries; track entry.id) {
-                          <li class="transactions-table__ledger-item">
-                            <span class="transactions-table__ledger-account">
-                              {{ getAccountName(entry.accountId) }}
-                            </span>
-                            <span
-                              class="transactions-table__ledger-type"
-                              [class.transactions-table__ledger-type--debit]="isLedgerDebit(entry.entryType)"
-                              [class.transactions-table__ledger-type--credit]="!isLedgerDebit(entry.entryType)"
-                            >
-                              {{ getLedgerEntrySign(entry.entryType) }}
-                              {{ isLedgerDebit(entry.entryType) ? 'Debit' : 'Credit' }}
-                            </span>
-                            <span
-                              class="transactions-table__ledger-amount"
-                              [class.transactions-table__ledger-amount--debit]="isLedgerDebit(entry.entryType)"
-                              [class.transactions-table__ledger-amount--credit]="!isLedgerDebit(entry.entryType)"
-                            >
-                              {{ getLedgerEntrySign(entry.entryType) }}{{ entry.amount | currency: getAccountCurrency(entry.accountId) }}
-                            </span>
-                          </li>
-                        }
-                      </ul>
+              <div class="transactions-card__details">
+                <h3 class="transactions-table__details-title">Ledger entries</h3>
+                @if (transaction.ledgerEntries.length === 0) {
+                  <p class="transactions-table__details-empty">No ledger entries.</p>
+                } @else {
+                  <ul class="transactions-table__ledger-list">
+                    @for (entry of transaction.ledgerEntries; track entry.id) {
+                      <li class="transactions-table__ledger-item">
+                        <span class="transactions-table__ledger-account">
+                          {{ getAccountName(entry.accountId) }}
+                        </span>
+                        <span
+                          class="transactions-table__ledger-type"
+                          [class.transactions-table__ledger-type--debit]="isLedgerDebit(entry.entryType)"
+                          [class.transactions-table__ledger-type--credit]="!isLedgerDebit(entry.entryType)"
+                        >
+                          {{ getLedgerEntrySign(entry.entryType) }}
+                          {{ isLedgerDebit(entry.entryType) ? 'Debit' : 'Credit' }}
+                        </span>
+                        <span
+                          class="transactions-table__ledger-amount"
+                          [class.transactions-table__ledger-amount--debit]="isLedgerDebit(entry.entryType)"
+                          [class.transactions-table__ledger-amount--credit]="!isLedgerDebit(entry.entryType)"
+                        >
+                          {{ getLedgerEntrySign(entry.entryType) }}{{ entry.amount | currency: getAccountCurrency(entry.accountId) }}
+                        </span>
+                      </li>
                     }
-                  </div>
-                </td>
-              </tr>
+                  </ul>
+                }
+              </div>
             }
-          }
-        </tbody>
-      </table>
+          </li>
+        }
+      </ul>
     }
   </section>
 </div>

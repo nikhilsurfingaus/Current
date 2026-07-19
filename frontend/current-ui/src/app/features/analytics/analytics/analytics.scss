@@ -93,6 +93,10 @@
   margin-top: $space-md;
 }
 
+.analytics-cashflow-summary {
+  display: none;
+}
+
 .analytics-list__item {
   display: flex;
   align-items: center;
@@ -207,6 +211,24 @@
 @media (max-width: 900px) {
   .analytics-page__columns,
   .analytics-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .analytics-cashflow-summary {
+    display: block;
+  }
+
+  .analytics-overview-card__value,
+  .analytics-kpi-card__value {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 600px) {
+  .analytics-page__overview-grid,
+  .analytics-page__kpi-grid {
     grid-template-columns: 1fr;
   }
 }

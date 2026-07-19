@@ -306,26 +306,47 @@
       } @else if (contributionHistory().length === 0) {
         <p class="goal-detail-page__status">No contributions yet.</p>
       } @else {
-        <table class="goal-history-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Amount</th>
-              <th>Note</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (entry of contributionHistory(); track entry.id) {
+        <div class="goal-history-desktop">
+          <table class="goal-history-table">
+            <thead>
               <tr>
-                <td>{{ entry.createdAt | date: 'medium' }}</td>
-                <td>{{ getContributionTypeLabel(entry.contributionType) }}</td>
-                <td>{{ entry.amount | currency: currentGoal.currency }}</td>
-                <td>{{ entry.note || '—' }}</td>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Note</th>
               </tr>
-            }
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              @for (entry of contributionHistory(); track entry.id) {
+                <tr>
+                  <td>{{ entry.createdAt | date: 'medium' }}</td>
+                  <td>{{ getContributionTypeLabel(entry.contributionType) }}</td>
+                  <td>{{ entry.amount | currency: currentGoal.currency }}</td>
+                  <td>{{ entry.note || '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <ul class="goal-history-cards">
+          @for (entry of contributionHistory(); track entry.id) {
+            <li class="goal-history-card">
+              <div class="goal-history-card__top">
+                <p class="goal-history-card__amount">
+                  {{ entry.amount | currency: currentGoal.currency }}
+                </p>
+                <span class="goal-history-card__type">
+                  {{ getContributionTypeLabel(entry.contributionType) }}
+                </span>
+              </div>
+              <p class="goal-history-card__meta">{{ entry.createdAt | date: 'medium' }}</p>
+              @if (entry.note) {
+                <p class="goal-history-card__note">{{ entry.note }}</p>
+              }
+            </li>
+          }
+        </ul>
       }
     </section>
   }

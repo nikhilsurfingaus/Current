@@ -1,6 +1,6 @@
 import { CurrencyPipe, PercentPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, computed, signal } from '@angular/core';
+import { Component, HostListener, OnInit, computed, signal } from '@angular/core';
 import { ChartConfiguration, ChartData } from 'chart.js';
 import { forkJoin } from 'rxjs';
 
@@ -21,6 +21,7 @@ const CHART_PRIMARY = '#2f80ed';
 const CHART_SUCCESS = '#16a34a';
 const CHART_ERROR = '#dc2626';
 const CHART_MUTED = '#94a3b8';
+const COMPACT_BREAKPOINT_PX = 700;
 const CATEGORY_COLORS = [
   '#2f80ed',
   '#16a34a',
@@ -44,6 +45,9 @@ const CATEGORY_COLORS = [
 export class AnalyticsComponent implements OnInit {
   analyticsLoading = signal(false);
   analyticsLoadError = signal('');
+  isCompactViewport = signal(
+    typeof window !== 'undefined' && window.innerWidth <= COMPACT_BREAKPOINT_PX,
+  );
 
   overview = signal<AnalyticsOverview | null>(null);
   cashFlowMonths = signal<CashFlowMonthPoint[]>([]);
@@ -54,50 +58,85 @@ export class AnalyticsComponent implements OnInit {
 
   readonly getTransactionCategoryLabel = getTransactionCategoryLabel;
 
+  chartHeight = computed(() => (this.isCompactViewport() ? '220px' : '280px'));
+  categoryChartHeight = computed(() => (this.isCompactViewport() ? '200px' : '260px'));
+
   cashFlowChartData = computed<ChartData>(() => {
     const months = this.cashFlowMonths();
+    const compact = this.isCompactViewport();
+
     return {
-      labels: months.map((month) => this.formatMonthLabel(month.month)),
+      labels: months.map((month) => this.formatMonthLabel(month.month, compact)),
       datasets: [
         {
           label: 'Income',
           data: months.map((month) => month.income),
           backgroundColor: CHART_SUCCESS,
           borderRadius: 6,
-          maxBarThickness: 28,
+          maxBarThickness: compact ? 18 : 28,
         },
         {
           label: 'Expenses',
           data: months.map((month) => month.expenses),
           backgroundColor: CHART_ERROR,
           borderRadius: 6,
-          maxBarThickness: 28,
+          maxBarThickness: compact ? 18 : 28,
         },
       ],
     };
   });
 
-  cashFlowChartOptions: ChartConfiguration['options'] = {
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: { boxWidth: 12, usePointStyle: true },
-      },
-    },
-    scales: {
-      x: {
-        grid: { display: false },
-        ticks: { color: CHART_MUTED },
-      },
-      y: {
-        beginAtZero: true,
-        ticks: {
-          color: CHART_MUTED,
-          callback: (value) => `$${Number(value).toLocaleString()}`,
+  cashFlowChartOptions = computed<ChartConfiguration['options']>(() => {
+    const compact = this.isCompactViewport();
+
+    if (compact) {
+      return {
+        indexAxis: 'y',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { boxWidth: 10, usePointStyle: true, font: { size: 11 } },
+          },
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: {
+              color: CHART_MUTED,
+              maxTicksLimit: 4,
+              callback: (value) => `$${Number(value).toLocaleString()}`,
+            },
+          },
+          y: {
+            grid: { display: false },
+            ticks: { color: CHART_MUTED, font: { size: 11 } },
+          },
+        },
+      };
+    }
+
+    return {
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 12, usePointStyle: true },
         },
       },
-    },
-  };
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: CHART_MUTED },
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: CHART_MUTED,
+            callback: (value) => `$${Number(value).toLocaleString()}`,
+          },
+        },
+      },
+    };
+  });
 
   categoryChartData = computed<ChartData>(() => {
     const categories = this.categoryBreakdown();
@@ -114,14 +153,15 @@ export class AnalyticsComponent implements OnInit {
     };
   });
 
-  categoryChartOptions: ChartConfiguration['options'] = {
+  categoryChartOptions = computed<ChartConfiguration['options']>(() => ({
     plugins: {
       legend: {
+        display: !this.isCompactViewport(),
         position: 'bottom',
         labels: { boxWidth: 12, usePointStyle: true },
       },
     },
-  };
+  }));
 
   netWorthChartData = computed<ChartData>(() => {
     const points = this.netWorthPoints();
@@ -143,26 +183,37 @@ export class AnalyticsComponent implements OnInit {
     };
   });
 
-  netWorthChartOptions: ChartConfiguration['options'] = {
-    plugins: {
-      legend: { display: false },
-    },
-    scales: {
-      x: {
-        grid: { display: false },
-        ticks: {
-          color: CHART_MUTED,
-          maxTicksLimit: 6,
+  netWorthChartOptions = computed<ChartConfiguration['options']>(() => {
+    const compact = this.isCompactViewport();
+
+    return {
+      plugins: {
+        legend: { display: false },
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: {
+            color: CHART_MUTED,
+            maxTicksLimit: compact ? 4 : 6,
+            font: { size: compact ? 10 : 12 },
+          },
+        },
+        y: {
+          ticks: {
+            color: CHART_MUTED,
+            maxTicksLimit: compact ? 4 : undefined,
+            callback: (value) => `$${Number(value).toLocaleString()}`,
+          },
         },
       },
-      y: {
-        ticks: {
-          color: CHART_MUTED,
-          callback: (value) => `$${Number(value).toLocaleString()}`,
-        },
-      },
-    },
-  };
+    };
+  });
+
+  recentCashFlowMonths = computed(() => {
+    const months = this.cashFlowMonths();
+    return months.slice(-3).reverse();
+  });
 
   ngOnInit(): void {
     this.loadAnalytics();
@@ -200,13 +251,25 @@ export class AnalyticsComponent implements OnInit {
 
   constructor(private analyticsService: AnalyticsService) {}
 
-  private formatMonthLabel(monthValue: string): string {
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.isCompactViewport.set(window.innerWidth <= COMPACT_BREAKPOINT_PX);
+  }
+
+  formatMonthLabelPublic(monthValue: string): string {
+    return this.formatMonthLabel(monthValue, this.isCompactViewport());
+  }
+
+  private formatMonthLabel(monthValue: string, compact = false): string {
     const parsedDate = new Date(`${monthValue}-01T00:00:00`);
     if (Number.isNaN(parsedDate.getTime())) {
       return monthValue;
     }
 
-    return parsedDate.toLocaleDateString(undefined, { month: 'short', year: '2-digit' });
+    return parsedDate.toLocaleDateString(undefined, {
+      month: 'short',
+      year: compact ? undefined : '2-digit',
+    });
   }
 
   private formatDayLabel(dateValue: string): string {

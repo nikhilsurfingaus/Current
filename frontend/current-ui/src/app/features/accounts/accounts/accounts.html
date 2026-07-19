@@ -96,26 +96,44 @@
     } @else if (userFacingAccounts().length === 0) {
       <p class="accounts-page__status">No accounts yet. Create your first account to get started.</p>
     } @else {
-      <table class="accounts-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Balance</th>
-            <th>Currency</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (account of userFacingAccounts(); track account.id) {
+      <div class="accounts-desktop">
+        <table class="accounts-table">
+          <thead>
             <tr>
-              <td>{{ account.name }}</td>
-              <td>{{ getAccountTypeLabel(account.accountType) }}</td>
-              <td>{{ account.currentBalance | currency: account.currency }}</td>
-              <td>{{ account.currency }}</td>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Balance</th>
+              <th>Currency</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (account of userFacingAccounts(); track account.id) {
+              <tr>
+                <td>{{ account.name }}</td>
+                <td>{{ getAccountTypeLabel(account.accountType) }}</td>
+                <td>{{ account.currentBalance | currency: account.currency }}</td>
+                <td>{{ account.currency }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <ul class="accounts-cards">
+        @for (account of userFacingAccounts(); track account.id) {
+          <li class="accounts-card">
+            <div class="accounts-card__top">
+              <p class="accounts-card__name">{{ account.name }}</p>
+              <p class="accounts-card__balance">
+                {{ account.currentBalance | currency: account.currency }}
+              </p>
+            </div>
+            <p class="accounts-card__meta">
+              {{ getAccountTypeLabel(account.accountType) }} · {{ account.currency }}
+            </p>
+          </li>
+        }
+      </ul>
     }
   </section>
 </div>

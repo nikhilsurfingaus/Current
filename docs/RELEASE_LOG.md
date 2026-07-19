@@ -297,3 +297,42 @@ Safely move money between users with ledger integrity, idempotency, and ownershi
 - Contacts enhancement: manage saved names/emails at `/contacts` and reuse them when paying
 - Cross-user payments identified as transactions where from/to accounts belong to different users
 - Phase 7 complete (Docker optional / deferred to Phase 9)
+
+---
+
+## Phase 8 — UX Polish & Accessibility
+
+**Status:** In progress  
+**Date started:** 2026-07-20  
+**Date completed:** —
+
+### Goal
+Make every Current workflow intentionally usable on desktop, tablet, mobile, keyboard and screen reader—with polished loading, empty, error and motion states, then user preferences.
+
+### Planned parts
+1. Mobile navigation and responsive layouts
+2. Mobile tables and chart adaptations
+3. Forms and accessibility
+4. Loading, empty and error states
+5. Subtle animations and reduced-motion support
+6. User profile and preferences
+
+### Delivered
+- [x] Part 1: slide-out mobile drawer navigation (replaces wrapped sidebar links)
+- [x] Part 1: mobile chrome (menu + brand), backdrop, Escape/resize/route close
+- [x] Part 1: keep user profile + logout in the drawer on mobile
+- [x] Part 1: narrow-phone topbar/footer/page spacing polish
+- [x] Part 1: tablet-friendly dashboard/analytics/goals grids
+- [x] Part 2: transactions/accounts/goal history table → mobile cards
+- [x] Part 2: analytics charts — flip cash flow, trim ticks, hide doughnut legend, mobile summaries
+- [ ] Part 3: forms + accessibility pass
+- [ ] Part 4: skeletons / empty / error states
+- [ ] Part 5: motion + `prefers-reduced-motion`
+- [ ] Part 6: profile / theme / currency / timezone / locale
+
+### Notes
+- Part 1 complete: intentional mobile shell instead of stacking all nav links
+- Part 2 complete: mobile card lists for dense tables; chart adaptations inspired by flip/trim/stack patterns
+- Drawer chosen over bottom nav because Current has eight primary destinations
+- User preferences deferred to Part 6 (needs backend fields + APIs)
+
