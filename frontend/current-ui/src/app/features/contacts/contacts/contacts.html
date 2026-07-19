@@ -1,0 +1,134 @@
+<div class="contacts-page">
+  <header class="contacts-page__header">
+    <div>
+      <h1 class="contacts-page__title">Contacts</h1>
+      <p class="contacts-page__subtitle">Save people you pay regularly</p>
+    </div>
+    <a class="contacts-page__action" routerLink="/payments/send">Pay someone</a>
+  </header>
+
+  @if (contactsLoadError()) {
+    <div class="contacts-page__alert contacts-page__alert--error">{{ contactsLoadError() }}</div>
+  }
+
+  <div class="contacts-page__columns">
+    <section class="contacts-page__card contacts-page__form-card">
+      <h2 class="contacts-page__card-title">
+        {{ editingContactId() ? 'Edit contact' : 'Add contact' }}
+      </h2>
+
+      @if (contactErrorMessage()) {
+        <div class="contacts-page__alert contacts-page__alert--error">{{ contactErrorMessage() }}</div>
+      }
+
+      <form class="contacts-form" [formGroup]="contactForm" (ngSubmit)="onSubmitContact()">
+        <div class="contacts-form__field">
+          <label class="contacts-form__label" for="contact-name">Name</label>
+          <input
+            id="contact-name"
+            class="contacts-form__input"
+            type="text"
+            formControlName="name"
+            maxlength="100"
+            placeholder="e.g. John Smith"
+          />
+          @if (contactFormSubmitted() && contactForm.controls.name.invalid) {
+            <span class="contacts-form__error">Enter a contact name.</span>
+          }
+        </div>
+
+        <div class="contacts-form__field">
+          <label class="contacts-form__label" for="contact-email">Email</label>
+          <input
+            id="contact-email"
+            class="contacts-form__input"
+            type="email"
+            formControlName="email"
+            maxlength="255"
+            placeholder="friend@email.com"
+            autocomplete="email"
+          />
+          @if (contactFormSubmitted() && contactForm.controls.email.invalid) {
+            <span class="contacts-form__error">Enter a valid email.</span>
+          }
+        </div>
+
+        <div class="contacts-form__actions">
+          <button
+            class="contacts-form__submit"
+            type="submit"
+            [disabled]="contactRequestInFlight()"
+          >
+            @if (contactRequestInFlight()) {
+              Saving...
+            } @else {
+              {{ editingContactId() ? 'Update contact' : 'Add contact' }}
+            }
+          </button>
+          @if (editingContactId()) {
+            <button class="contacts-form__cancel" type="button" (click)="cancelEditing()">
+              Cancel
+            </button>
+          }
+        </div>
+      </form>
+    </section>
+
+    <section class="contacts-page__card">
+      <h2 class="contacts-page__card-title">Saved contacts</h2>
+
+      @if (contactsLoading()) {
+        <p class="contacts-page__status">Loading contacts...</p>
+      } @else if (contacts().length === 0) {
+        <p class="contacts-page__status">No contacts saved yet.</p>
+      } @else {
+        <ul class="contacts-list">
+          @for (contact of contacts(); track contact.id) {
+            <li class="contacts-list__item">
+              <div class="contacts-list__identity">
+                <span class="contacts-list__avatar">{{ contact.name.slice(0, 1).toUpperCase() }}</span>
+                <div>
+                  <p class="contacts-list__name">{{ contact.name }}</p>
+                  <p class="contacts-list__email">{{ contact.email }}</p>
+                </div>
+              </div>
+
+              @if (pendingDeleteContactId() === contact.id) {
+                <div class="contacts-list__delete-confirm">
+                  <span>Delete?</span>
+                  <button
+                    type="button"
+                    class="contacts-list__delete"
+                    [disabled]="deletingContactId() === contact.id"
+                    (click)="confirmDelete(contact.id)"
+                  >
+                    {{ deletingContactId() === contact.id ? 'Deleting...' : 'Yes' }}
+                  </button>
+                  <button type="button" class="contacts-list__button" (click)="cancelDelete()">
+                    No
+                  </button>
+                </div>
+              } @else {
+                <div class="contacts-list__actions">
+                  <a
+                    class="contacts-list__pay"
+                    [routerLink]="['/payments/send']"
+                    [queryParams]="{ contactId: contact.id }"
+                  >
+                    Pay
+                  </a>
+                  <button type="button" class="contacts-list__button" (click)="startEditing(contact)">
+                    Edit
+                  </button>
+                  <button type="button" class="contacts-list__delete" (click)="requestDelete(contact.id)">
+                    Delete
+                  </button>
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+</div>

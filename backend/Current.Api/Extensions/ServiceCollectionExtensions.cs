@@ -51,6 +51,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<ITransactionService, TransactionService>();
         services.AddScoped<IPaymentService, PaymentService>();
+        services.AddScoped<IContactService, ContactService>();
         services.AddScoped<IGoalService, GoalService>();
         services.AddScoped<IAnalyticsService, AnalyticsService>();
         services.AddScoped<IAuthService, AuthService>();

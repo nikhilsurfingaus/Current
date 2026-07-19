@@ -5,6 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 import { AccountService } from '../../../core/services/account.service';
 import { GoalService } from '../../../core/services/goal.service';
+import { NormalizeAmountDirective } from '../../../shared/directives/normalize-amount.directive';
 import { Account, AccountType, ApiError, CreateAccountRequest, Goal } from '../../../shared/models';
 import {
   ACCOUNT_TYPE_OPTIONS,
@@ -15,7 +16,7 @@ import { filterNonGoalAccounts } from '../../../shared/utils/goal-account.utils'
 @Component({
   selector: 'app-accounts',
   standalone: true,
-  imports: [ReactiveFormsModule, CurrencyPipe],
+  imports: [ReactiveFormsModule, CurrencyPipe, NormalizeAmountDirective],
   templateUrl: './accounts.html',
   styleUrl: './accounts.scss',
 })

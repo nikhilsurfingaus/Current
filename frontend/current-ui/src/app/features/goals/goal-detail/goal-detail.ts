@@ -9,6 +9,7 @@ import { GoalService } from '../../../core/services/goal.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { GoalIconComponent } from '../../../shared/components/goal-icon/goal-icon';
 import { GOAL_ICON_OPTIONS } from '../../../shared/constants/goal-icon-options';
+import { NormalizeAmountDirective } from '../../../shared/directives/normalize-amount.directive';
 import {
   Account,
   ApiError,
@@ -33,6 +34,7 @@ import { getGoalStatusLabel } from '../../../shared/utils/goal-status.utils';
     DatePipe,
     PercentPipe,
     GoalIconComponent,
+    NormalizeAmountDirective,
   ],
   templateUrl: './goal-detail.html',
   styleUrl: './goal-detail.scss',

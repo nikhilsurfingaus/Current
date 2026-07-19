@@ -67,26 +67,56 @@ export class DashboardComponent implements OnInit {
           data: points.map((point) => point.balance),
           borderColor: CHART_PRIMARY,
           backgroundColor: 'rgba(47, 128, 237, 0.15)',
-          fill: true,
-          tension: 0.4,
+          fill: 'start',
+          tension: 0.35,
           pointRadius: 0,
+          pointHoverRadius: 0,
           borderWidth: 2,
+          clip: false,
         },
       ],
     };
   });
 
   netWorthSparklineOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: false,
+    layout: {
+      padding: 0,
+    },
     plugins: {
       legend: { display: false },
       tooltip: { enabled: false },
+      filler: {
+        propagate: false,
+      },
     },
     scales: {
-      x: { display: false },
-      y: { display: false },
+      x: {
+        display: false,
+        offset: false,
+        bounds: 'data',
+        border: { display: false },
+        grid: { display: false },
+      },
+      y: {
+        display: false,
+        beginAtZero: false,
+        grace: '8%',
+        border: { display: false },
+        grid: { display: false },
+      },
     },
     elements: {
-      line: { borderJoinStyle: 'round' },
+      line: {
+        borderJoinStyle: 'round',
+        borderCapStyle: 'round',
+      },
+      point: {
+        radius: 0,
+        hoverRadius: 0,
+      },
     },
   };
 

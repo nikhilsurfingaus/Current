@@ -63,6 +63,7 @@
               min="0.01"
               step="0.01"
               formControlName="targetAmount"
+              appNormalizeAmount
             />
             @if (createFormSubmitted() && createGoalForm.controls.targetAmount.invalid) {
               <span class="goals-form__error">Target must be greater than zero.</span>

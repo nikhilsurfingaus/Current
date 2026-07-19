@@ -38,4 +38,8 @@ export const API_PATHS = {
     history: '/payments/history',
     byId: (transactionId: string) => `/payments/${transactionId}`,
   },
+  contacts: {
+    list: '/contacts',
+    byId: (contactId: string) => `/contacts/${contactId}`,
+  },
 } as const;

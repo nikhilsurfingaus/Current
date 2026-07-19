@@ -143,6 +143,7 @@
               min="0.01"
               step="0.01"
               formControlName="amount"
+              appNormalizeAmount
             />
             @if (contributeFormSubmitted() && contributeForm.controls.amount.invalid) {
               <span class="goal-detail-form__error">Enter an amount greater than zero.</span>
@@ -180,6 +181,7 @@
               min="0.01"
               step="0.01"
               formControlName="amount"
+              appNormalizeAmount
             />
             @if (withdrawFormSubmitted() && withdrawForm.controls.amount.invalid) {
               <span class="goal-detail-form__error">Enter an amount greater than zero.</span>
@@ -262,6 +264,7 @@
                 min="0.01"
                 step="0.01"
                 formControlName="targetAmount"
+                appNormalizeAmount
               />
             </div>
 

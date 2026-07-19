@@ -25,6 +25,8 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<IdempotencyKey> IdempotencyKeys => Set<IdempotencyKey>();
 
+    public DbSet<Contact> Contacts => Set<Contact>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(entity =>
@@ -212,6 +214,27 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(idempotencyKey => idempotencyKey.User)
                 .WithMany()
                 .HasForeignKey(idempotencyKey => idempotencyKey.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Contact>(entity =>
+        {
+            entity.HasKey(contact => contact.Id);
+
+            entity.Property(contact => contact.Name)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.Property(contact => contact.Email)
+                .HasMaxLength(255)
+                .IsRequired();
+
+            entity.HasIndex(contact => new { contact.UserId, contact.Email })
+                .IsUnique();
+
+            entity.HasOne(contact => contact.User)
+                .WithMany()
+                .HasForeignKey(contact => contact.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 

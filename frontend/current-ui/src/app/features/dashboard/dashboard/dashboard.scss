@@ -62,9 +62,10 @@
 
 .dashboard-hero-card__body {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: $space-md;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  min-width: 0;
 }
 
 .dashboard-hero-card__value {
@@ -82,10 +83,18 @@
 }
 
 .dashboard-hero-card__chart {
-  flex-shrink: 0;
-  width: 140px;
-  height: 48px;
+  position: relative;
+  width: 100%;
+  height: 56px;
+  margin-top: $space-md;
   overflow: hidden;
+
+  app-chart,
+  .app-chart {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .dashboard-stat-card {

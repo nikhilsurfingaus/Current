@@ -17,3 +17,4 @@ export * from './goals/withdraw-goal-request.model';
 export * from './analytics/analytics.model';
 export * from './payments/send-payment-request.model';
 export * from './payments/payment.model';
+export * from './contacts/contact.model';

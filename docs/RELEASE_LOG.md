@@ -275,6 +275,7 @@ Safely move money between users with ledger integrity, idempotency, and ownershi
 - [x] Typed payment error codes (`PaymentException` / `PaymentErrorCode`)
 - [x] Payment receipt by id + sent/received/history endpoints
 - [x] Frontend: Pay Someone, Payment History, Payment Receipt + sidebar
+- [x] Saved contacts — per-user CRUD, payment picker, optional save after payment
 - [ ] Docker (optional wrap for this phase)
 
 ### Endpoints
@@ -285,11 +286,14 @@ Safely move money between users with ledger integrity, idempotency, and ownershi
 | GET | `/payments/received` | ✅ |
 | GET | `/payments/history` | ✅ |
 | GET | `/payments/{transactionId}` | ✅ (receipt) |
+| GET/POST | `/contacts` | ✅ |
+| GET/PUT/DELETE | `/contacts/{contactId}` | ✅ |
 
 ### Notes
 - Part 1 complete: payment send flow + receipt response
 - Part 2 complete: idempotency + standardized payment errors
 - Part 3 complete: receipt lookup + sent/received/history
 - Part 4 complete: Angular Pay Someone (`/payments/send`), history (`/payments`), receipt (`/payments/:id`)
+- Contacts enhancement: manage saved names/emails at `/contacts` and reuse them when paying
 - Cross-user payments identified as transactions where from/to accounts belong to different users
 - Phase 7 complete (Docker optional / deferred to Phase 9)

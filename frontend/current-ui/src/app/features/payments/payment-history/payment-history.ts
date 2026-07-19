@@ -3,7 +3,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+import { ContactService } from '../../../core/services/contact.service';
 import { PaymentService } from '../../../core/services/payment.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { PaymentDirection, PaymentHistoryItem, TransactionStatus } from '../../../shared/models';
 import { resolveApiErrorMessage } from '../../../shared/utils/http-error.utils';
 import { getTransactionStatusLabel } from '../../../shared/utils/transaction-status.utils';
@@ -22,6 +24,9 @@ export class PaymentHistoryComponent implements OnInit {
   paymentsLoading = signal(false);
   paymentsLoadError = signal('');
   activeFilter = signal<PaymentHistoryFilter>('all');
+  contactsLoaded = signal(false);
+  savedContactEmails = signal<Set<string>>(new Set());
+  addingContactEmail = signal<string | null>(null);
 
   readonly paymentDirection = PaymentDirection;
   readonly getTransactionStatusLabel = getTransactionStatusLabel;
@@ -42,10 +47,15 @@ export class PaymentHistoryComponent implements OnInit {
     return payments;
   });
 
-  constructor(private paymentService: PaymentService) {}
+  constructor(
+    private paymentService: PaymentService,
+    private contactService: ContactService,
+    private toastService: ToastService,
+  ) {}
 
   ngOnInit(): void {
     this.loadPaymentHistory();
+    this.loadContacts();
   }
 
   setFilter(filter: PaymentHistoryFilter): void {
@@ -58,6 +68,40 @@ export class PaymentHistoryComponent implements OnInit {
     }
 
     return payment.senderName || payment.senderEmail;
+  }
+
+  getCounterpartyEmail(payment: PaymentHistoryItem): string {
+    return payment.direction === PaymentDirection.Sent
+      ? payment.recipientEmail
+      : payment.senderEmail;
+  }
+
+  isCounterpartySaved(payment: PaymentHistoryItem): boolean {
+    return this.savedContactEmails().has(this.getCounterpartyEmail(payment).toLowerCase());
+  }
+
+  addCounterpartyToContacts(payment: PaymentHistoryItem): void {
+    const contactEmail = this.getCounterpartyEmail(payment).trim().toLowerCase();
+
+    if (!contactEmail || this.savedContactEmails().has(contactEmail)) {
+      return;
+    }
+
+    this.addingContactEmail.set(contactEmail);
+    this.contactService.createContact({
+      name: this.getCounterpartyLabel(payment),
+      email: contactEmail,
+    }).subscribe({
+      next: () => {
+        this.savedContactEmails.update((contactEmails) => new Set(contactEmails).add(contactEmail));
+        this.addingContactEmail.set(null);
+        this.toastService.showSuccess('Contact saved.');
+      },
+      error: (error: HttpErrorResponse) => {
+        this.addingContactEmail.set(null);
+        this.toastService.showError(resolveApiErrorMessage(error, 'Unable to save contact.'));
+      },
+    });
   }
 
   loadPaymentHistory(): void {
@@ -74,6 +118,17 @@ export class PaymentHistoryComponent implements OnInit {
         this.paymentsLoadError.set(
           resolveApiErrorMessage(error, 'Unable to load payment history.'),
         );
+      },
+    });
+  }
+
+  private loadContacts(): void {
+    this.contactService.getAllContacts().subscribe({
+      next: (contacts) => {
+        this.savedContactEmails.set(
+          new Set(contacts.map((contact) => contact.email.trim().toLowerCase())),
+        );
+        this.contactsLoaded.set(true);
       },
     });
   }

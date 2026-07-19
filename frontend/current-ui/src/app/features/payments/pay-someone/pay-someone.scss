@@ -23,6 +23,12 @@
   @include shell.page-subtitle;
 }
 
+.payments-page__header-actions {
+  display: flex;
+  align-items: center;
+  gap: $space-md;
+}
+
 .payments-page__card {
   max-width: 520px;
   @include app-card;
@@ -82,6 +88,31 @@
   color: $text-secondary;
 }
 
+.payments-form__checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-sm;
+  font-size: 13px;
+  color: $text-primary;
+  cursor: pointer;
+
+  input {
+    width: 16px;
+    height: 16px;
+    accent-color: $color-primary;
+  }
+}
+
 .payments-form__submit {
   @include app-primary-button;
+}
+
+@media (max-width: 650px) {
+  .payments-page__header {
+    flex-direction: column;
+  }
+
+  .payments-page__header-actions {
+    flex-wrap: wrap;
+  }
 }

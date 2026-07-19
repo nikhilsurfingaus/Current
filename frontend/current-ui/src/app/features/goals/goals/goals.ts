@@ -11,6 +11,7 @@ import {
   DEFAULT_GOAL_ICON_KEY,
   GOAL_ICON_OPTIONS,
 } from '../../../shared/constants/goal-icon-options';
+import { NormalizeAmountDirective } from '../../../shared/directives/normalize-amount.directive';
 import {
   Account,
   CreateGoalRequest,
@@ -27,7 +28,15 @@ import {
 @Component({
   selector: 'app-goals',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, DatePipe, PercentPipe, GoalIconComponent],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    CurrencyPipe,
+    DatePipe,
+    PercentPipe,
+    GoalIconComponent,
+    NormalizeAmountDirective,
+  ],
   templateUrl: './goals.html',
   styleUrl: './goals.scss',
 })

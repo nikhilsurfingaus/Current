@@ -167,6 +167,39 @@ namespace Current.Api.Migrations
                     b.ToTable("GoalContributions");
                 });
 
+            modelBuilder.Entity("Current.Api.Entities.Contact", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Email")
+                        .IsUnique();
+
+                    b.ToTable("Contacts");
+                });
+
             modelBuilder.Entity("Current.Api.Entities.IdempotencyKey", b =>
                 {
                     b.Property<Guid>("Id")
@@ -389,6 +422,17 @@ namespace Current.Api.Migrations
                     b.Navigation("Goal");
 
                     b.Navigation("Transaction");
+                });
+
+            modelBuilder.Entity("Current.Api.Entities.Contact", b =>
+                {
+                    b.HasOne("Current.Api.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Current.Api.Entities.IdempotencyKey", b =>

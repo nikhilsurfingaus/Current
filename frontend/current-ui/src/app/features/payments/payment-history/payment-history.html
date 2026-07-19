@@ -51,7 +51,7 @@
     } @else {
       <ul class="payments-history-list">
         @for (payment of filteredPayments(); track payment.transactionId) {
-          <li>
+          <li class="payments-history-list__row">
             <a class="payments-history-list__item" [routerLink]="['/payments', payment.transactionId]">
               <div class="payments-history-list__leading">
                 <span
@@ -84,6 +84,20 @@
                 </span>
               </div>
             </a>
+            @if (contactsLoaded() && !isCounterpartySaved(payment)) {
+              <button
+                type="button"
+                class="payments-history-list__contact-action"
+                [disabled]="addingContactEmail() === getCounterpartyEmail(payment).toLowerCase()"
+                (click)="addCounterpartyToContacts(payment)"
+              >
+                {{
+                  addingContactEmail() === getCounterpartyEmail(payment).toLowerCase()
+                    ? 'Saving...'
+                    : 'Add contact'
+                }}
+              </button>
+            }
           </li>
         }
       </ul>

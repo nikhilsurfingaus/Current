@@ -11,22 +11,20 @@
         <article class="dashboard-hero-card">
           <p class="dashboard-hero-card__label">Total balance</p>
           <div class="dashboard-hero-card__body">
-            <div>
-              <p class="dashboard-hero-card__value">
-                {{ currencyBalanceTotals()[0].totalBalance | currency: currencyBalanceTotals()[0].currency }}
-              </p>
-              <p class="dashboard-hero-card__meta">
-                Across {{ userFacingAccounts().length }}
-                {{ userFacingAccounts().length === 1 ? 'account' : 'accounts' }}
-              </p>
-            </div>
+            <p class="dashboard-hero-card__value">
+              {{ currencyBalanceTotals()[0].totalBalance | currency: currencyBalanceTotals()[0].currency }}
+            </p>
+            <p class="dashboard-hero-card__meta">
+              Across {{ userFacingAccounts().length }}
+              {{ userFacingAccounts().length === 1 ? 'account' : 'accounts' }}
+            </p>
             @if (netWorthPoints().length > 1) {
               <div class="dashboard-hero-card__chart" aria-hidden="true">
                 <app-chart
                   chartType="line"
                   [chartData]="netWorthSparklineData()"
                   [chartOptions]="netWorthSparklineOptions"
-                  chartHeight="48px"
+                  chartHeight="56px"
                 />
               </div>
             }
@@ -60,7 +58,7 @@
             <span class="dashboard-quick-action__icon" aria-hidden="true">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                 <path
-                  d="M12 3v18M7 8h7.5a2.5 2.5 0 0 1 0 5H9.5a2.5 2.5 0 0 0 0 5H17"
+                  d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
                   stroke="currentColor"
                   stroke-width="1.5"
                   stroke-linecap="round"

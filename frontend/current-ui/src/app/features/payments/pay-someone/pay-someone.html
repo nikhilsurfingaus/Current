@@ -4,7 +4,10 @@
       <h1 class="payments-page__title">Pay someone</h1>
       <p class="payments-page__subtitle">Send money to another Current user by email</p>
     </div>
-    <a class="payments-page__link" routerLink="/payments">Payment history</a>
+    <div class="payments-page__header-actions">
+      <a class="payments-page__link" routerLink="/contacts">Manage contacts</a>
+      <a class="payments-page__link" routerLink="/payments">Payment history</a>
+    </div>
   </header>
 
   @if (pageLoadError()) {
@@ -25,6 +28,23 @@
       }
 
       <form class="payments-form" [formGroup]="paymentForm" (ngSubmit)="onSubmitPayment()">
+        @if (contacts().length > 0) {
+          <div class="payments-form__field">
+            <label class="payments-form__label" for="payment-contact">Saved contact (optional)</label>
+            <select
+              id="payment-contact"
+              class="payments-form__input"
+              formControlName="selectedContactId"
+              (change)="onSavedContactSelected()"
+            >
+              <option value="">Enter an email instead</option>
+              @for (contact of contacts(); track contact.id) {
+                <option [value]="contact.id">{{ contact.name }} ({{ contact.email }})</option>
+              }
+            </select>
+          </div>
+        }
+
         <div class="payments-form__field">
           <label class="payments-form__label" for="payment-from">From account</label>
           <select id="payment-from" class="payments-form__input" formControlName="fromAccountId">
@@ -55,6 +75,34 @@
           }
         </div>
 
+        @if (!recipientAlreadySaved) {
+          <label class="payments-form__checkbox">
+            <input type="checkbox" formControlName="saveContact" />
+            Save this recipient as a contact
+          </label>
+
+          @if (paymentForm.controls.saveContact.value) {
+            <div class="payments-form__field">
+              <label class="payments-form__label" for="payment-contact-name">Contact name</label>
+              <input
+                id="payment-contact-name"
+                class="payments-form__input"
+                type="text"
+                formControlName="contactName"
+                placeholder="e.g. John Smith"
+                maxlength="100"
+              />
+              @if (
+                paymentFormSubmitted() &&
+                paymentForm.controls.saveContact.value &&
+                !paymentForm.controls.contactName.value.trim()
+              ) {
+                <span class="payments-form__error">Enter a name for this contact.</span>
+              }
+            </div>
+          }
+        }
+
         <div class="payments-form__field">
           <label class="payments-form__label" for="payment-amount">Amount</label>
           <input
@@ -64,6 +112,7 @@
             min="0.01"
             step="0.01"
             formControlName="amount"
+            appNormalizeAmount
           />
           @if (paymentFormSubmitted() && paymentForm.controls.amount.invalid) {
             <span class="payments-form__error">Enter an amount greater than zero.</span>

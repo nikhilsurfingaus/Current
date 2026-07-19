@@ -61,6 +61,7 @@
               min="0"
               step="0.01"
               formControlName="currentBalance"
+              appNormalizeAmount
             />
             @if (createFormSubmitted() && createAccountForm.controls.currentBalance.invalid) {
               <span class="accounts-form__error">Balance must be zero or greater.</span>

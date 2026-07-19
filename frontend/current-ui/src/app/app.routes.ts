@@ -6,6 +6,7 @@ import { AUTH_TITLE_ROUTE_DATA_KEY } from './core/routing/app-title.constants';
 import { AccountsComponent } from './features/accounts/accounts/accounts';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
+import { ContactsComponent } from './features/contacts/contacts/contacts';
 import { DashboardComponent } from './features/dashboard/dashboard/dashboard';
 import { AnalyticsComponent } from './features/analytics/analytics/analytics';
 import { TransferComponent } from './features/transfer/transfer/transfer';
@@ -67,6 +68,11 @@ export const routes: Routes = [
         path: 'payments',
         component: PaymentHistoryComponent,
         title: 'Payments',
+      },
+      {
+        path: 'contacts',
+        component: ContactsComponent,
+        title: 'Contacts',
       },
       {
         path: 'transactions',

@@ -13,13 +13,14 @@ import { Subscription } from 'rxjs';
 import { AccountService } from '../../../core/services/account.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { TransactionService } from '../../../core/services/transaction.service';
+import { NormalizeAmountDirective } from '../../../shared/directives/normalize-amount.directive';
 import { Account, ApiError, TransferRequest } from '../../../shared/models';
 import { differentAccountsValidator } from './different-accounts.validator';
 
 @Component({
   selector: 'app-transfer',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe],
+  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, NormalizeAmountDirective],
   templateUrl: './transfer.html',
   styleUrl: './transfer.scss',
 })

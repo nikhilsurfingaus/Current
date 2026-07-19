@@ -44,7 +44,7 @@ Chart.register(
   selector: 'app-chart',
   standalone: true,
   template: `
-    <div class="app-chart" [style.height]="chartHeight()">
+    <div class="app-chart" [style.height]="chartHeight()" #chartHost>
       <canvas #chartCanvas></canvas>
     </div>
   `,
@@ -52,12 +52,12 @@ Chart.register(
     .app-chart {
       position: relative;
       width: 100%;
-      height: 100%;
+      min-width: 0;
+      overflow: hidden;
     }
 
     canvas {
-      width: 100% !important;
-      height: 100% !important;
+      display: block;
     }
   `,
 })
@@ -67,22 +67,44 @@ export class AppChartComponent implements OnDestroy {
   chartOptions = input<ChartConfiguration['options']>({});
   chartHeight = input('240px');
 
+  private chartHost = viewChild.required<ElementRef<HTMLDivElement>>('chartHost');
   private chartCanvas = viewChild.required<ElementRef<HTMLCanvasElement>>('chartCanvas');
   private chartInstance: Chart | null = null;
+  private resizeObserver: ResizeObserver | null = null;
 
   constructor() {
-    effect(() => {
+    effect((onCleanup) => {
       const type = this.chartType();
       const data = this.chartData();
       const options = this.chartOptions() ?? {};
-      const canvasRef = this.chartCanvas();
+      const canvas = this.chartCanvas().nativeElement;
+      const host = this.chartHost().nativeElement;
 
-      queueMicrotask(() => this.renderChart(type, data, options, canvasRef.nativeElement));
+      queueMicrotask(() => {
+        this.renderChart(type, data, options, canvas);
+        this.observeHostSize(host);
+      });
+
+      onCleanup(() => {
+        this.resizeObserver?.disconnect();
+        this.resizeObserver = null;
+      });
     });
   }
 
   ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
     this.destroyChart();
+  }
+
+  private observeHostSize(host: HTMLDivElement): void {
+    this.resizeObserver?.disconnect();
+
+    this.resizeObserver = new ResizeObserver(() => {
+      this.chartInstance?.resize();
+    });
+    this.resizeObserver.observe(host);
   }
 
   private renderChart(
@@ -102,6 +124,8 @@ export class AppChartComponent implements OnDestroy {
         ...options,
       },
     });
+
+    requestAnimationFrame(() => this.chartInstance?.resize());
   }
 
   private destroyChart(): void {

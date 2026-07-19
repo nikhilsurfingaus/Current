@@ -89,15 +89,12 @@
   list-style: none;
 }
 
-.payments-history-list__item {
+.payments-history-list__row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: $space-md;
   padding: 14px 0;
   border-bottom: 1px solid $border-color;
-  text-decoration: none;
-  color: inherit;
 
   &:last-child {
     border-bottom: none;
@@ -107,6 +104,17 @@
   &:first-child {
     padding-top: 0;
   }
+}
+
+.payments-history-list__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-md;
+  min-width: 0;
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
 
   &:hover .payments-history-list__name {
     color: $color-primary;
@@ -173,18 +181,49 @@
   color: $text-secondary;
 }
 
+.payments-history-list__contact-action {
+  padding: 6px 10px;
+  border: 1px solid rgba($color-primary, 0.3);
+  border-radius: $radius-button;
+  background: $bg-secondary;
+  color: $color-primary;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: $bg-active;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+}
+
 @media (max-width: 700px) {
   .payments-history-page__header {
     flex-direction: column;
   }
 
+  .payments-history-list__row {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
   .payments-history-list__item {
     align-items: flex-start;
     flex-direction: column;
+    flex-basis: 100%;
   }
 
   .payments-history-list__trailing {
     text-align: left;
     padding-left: calc(72px + #{$space-md});
+  }
+
+  .payments-history-list__contact-action {
+    margin-left: calc(72px + #{$space-md});
   }
 }
