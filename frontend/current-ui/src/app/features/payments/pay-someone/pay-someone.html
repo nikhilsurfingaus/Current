@@ -1,0 +1,96 @@
+<div class="payments-page">
+  <header class="payments-page__header">
+    <div>
+      <h1 class="payments-page__title">Pay someone</h1>
+      <p class="payments-page__subtitle">Send money to another Current user by email</p>
+    </div>
+    <a class="payments-page__link" routerLink="/payments">Payment history</a>
+  </header>
+
+  @if (pageLoadError()) {
+    <div class="payments-page__alert payments-page__alert--error">{{ pageLoadError() }}</div>
+  }
+
+  <section class="payments-page__card">
+    @if (pageLoading()) {
+      <p class="payments-page__status">Loading accounts...</p>
+    } @else if (userFacingAccounts().length === 0) {
+      <p class="payments-page__status">
+        You need an account to send a payment.
+        <a class="payments-page__link" routerLink="/accounts">Create an account</a>
+      </p>
+    } @else {
+      @if (paymentErrorMessage()) {
+        <div class="payments-page__alert payments-page__alert--error">{{ paymentErrorMessage() }}</div>
+      }
+
+      <form class="payments-form" [formGroup]="paymentForm" (ngSubmit)="onSubmitPayment()">
+        <div class="payments-form__field">
+          <label class="payments-form__label" for="payment-from">From account</label>
+          <select id="payment-from" class="payments-form__input" formControlName="fromAccountId">
+            <option value="" disabled>Select account</option>
+            @for (account of userFacingAccounts(); track account.id) {
+              <option [value]="account.id">
+                {{ account.name }} ({{ account.currentBalance | currency: account.currency }})
+              </option>
+            }
+          </select>
+          @if (paymentFormSubmitted() && paymentForm.controls.fromAccountId.invalid) {
+            <span class="payments-form__error">Select a source account.</span>
+          }
+        </div>
+
+        <div class="payments-form__field">
+          <label class="payments-form__label" for="payment-email">Recipient email</label>
+          <input
+            id="payment-email"
+            class="payments-form__input"
+            type="email"
+            formControlName="recipientEmail"
+            placeholder="friend@email.com"
+            autocomplete="email"
+          />
+          @if (paymentFormSubmitted() && paymentForm.controls.recipientEmail.invalid) {
+            <span class="payments-form__error">Enter a valid recipient email.</span>
+          }
+        </div>
+
+        <div class="payments-form__field">
+          <label class="payments-form__label" for="payment-amount">Amount</label>
+          <input
+            id="payment-amount"
+            class="payments-form__input"
+            type="number"
+            min="0.01"
+            step="0.01"
+            formControlName="amount"
+          />
+          @if (paymentFormSubmitted() && paymentForm.controls.amount.invalid) {
+            <span class="payments-form__error">Enter an amount greater than zero.</span>
+          }
+          @if (selectedFromAccount) {
+            <span class="payments-form__hint">
+              Available: {{ selectedFromAccount.currentBalance | currency: selectedFromAccount.currency }}
+            </span>
+          }
+        </div>
+
+        <div class="payments-form__field">
+          <label class="payments-form__label" for="payment-reference">Reference (optional)</label>
+          <input
+            id="payment-reference"
+            class="payments-form__input"
+            type="text"
+            formControlName="reference"
+            placeholder="e.g. Dinner"
+            maxlength="100"
+          />
+        </div>
+
+        <button class="payments-form__submit" type="submit" [disabled]="paymentRequestInFlight()">
+          {{ paymentRequestInFlight() ? 'Sending...' : 'Send payment' }}
+        </button>
+      </form>
+    }
+  </section>
+</div>

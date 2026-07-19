@@ -260,8 +260,9 @@ Financial reporting and charts.
 
 ## Phase 7 — Payments + Security Hardening
 
-**Status:** In progress  
-**Date started:** 2026-07-09
+**Status:** Complete  
+**Date started:** 2026-07-09  
+**Date completed:** 2026-07-19
 
 ### Goal
 Safely move money between users with ledger integrity, idempotency, and ownership rules.
@@ -273,7 +274,7 @@ Safely move money between users with ledger integrity, idempotency, and ownershi
 - [x] `IdempotencyKeys` table + `Idempotency-Key` header (safe retries)
 - [x] Typed payment error codes (`PaymentException` / `PaymentErrorCode`)
 - [x] Payment receipt by id + sent/received/history endpoints
-- [ ] Frontend: Pay Someone, Payment History, Transfer Receipt
+- [x] Frontend: Pay Someone, Payment History, Payment Receipt + sidebar
 - [ ] Docker (optional wrap for this phase)
 
 ### Endpoints
@@ -289,5 +290,6 @@ Safely move money between users with ledger integrity, idempotency, and ownershi
 - Part 1 complete: payment send flow + receipt response
 - Part 2 complete: idempotency + standardized payment errors
 - Part 3 complete: receipt lookup + sent/received/history
+- Part 4 complete: Angular Pay Someone (`/payments/send`), history (`/payments`), receipt (`/payments/:id`)
 - Cross-user payments identified as transactions where from/to accounts belong to different users
-- Next: Part 4 frontend pages
+- Phase 7 complete (Docker optional / deferred to Phase 9)

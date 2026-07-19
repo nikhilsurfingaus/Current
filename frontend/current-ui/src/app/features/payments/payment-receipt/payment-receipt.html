@@ -1,0 +1,69 @@
+<div class="payment-receipt-page">
+  <header class="payment-receipt-page__header">
+    <div>
+      <h1 class="payment-receipt-page__title">Payment receipt</h1>
+      <p class="payment-receipt-page__subtitle">Details for this payment</p>
+    </div>
+    <a class="payment-receipt-page__link" routerLink="/payments">Back to payments</a>
+  </header>
+
+  @if (receiptLoadError()) {
+    <div class="payment-receipt-page__alert payment-receipt-page__alert--error">
+      {{ receiptLoadError() }}
+    </div>
+  }
+
+  <section class="payment-receipt-page__card">
+    @if (receiptLoading()) {
+      <p class="payment-receipt-page__status">Loading receipt...</p>
+    } @else if (receipt(); as paymentReceipt) {
+      <div class="payment-receipt">
+        <p class="payment-receipt__eyebrow">
+          {{ paymentReceipt.direction === paymentDirection.Sent ? 'Payment sent' : 'Payment received' }}
+        </p>
+        <p class="payment-receipt__amount">
+          {{ paymentReceipt.amount | currency: paymentReceipt.currency }}
+        </p>
+        <p class="payment-receipt__status">
+          {{ getTransactionStatusLabel(paymentReceipt.status) }}
+        </p>
+
+        <dl class="payment-receipt__details">
+          <div class="payment-receipt__row">
+            <dt>Recipient</dt>
+            <dd>
+              {{ paymentReceipt.recipientName }}
+              <span class="payment-receipt__secondary">{{ paymentReceipt.recipientEmail }}</span>
+            </dd>
+          </div>
+          <div class="payment-receipt__row">
+            <dt>Sender</dt>
+            <dd>
+              {{ paymentReceipt.senderName }}
+              <span class="payment-receipt__secondary">{{ paymentReceipt.senderEmail }}</span>
+            </dd>
+          </div>
+          <div class="payment-receipt__row">
+            <dt>Reference</dt>
+            <dd>{{ paymentReceipt.reference || '—' }}</dd>
+          </div>
+          <div class="payment-receipt__row">
+            <dt>Transaction ID</dt>
+            <dd class="payment-receipt__mono">{{ paymentReceipt.transactionId }}</dd>
+          </div>
+          <div class="payment-receipt__row">
+            <dt>Date</dt>
+            <dd>{{ paymentReceipt.createdAt | date: 'medium' }}</dd>
+          </div>
+        </dl>
+
+        <div class="payment-receipt__actions">
+          <a class="payment-receipt__action" routerLink="/payments/send">Pay someone else</a>
+          <a class="payment-receipt__action payment-receipt__action--secondary" routerLink="/payments">
+            View history
+          </a>
+        </div>
+      </div>
+    }
+  </section>
+</div>

@@ -1,0 +1,87 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+@use '../../../../styles/page-shell' as shell;
+
+.payments-page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
+}
+
+.payments-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-md;
+}
+
+.payments-page__title {
+  @include shell.page-title;
+}
+
+.payments-page__subtitle {
+  @include shell.page-subtitle;
+}
+
+.payments-page__card {
+  max-width: 520px;
+  @include app-card;
+}
+
+.payments-page__alert {
+  padding: 10px 12px;
+  border-radius: $radius-button;
+  font-size: 13px;
+}
+
+.payments-page__alert--error {
+  background: rgba($color-error, 0.08);
+  color: $color-error;
+  border: 1px solid rgba($color-error, 0.15);
+}
+
+.payments-page__link {
+  @include app-link;
+}
+
+.payments-page__status {
+  margin: 0;
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.payments-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.payments-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.payments-form__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: $text-primary;
+}
+
+.payments-form__input {
+  @include app-input;
+}
+
+.payments-form__error {
+  font-size: 12px;
+  color: $color-error;
+}
+
+.payments-form__hint {
+  font-size: 12px;
+  color: $text-secondary;
+}
+
+.payments-form__submit {
+  @include app-primary-button;
+}

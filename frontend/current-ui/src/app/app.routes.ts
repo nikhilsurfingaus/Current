@@ -12,6 +12,9 @@ import { TransferComponent } from './features/transfer/transfer/transfer';
 import { TransactionsComponent } from './features/transactions/transactions/transactions';
 import { GoalsComponent } from './features/goals/goals/goals';
 import { GoalDetailComponent } from './features/goals/goal-detail/goal-detail';
+import { PaymentHistoryComponent } from './features/payments/payment-history/payment-history';
+import { PaySomeoneComponent } from './features/payments/pay-someone/pay-someone';
+import { PaymentReceiptComponent } from './features/payments/payment-receipt/payment-receipt';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout';
 
@@ -49,6 +52,21 @@ export const routes: Routes = [
         path: 'transfer',
         component: TransferComponent,
         title: 'Transfer',
+      },
+      {
+        path: 'payments/send',
+        component: PaySomeoneComponent,
+        title: 'Pay someone',
+      },
+      {
+        path: 'payments/:transactionId',
+        component: PaymentReceiptComponent,
+        title: 'Payment receipt',
+      },
+      {
+        path: 'payments',
+        component: PaymentHistoryComponent,
+        title: 'Payments',
       },
       {
         path: 'transactions',

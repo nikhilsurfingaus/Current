@@ -31,4 +31,11 @@ export const API_PATHS = {
     goals: '/analytics/goals',
     monthlySummary: '/analytics/monthly-summary',
   },
+  payments: {
+    send: '/payments/send',
+    sent: '/payments/sent',
+    received: '/payments/received',
+    history: '/payments/history',
+    byId: (transactionId: string) => `/payments/${transactionId}`,
+  },
 } as const;

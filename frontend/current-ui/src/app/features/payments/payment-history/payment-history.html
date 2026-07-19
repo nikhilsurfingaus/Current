@@ -1,0 +1,92 @@
+<div class="payments-history-page">
+  <header class="payments-history-page__header">
+    <div>
+      <h1 class="payments-history-page__title">Payments</h1>
+      <p class="payments-history-page__subtitle">Sent and received payments between users</p>
+    </div>
+    <a class="payments-history-page__action" routerLink="/payments/send">Pay someone</a>
+  </header>
+
+  @if (paymentsLoadError()) {
+    <div class="payments-history-page__alert payments-history-page__alert--error">
+      {{ paymentsLoadError() }}
+    </div>
+  }
+
+  <div class="payments-history-page__filters">
+    <button
+      type="button"
+      class="payments-history-page__filter"
+      [class.payments-history-page__filter--active]="activeFilter() === 'all'"
+      (click)="setFilter('all')"
+    >
+      All
+    </button>
+    <button
+      type="button"
+      class="payments-history-page__filter"
+      [class.payments-history-page__filter--active]="activeFilter() === 'sent'"
+      (click)="setFilter('sent')"
+    >
+      Sent
+    </button>
+    <button
+      type="button"
+      class="payments-history-page__filter"
+      [class.payments-history-page__filter--active]="activeFilter() === 'received'"
+      (click)="setFilter('received')"
+    >
+      Received
+    </button>
+  </div>
+
+  <section class="payments-history-page__card">
+    @if (paymentsLoading()) {
+      <p class="payments-history-page__status">Loading payments...</p>
+    } @else if (filteredPayments().length === 0) {
+      <p class="payments-history-page__status">
+        No payments yet.
+        <a class="payments-history-page__link" routerLink="/payments/send">Pay someone</a>
+      </p>
+    } @else {
+      <ul class="payments-history-list">
+        @for (payment of filteredPayments(); track payment.transactionId) {
+          <li>
+            <a class="payments-history-list__item" [routerLink]="['/payments', payment.transactionId]">
+              <div class="payments-history-list__leading">
+                <span
+                  class="payments-history-list__direction"
+                  [class.payments-history-list__direction--sent]="
+                    payment.direction === paymentDirection.Sent
+                  "
+                  [class.payments-history-list__direction--received]="
+                    payment.direction === paymentDirection.Received
+                  "
+                >
+                  {{ payment.direction === paymentDirection.Sent ? 'Sent' : 'Received' }}
+                </span>
+                <div>
+                  <p class="payments-history-list__name">{{ getCounterpartyLabel(payment) }}</p>
+                  <p class="payments-history-list__meta">
+                    {{ payment.createdAt | date: 'medium' }}
+                    @if (payment.reference) {
+                      · {{ payment.reference }}
+                    }
+                  </p>
+                </div>
+              </div>
+              <div class="payments-history-list__trailing">
+                <p class="payments-history-list__amount">
+                  {{ payment.amount | currency: payment.currency }}
+                </p>
+                <span class="payments-history-list__status">
+                  {{ getTransactionStatusLabel(payment.status) }}
+                </span>
+              </div>
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</div>

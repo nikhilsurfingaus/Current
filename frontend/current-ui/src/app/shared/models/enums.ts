@@ -49,3 +49,8 @@ export enum TransactionCategory {
   Education = 12,
   Other = 13,
 }
+
+export enum PaymentDirection {
+  Sent = 0,
+  Received = 1,
+}
