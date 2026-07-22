@@ -215,7 +215,7 @@
                       {{ transaction.description || 'Transfer' }}
                     </p>
                     <p class="dashboard-activity-list__meta">
-                      {{ getAccountName(transaction.fromAccountId) }} →
+                      {{ getTransactionFromName(transaction) }} →
                       {{ getAccountName(transaction.toAccountId) }}
                     </p>
                   </div>

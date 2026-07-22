@@ -55,20 +55,20 @@
                 (keydown.space)="toggleTransactionDetails(transaction.id); $event.preventDefault()"
               >
                 <td>{{ transaction.createdAt | date: 'medium' }}</td>
-                <td>{{ getAccountName(transaction.fromAccountId) }}</td>
+                <td>
+                  @if (isBranchFundedTransaction(transaction)) {
+                    <span class="transactions-table__branch-label">
+                      {{ getTransactionFromName(transaction) }}
+                    </span>
+                  } @else {
+                    {{ getTransactionFromName(transaction) }}
+                  }
+                </td>
                 <td>{{ getAccountName(transaction.toAccountId) }}</td>
                 <td>
                   {{ transaction.amount | currency: getAccountCurrency(transaction.fromAccountId) }}
                 </td>
-                <td>
-                  @if (isBranchFundedTransaction(transaction.description)) {
-                    <span class="transactions-table__branch-label">
-                      {{ getBranchTransactionLabel(transaction.description) }}
-                    </span>
-                  } @else {
-                    {{ transaction.description || '—' }}
-                  }
-                </td>
+                <td>{{ transaction.description || '—' }}</td>
                 <td>
                   <span
                     class="transactions-table__status"
@@ -98,7 +98,7 @@
                           @for (entry of transaction.ledgerEntries; track entry.id) {
                             <li class="transactions-table__ledger-item">
                               <span class="transactions-table__ledger-account">
-                                {{ getAccountName(entry.accountId) }}
+                                {{ getLedgerAccountName(transaction, entry.accountId) }}
                               </span>
                               <span
                                 class="transactions-table__ledger-type"
@@ -143,7 +143,7 @@
                     {{ transaction.amount | currency: getAccountCurrency(transaction.fromAccountId) }}
                   </p>
                   <p class="transactions-card__route">
-                    {{ getAccountName(transaction.fromAccountId) }}
+                    {{ getTransactionFromName(transaction) }}
                     →
                     {{ getAccountName(transaction.toAccountId) }}
                   </p>
@@ -162,13 +162,7 @@
               </div>
               <div class="transactions-card__meta">
                 <span>{{ transaction.createdAt | date: 'mediumDate' }}</span>
-                <span>
-                  @if (isBranchFundedTransaction(transaction.description)) {
-                    {{ getBranchTransactionLabel(transaction.description) }}
-                  } @else {
-                    {{ transaction.description || 'No description' }}
-                  }
-                </span>
+                <span>{{ transaction.description || 'No description' }}</span>
                 <span class="transactions-card__expand">
                   {{ isTransactionExpanded(transaction.id) ? 'Hide ledger' : 'Show ledger' }}
                 </span>
@@ -185,7 +179,7 @@
                     @for (entry of transaction.ledgerEntries; track entry.id) {
                       <li class="transactions-table__ledger-item">
                         <span class="transactions-table__ledger-account">
-                          {{ getAccountName(entry.accountId) }}
+                          {{ getLedgerAccountName(transaction, entry.accountId) }}
                         </span>
                         <span
                           class="transactions-table__ledger-type"

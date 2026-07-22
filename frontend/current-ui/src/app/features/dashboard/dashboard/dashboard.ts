@@ -25,6 +25,7 @@ import { filterNonGoalAccounts } from '../../../shared/utils/goal-account.utils'
 import { getAccountTypeLabel } from '../../../shared/utils/account-type.utils';
 import { buildCurrencyBalanceTotals } from '../../../shared/utils/currency-balance.utils';
 import { getTransactionStatusLabel } from '../../../shared/utils/transaction-status.utils';
+import { getTransactionFromDisplayName } from '../../../shared/utils/branch-transaction.utils';
 
 const RECENT_TRANSACTION_LIMIT = 5;
 const DASHBOARD_GOALS_LIMIT = 3;
@@ -161,6 +162,10 @@ export class DashboardComponent implements OnInit {
 
   getAccountName(accountId: string): string {
     return this.accounts().find((account) => account.id === accountId)?.name ?? 'Unknown account';
+  }
+
+  getTransactionFromName(transaction: Transaction): string {
+    return getTransactionFromDisplayName(transaction, (accountId) => this.getAccountName(accountId));
   }
 
   getAccountCurrency(accountId: string): string {
