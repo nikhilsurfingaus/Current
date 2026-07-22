@@ -5,25 +5,32 @@
   </header>
 
   @if (analyticsLoadError()) {
-    <div class="analytics-page__alert analytics-page__alert--error">{{ analyticsLoadError() }}</div>
+    <div class="analytics-page__alert analytics-page__alert--error">
+      <p>{{ analyticsLoadError() }}</p>
+      <button class="analytics-page__retry" type="button" (click)="loadAnalytics()">Try again</button>
+    </div>
   }
 
   @if (analyticsLoading()) {
-    <p class="analytics-page__status">Loading analytics...</p>
+    <div class="analytics-page__skeleton" aria-busy="true" aria-live="polite">
+      <app-skeleton-loader variant="block" height="120px" />
+      <app-skeleton-loader variant="block" height="280px" />
+      <app-skeleton-loader variant="block" height="280px" />
+    </div>
   } @else {
     @if (overview(); as overviewData) {
       <section class="analytics-page__overview-grid">
         <article class="analytics-overview-card">
           <p class="analytics-overview-card__label">Total balance</p>
-          <p class="analytics-overview-card__value">{{ overviewData.totalBalance | currency: 'AUD' }}</p>
+          <p class="analytics-overview-card__value">{{ overviewData.totalBalance | currency: displayCurrency() }}</p>
         </article>
         <article class="analytics-overview-card">
           <p class="analytics-overview-card__label">Monthly income</p>
-          <p class="analytics-overview-card__value">{{ overviewData.monthlyIncome | currency: 'AUD' }}</p>
+          <p class="analytics-overview-card__value">{{ overviewData.monthlyIncome | currency: displayCurrency() }}</p>
         </article>
         <article class="analytics-overview-card">
           <p class="analytics-overview-card__label">Monthly expenses</p>
-          <p class="analytics-overview-card__value">{{ overviewData.monthlyExpenses | currency: 'AUD' }}</p>
+          <p class="analytics-overview-card__value">{{ overviewData.monthlyExpenses | currency: displayCurrency() }}</p>
         </article>
         <article class="analytics-overview-card">
           <p class="analytics-overview-card__label">Net cash flow</p>
@@ -31,7 +38,7 @@
             class="analytics-overview-card__value"
             [class.analytics-overview-card__value--negative]="overviewData.netCashFlow < 0"
           >
-            {{ overviewData.netCashFlow | currency: 'AUD' }}
+            {{ overviewData.netCashFlow | currency: displayCurrency() }}
           </p>
         </article>
       </section>
@@ -53,7 +60,7 @@
         </article>
         <article class="analytics-kpi-card">
           <p class="analytics-kpi-card__label">Goal savings</p>
-          <p class="analytics-kpi-card__value">{{ overviewData.totalGoalSavings | currency: 'AUD' }}</p>
+          <p class="analytics-kpi-card__value">{{ overviewData.totalGoalSavings | currency: displayCurrency() }}</p>
         </article>
       </section>
     }
@@ -77,8 +84,8 @@
             <li class="analytics-list__item">
               <span class="analytics-list__key">{{ formatMonthLabelPublic(month.month) }}</span>
               <div class="analytics-list__value-group">
-                <span>+{{ month.income | currency: 'AUD' }}</span>
-                <span class="analytics-list__value--negative">-{{ month.expenses | currency: 'AUD' }}</span>
+                <span>+{{ month.income | currency: displayCurrency() }}</span>
+                <span class="analytics-list__value--negative">-{{ month.expenses | currency: displayCurrency() }}</span>
               </div>
             </li>
           }
@@ -108,7 +115,7 @@
                   {{ getTransactionCategoryLabel(categoryItem.category) }}
                 </span>
                 <div class="analytics-list__value-group">
-                  <span>{{ categoryItem.amount | currency: 'AUD' }}</span>
+                  <span>{{ categoryItem.amount | currency: displayCurrency() }}</span>
                   <span>{{ categoryItem.percent / 100 | percent: '1.0-2' }}</span>
                 </div>
               </li>
@@ -135,8 +142,8 @@
                   <div class="analytics-goals-list__fill" [style.width.%]="goalItem.completionPercent"></div>
                 </div>
                 <p class="analytics-goals-list__meta">
-                  {{ goalItem.currentAmount | currency: 'AUD' }} of
-                  {{ goalItem.targetAmount | currency: 'AUD' }}
+                  {{ goalItem.currentAmount | currency: displayCurrency() }} of
+                  {{ goalItem.targetAmount | currency: displayCurrency() }}
                 </p>
               </li>
             }
@@ -169,10 +176,10 @@
         </div>
         <div class="analytics-summary-grid">
           <p><strong>Transactions:</strong> {{ monthSummary.transactionCount }}</p>
-          <p><strong>Average transaction:</strong> {{ monthSummary.averageTransactionAmount | currency: 'AUD' }}</p>
-          <p><strong>Largest expense:</strong> {{ monthSummary.largestExpense | currency: 'AUD' }}</p>
-          <p><strong>Largest income:</strong> {{ monthSummary.largestIncome | currency: 'AUD' }}</p>
-          <p><strong>Transfers:</strong> {{ monthSummary.transfers | currency: 'AUD' }}</p>
+          <p><strong>Average transaction:</strong> {{ monthSummary.averageTransactionAmount | currency: displayCurrency() }}</p>
+          <p><strong>Largest expense:</strong> {{ monthSummary.largestExpense | currency: displayCurrency() }}</p>
+          <p><strong>Largest income:</strong> {{ monthSummary.largestIncome | currency: displayCurrency() }}</p>
+          <p><strong>Transfers:</strong> {{ monthSummary.transfers | currency: displayCurrency() }}</p>
         </div>
       </section>
     }

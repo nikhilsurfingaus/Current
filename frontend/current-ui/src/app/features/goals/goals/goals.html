@@ -11,7 +11,10 @@
   </div>
 
   @if (goalsLoadError()) {
-    <div class="goals-page__alert goals-page__alert--error">{{ goalsLoadError() }}</div>
+    <div class="goals-page__alert goals-page__alert--error">
+      <p>{{ goalsLoadError() }}</p>
+      <button class="goals-page__retry" type="button" (click)="loadGoalsPageData()">Try again</button>
+    </div>
   }
 
   @if (createPanelOpen()) {
@@ -60,6 +63,7 @@
               id="goal-target"
               class="goals-form__input"
               type="number"
+              inputmode="decimal"
               min="0.01"
               step="0.01"
               formControlName="targetAmount"
@@ -150,6 +154,7 @@
         class="goals-page__tab"
         [class.goals-page__tab--active]="isStatusFilterActive(option.value)"
         type="button"
+        [attr.aria-pressed]="isStatusFilterActive(option.value)"
         (click)="setStatusFilter(option.value)"
       >
         {{ option.label }}
@@ -158,16 +163,22 @@
   </div>
 
   @if (goalsLoading()) {
-    <p class="goals-page__status">Loading goals...</p>
+    <div class="goals-page__skeleton" aria-busy="true" aria-live="polite">
+      @for (card of [1, 2, 3]; track card) {
+        <app-skeleton-loader variant="block" height="160px" />
+      }
+    </div>
   } @else if (filteredGoals().length === 0) {
     <section class="goals-page__empty-card">
-      <p class="goals-page__status">
-        @if (goals().length === 0) {
-          No goals yet. Create your first savings goal to get started.
-        } @else {
-          No goals match this filter.
-        }
-      </p>
+      @if (goals().length === 0) {
+        <app-empty-state
+          message="No goals yet. Create your first savings goal to get started."
+          actionLabel="Create goal"
+          actionRoute="/goals"
+        />
+      } @else {
+        <p class="goals-page__status">No goals match this filter.</p>
+      }
     </section>
   } @else {
     <section class="goals-page__grid">
@@ -189,6 +200,11 @@
             <div class="goal-card__progress-track">
               <div
                 class="goal-card__progress-fill"
+                role="progressbar"
+                [attr.aria-valuenow]="goal.progressPercent"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                [attr.aria-label]="goal.name + ' progress'"
                 [class.goal-card__progress-fill--completed]="goal.status === goalStatus.Completed"
                 [style.width.%]="goal.progressPercent"
               ></div>

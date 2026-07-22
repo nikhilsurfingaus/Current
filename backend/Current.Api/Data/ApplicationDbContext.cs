@@ -55,6 +55,27 @@ public class ApplicationDbContext : DbContext
                 .HasDefaultValue(UserRole.User)
                 .IsRequired();
 
+            entity.Property(user => user.ThemePreference)
+                .HasConversion<string>()
+                .HasMaxLength(20)
+                .HasDefaultValue(ThemePreference.System)
+                .IsRequired();
+
+            entity.Property(user => user.PreferredCurrency)
+                .HasMaxLength(3)
+                .HasDefaultValue("AUD")
+                .IsRequired();
+
+            entity.Property(user => user.Timezone)
+                .HasMaxLength(100)
+                .HasDefaultValue("Australia/Sydney")
+                .IsRequired();
+
+            entity.Property(user => user.Locale)
+                .HasMaxLength(20)
+                .HasDefaultValue("en-AU")
+                .IsRequired();
+
             entity.HasIndex(user => user.Email)
                 .IsUnique(); // One email per user
         });

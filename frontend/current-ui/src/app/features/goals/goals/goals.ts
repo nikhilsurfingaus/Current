@@ -7,6 +7,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AccountService } from '../../../core/services/account.service';
 import { GoalService } from '../../../core/services/goal.service';
 import { GoalIconComponent } from '../../../shared/components/goal-icon/goal-icon';
+import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state';
+import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader';
 import {
   DEFAULT_GOAL_ICON_KEY,
   GOAL_ICON_OPTIONS,
@@ -20,6 +22,7 @@ import {
 } from '../../../shared/models';
 import { filterNonGoalAccounts } from '../../../shared/utils/goal-account.utils';
 import { resolveApiErrorMessage } from '../../../shared/utils/http-error.utils';
+import { focusFirstInvalidControl } from '../../../shared/utils/form-accessibility.utils';
 import {
   GOAL_STATUS_FILTER_OPTIONS,
   getGoalStatusLabel,
@@ -36,6 +39,8 @@ import {
     PercentPipe,
     GoalIconComponent,
     NormalizeAmountDirective,
+    SkeletonLoaderComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './goals.html',
   styleUrl: './goals.scss',
@@ -187,6 +192,7 @@ export class GoalsComponent implements OnInit {
     this.createErrorMessage.set('');
 
     if (this.createGoalForm.invalid) {
+      focusFirstInvalidControl(this.createGoalForm);
       return;
     }
 

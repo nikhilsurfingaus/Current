@@ -6,17 +6,20 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AccountService } from '../../../core/services/account.service';
 import { GoalService } from '../../../core/services/goal.service';
 import { NormalizeAmountDirective } from '../../../shared/directives/normalize-amount.directive';
+import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state';
+import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader';
 import { Account, AccountType, ApiError, CreateAccountRequest, Goal } from '../../../shared/models';
 import {
   ACCOUNT_TYPE_OPTIONS,
   getAccountTypeLabel,
 } from '../../../shared/utils/account-type.utils';
 import { filterNonGoalAccounts } from '../../../shared/utils/goal-account.utils';
+import { focusFirstInvalidControl } from '../../../shared/utils/form-accessibility.utils';
 
 @Component({
   selector: 'app-accounts',
   standalone: true,
-  imports: [ReactiveFormsModule, CurrencyPipe, NormalizeAmountDirective],
+  imports: [ReactiveFormsModule, CurrencyPipe, NormalizeAmountDirective, SkeletonLoaderComponent, EmptyStateComponent],
   templateUrl: './accounts.html',
   styleUrl: './accounts.scss',
 })
@@ -115,6 +118,7 @@ export class AccountsComponent implements OnInit {
     this.createErrorMessage.set('');
 
     if (this.createAccountForm.invalid) {
+      focusFirstInvalidControl(this.createAccountForm);
       return;
     }
 

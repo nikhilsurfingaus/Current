@@ -13,6 +13,10 @@ public static class UserMappings
             FirstName = user.FirstName,
             LastName = user.LastName,
             Email = user.Email,
+            ThemePreference = user.ThemePreference,
+            PreferredCurrency = user.PreferredCurrency,
+            Timezone = user.Timezone,
+            Locale = user.Locale,
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt
         };

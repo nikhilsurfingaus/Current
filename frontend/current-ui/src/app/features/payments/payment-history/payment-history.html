@@ -9,7 +9,10 @@
 
   @if (paymentsLoadError()) {
     <div class="payments-history-page__alert payments-history-page__alert--error">
-      {{ paymentsLoadError() }}
+      <p>{{ paymentsLoadError() }}</p>
+      <button class="payments-history-page__retry" type="button" (click)="loadPaymentHistory()">
+        Try again
+      </button>
     </div>
   }
 
@@ -18,6 +21,7 @@
       type="button"
       class="payments-history-page__filter"
       [class.payments-history-page__filter--active]="activeFilter() === 'all'"
+      [attr.aria-pressed]="activeFilter() === 'all'"
       (click)="setFilter('all')"
     >
       All
@@ -26,6 +30,7 @@
       type="button"
       class="payments-history-page__filter"
       [class.payments-history-page__filter--active]="activeFilter() === 'sent'"
+      [attr.aria-pressed]="activeFilter() === 'sent'"
       (click)="setFilter('sent')"
     >
       Sent
@@ -34,6 +39,7 @@
       type="button"
       class="payments-history-page__filter"
       [class.payments-history-page__filter--active]="activeFilter() === 'received'"
+      [attr.aria-pressed]="activeFilter() === 'received'"
       (click)="setFilter('received')"
     >
       Received
@@ -42,12 +48,17 @@
 
   <section class="payments-history-page__card">
     @if (paymentsLoading()) {
-      <p class="payments-history-page__status">Loading payments...</p>
+      <div class="payments-history-page__skeleton" aria-busy="true" aria-live="polite">
+        @for (row of [1, 2, 3, 4]; track row) {
+          <app-skeleton-loader variant="text" />
+        }
+      </div>
     } @else if (filteredPayments().length === 0) {
-      <p class="payments-history-page__status">
-        No payments yet.
-        <a class="payments-history-page__link" routerLink="/payments/send">Pay someone</a>
-      </p>
+      <app-empty-state
+        message="No payments yet."
+        actionLabel="Pay someone"
+        actionRoute="/payments/send"
+      />
     } @else {
       <ul class="payments-history-list">
         @for (payment of filteredPayments(); track payment.transactionId) {

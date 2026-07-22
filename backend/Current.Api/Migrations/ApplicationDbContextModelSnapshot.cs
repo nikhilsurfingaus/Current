@@ -345,10 +345,24 @@ namespace Current.Api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<string>("Locale")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("en-AU");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
+
+                    b.Property<string>("PreferredCurrency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)")
+                        .HasDefaultValue("AUD");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -356,6 +370,20 @@ namespace Current.Api.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasDefaultValue("User");
+
+                    b.Property<string>("ThemePreference")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("System");
+
+                    b.Property<string>("Timezone")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("Australia/Sydney");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");

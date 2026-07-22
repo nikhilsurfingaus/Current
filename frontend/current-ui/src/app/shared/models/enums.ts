@@ -54,3 +54,9 @@ export enum PaymentDirection {
   Sent = 0,
   Received = 1,
 }
+
+export enum ThemePreference {
+  Light = 0,
+  Dark = 1,
+  System = 2,
+}

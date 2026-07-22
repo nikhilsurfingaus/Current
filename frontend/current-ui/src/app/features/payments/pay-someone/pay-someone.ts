@@ -24,13 +24,16 @@ import {
   SendPaymentRequest,
 } from '../../../shared/models';
 import { NormalizeAmountDirective } from '../../../shared/directives/normalize-amount.directive';
+import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state';
+import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader';
 import { filterNonGoalAccounts } from '../../../shared/utils/goal-account.utils';
+import { focusFirstInvalidControl } from '../../../shared/utils/form-accessibility.utils';
 import { resolveApiErrorMessage } from '../../../shared/utils/http-error.utils';
 
 @Component({
   selector: 'app-pay-someone',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, NormalizeAmountDirective],
+  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, NormalizeAmountDirective, SkeletonLoaderComponent, EmptyStateComponent],
   templateUrl: './pay-someone.html',
   styleUrl: './pay-someone.scss',
 })
@@ -144,6 +147,7 @@ export class PaySomeoneComponent implements OnInit {
     this.paymentErrorMessage.set('');
 
     if (this.paymentForm.invalid) {
+      focusFirstInvalidControl(this.paymentForm);
       return;
     }
 

@@ -33,6 +33,49 @@ public class UsersController : ControllerBase
         return Ok(user);
     }
 
+    [HttpPut("me/profile")]
+    public async Task<ActionResult<UserResponse>> UpdateProfile([FromBody] UpdateUserProfileRequest request)
+    {
+        try
+        {
+            var currentUserId = _currentUserService.GetCurrentUserId();
+            var user = await _userService.UpdateProfileAsync(currentUserId, request);
+
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(new { message = exception.Message });
+        }
+    }
+
+    [HttpPut("me/preferences")]
+    public async Task<ActionResult<UserResponse>> UpdatePreferences(
+        [FromBody] UpdateUserPreferencesRequest request)
+    {
+        try
+        {
+            var currentUserId = _currentUserService.GetCurrentUserId();
+            var user = await _userService.UpdatePreferencesAsync(currentUserId, request);
+
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(new { message = exception.Message });
+        }
+    }
+
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<UserResponse>> GetById(Guid id)
     {

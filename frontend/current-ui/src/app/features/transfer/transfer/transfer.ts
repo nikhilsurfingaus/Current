@@ -6,7 +6,6 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 
@@ -14,13 +13,19 @@ import { AccountService } from '../../../core/services/account.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { NormalizeAmountDirective } from '../../../shared/directives/normalize-amount.directive';
+import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state';
+import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader';
 import { Account, ApiError, TransferRequest } from '../../../shared/models';
+import {
+  focusFirstInvalidControl,
+  getControlDescribedBy,
+} from '../../../shared/utils/form-accessibility.utils';
 import { differentAccountsValidator } from './different-accounts.validator';
 
 @Component({
   selector: 'app-transfer',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, NormalizeAmountDirective],
+  imports: [ReactiveFormsModule, CurrencyPipe, NormalizeAmountDirective, SkeletonLoaderComponent, EmptyStateComponent],
   templateUrl: './transfer.html',
   styleUrl: './transfer.scss',
 })
@@ -31,6 +36,8 @@ export class TransferComponent implements OnInit, OnDestroy {
   transferFormSubmitted = signal(false);
   transferRequestInFlight = signal(false);
   transferErrorMessage = signal('');
+
+  readonly getControlDescribedBy = getControlDescribedBy;
 
   private transferFormSubscriptions = new Subscription();
 
@@ -109,6 +116,7 @@ export class TransferComponent implements OnInit, OnDestroy {
     this.transferErrorMessage.set('');
 
     if (this.transferForm.invalid) {
+      focusFirstInvalidControl(this.transferForm);
       return;
     }
 

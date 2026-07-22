@@ -6,9 +6,11 @@
   background: $bg-secondary;
   border: 1px solid $border-color;
   box-shadow: $shadow-card;
+  @include app-fade-in;
 }
 
 @mixin app-input {
+  min-height: 44px;
   padding: 11px 12px;
   border-radius: $radius-button;
   border: 1px solid $border-color;
@@ -19,11 +21,17 @@
   &:focus {
     outline: none;
     border-color: $color-primary;
-    box-shadow: 0 0 0 3px rgba($color-primary, 0.12);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 12%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
   }
 }
 
 @mixin app-primary-button {
+  min-height: 44px;
   padding: 10px 16px;
   border: none;
   border-radius: $radius-button;
@@ -42,6 +50,11 @@
   &:hover:not(:disabled) {
     background: $color-primary-hover;
   }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+  }
 }
 
 @mixin app-page-header {
@@ -53,6 +66,7 @@
 }
 
 @mixin app-outline-button {
+  min-height: 44px;
   padding: 10px 16px;
   border: 1px solid #bfdbfe;
   border-radius: $radius-button;
@@ -72,6 +86,11 @@
     background: $bg-active;
     border-color: $color-primary;
   }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+  }
 }
 
 @mixin app-link {
@@ -81,5 +100,27 @@
 
   &:hover {
     text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@mixin app-fade-in {
+  animation: app-fade-in 220ms ease;
+}
+
+@keyframes app-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

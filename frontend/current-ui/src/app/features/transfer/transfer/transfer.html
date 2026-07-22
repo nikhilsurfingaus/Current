@@ -7,17 +7,25 @@
   </header>
 
   @if (accountsLoadError()) {
-    <div class="transfer-page__alert transfer-page__alert--error">{{ accountsLoadError() }}</div>
+    <div class="transfer-page__alert transfer-page__alert--error">
+      <p>{{ accountsLoadError() }}</p>
+      <button class="transfer-page__retry" type="button" (click)="loadAccounts()">Try again</button>
+    </div>
   }
 
   <section class="transfer-page__card">
     @if (accountsLoading()) {
-      <p class="transfer-page__status">Loading accounts...</p>
+      <div class="transfer-page__skeleton" aria-busy="true" aria-live="polite">
+        <app-skeleton-loader variant="text" />
+        <app-skeleton-loader variant="text" />
+        <app-skeleton-loader variant="text" />
+      </div>
     } @else if (accounts().length < 2) {
-      <p class="transfer-page__status">
-        You need at least two accounts to make a transfer.
-        <a class="transfer-page__link" routerLink="/accounts">Create another account</a>
-      </p>
+      <app-empty-state
+        message="You need at least two accounts to make a transfer."
+        actionLabel="Create another account"
+        actionRoute="/accounts"
+      />
     } @else {
       @if (transferErrorMessage()) {
         <div class="transfer-page__alert transfer-page__alert--error">{{ transferErrorMessage() }}</div>
@@ -26,7 +34,17 @@
       <form class="transfer-form" [formGroup]="transferForm" (ngSubmit)="onSubmitTransfer()">
         <div class="transfer-form__field">
           <label class="transfer-form__label" for="transfer-from">From account</label>
-          <select id="transfer-from" class="transfer-form__input" formControlName="fromAccountId">
+          <select
+            id="transfer-from"
+            class="transfer-form__input"
+            formControlName="fromAccountId"
+            [attr.aria-invalid]="transferFormSubmitted() && transferForm.controls.fromAccountId.invalid"
+            [attr.aria-describedby]="
+              getControlDescribedBy('fromAccountId', {
+                invalid: transferFormSubmitted() && transferForm.controls.fromAccountId.invalid,
+              })
+            "
+          >
             <option value="" disabled>Select account</option>
             @for (account of getFromAccountOptions(); track account.id) {
               <option [value]="account.id">
@@ -35,13 +53,28 @@
             }
           </select>
           @if (transferFormSubmitted() && transferForm.controls.fromAccountId.invalid) {
-            <span class="transfer-form__error">Select a source account.</span>
+            <span id="fromAccountId-error" class="transfer-form__error">Select a source account.</span>
           }
         </div>
 
         <div class="transfer-form__field">
           <label class="transfer-form__label" for="transfer-to">To account</label>
-          <select id="transfer-to" class="transfer-form__input" formControlName="toAccountId">
+          <select
+            id="transfer-to"
+            class="transfer-form__input"
+            formControlName="toAccountId"
+            [attr.aria-invalid]="
+              transferFormSubmitted() &&
+              (transferForm.controls.toAccountId.invalid || hasSameAccountError())
+            "
+            [attr.aria-describedby]="
+              getControlDescribedBy('toAccountId', {
+                invalid:
+                  transferFormSubmitted() &&
+                  (transferForm.controls.toAccountId.invalid || hasSameAccountError()),
+              })
+            "
+          >
             <option value="" disabled>Select account</option>
             @for (account of getToAccountOptions(); track account.id) {
               <option [value]="account.id">
@@ -50,10 +83,10 @@
             }
           </select>
           @if (transferFormSubmitted() && transferForm.controls.toAccountId.invalid) {
-            <span class="transfer-form__error">Select a destination account.</span>
+            <span id="toAccountId-error" class="transfer-form__error">Select a destination account.</span>
           }
           @if (hasSameAccountError()) {
-            <span class="transfer-form__error">Source and destination must be different.</span>
+            <span id="toAccountId-error" class="transfer-form__error">Source and destination must be different.</span>
           }
         </div>
 
@@ -63,16 +96,24 @@
             id="transfer-amount"
             class="transfer-form__input"
             type="number"
+            inputmode="decimal"
             min="0.01"
             step="0.01"
             formControlName="amount"
             appNormalizeAmount
+            [attr.aria-invalid]="transferFormSubmitted() && transferForm.controls.amount.invalid"
+            [attr.aria-describedby]="
+              getControlDescribedBy('amount', {
+                invalid: transferFormSubmitted() && transferForm.controls.amount.invalid,
+                hintId: selectedFromAccount ? 'transfer-amount-hint' : undefined,
+              })
+            "
           />
           @if (transferFormSubmitted() && transferForm.controls.amount.invalid) {
-            <span class="transfer-form__error">Enter an amount greater than zero.</span>
+            <span id="amount-error" class="transfer-form__error">Enter an amount greater than zero.</span>
           }
           @if (selectedFromAccount) {
-            <span class="transfer-form__hint">
+            <span id="transfer-amount-hint" class="transfer-form__hint">
               Available: {{ selectedFromAccount.currentBalance | currency: selectedFromAccount.currency }}
             </span>
           }

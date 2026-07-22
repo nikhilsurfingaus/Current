@@ -1,17 +1,18 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { AccountService } from '../../../core/services/account.service';
 import { TransactionService } from '../../../core/services/transaction.service';
+import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state';
+import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader';
 import { Account, ApiError, LedgerEntryType, Transaction, TransactionStatus } from '../../../shared/models';
 import { getTransactionStatusLabel } from '../../../shared/utils/transaction-status.utils';
 
 @Component({
   selector: 'app-transactions',
   standalone: true,
-  imports: [CurrencyPipe, DatePipe, RouterLink],
+  imports: [CurrencyPipe, DatePipe, SkeletonLoaderComponent, EmptyStateComponent],
   templateUrl: './transactions.html',
   styleUrl: './transactions.scss',
 })

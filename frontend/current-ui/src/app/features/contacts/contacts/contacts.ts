@@ -10,6 +10,8 @@ import { RouterLink } from '@angular/router';
 
 import { ContactService } from '../../../core/services/contact.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state';
+import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader';
 import {
   Contact,
   CreateContactRequest,
@@ -20,7 +22,7 @@ import { resolveApiErrorMessage } from '../../../shared/utils/http-error.utils';
 @Component({
   selector: 'app-contacts',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, SkeletonLoaderComponent, EmptyStateComponent],
   templateUrl: './contacts.html',
   styleUrl: './contacts.scss',
 })

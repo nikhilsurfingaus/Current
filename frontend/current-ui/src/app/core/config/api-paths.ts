@@ -5,6 +5,8 @@ export const API_PATHS = {
   },
   users: {
     me: '/users/me',
+    profile: '/users/me/profile',
+    preferences: '/users/me/preferences',
     byId: (userId: string) => `/users/${userId}`,
   },
   accounts: {

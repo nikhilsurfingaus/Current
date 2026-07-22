@@ -1,0 +1,125 @@
+<div class="settings-page">
+  <header class="settings-page__header">
+    <h1 class="settings-page__title">Settings</h1>
+    <p class="settings-page__subtitle">Manage your profile and app preferences</p>
+  </header>
+
+  @if (pageLoadError()) {
+    <div class="settings-page__alert settings-page__alert--error">
+      <p>{{ pageLoadError() }}</p>
+      <button class="settings-page__retry" type="button" (click)="loadSettings()">Try again</button>
+    </div>
+  }
+
+  @if (pageLoading()) {
+    <div class="settings-page__skeleton" aria-busy="true" aria-live="polite">
+      <app-skeleton-loader variant="block" height="180px" />
+      <app-skeleton-loader variant="block" height="220px" />
+    </div>
+  } @else if (!pageLoadError()) {
+    <section class="settings-page__card">
+      <h2 class="settings-page__card-title">Profile</h2>
+      <p class="settings-page__email-label">Email</p>
+      <p class="settings-page__email-value">{{ userEmail() }}</p>
+      <p class="settings-page__hint">Email is used for payments and cannot be changed here.</p>
+
+      @if (profileError()) {
+        <div class="settings-page__alert settings-page__alert--error">{{ profileError() }}</div>
+      }
+
+      <form class="settings-form" [formGroup]="profileForm" (ngSubmit)="onSaveProfile()">
+        <div class="settings-form__field">
+          <label class="settings-form__label" for="settings-first-name">First name</label>
+          <input
+            id="settings-first-name"
+            class="settings-form__input"
+            type="text"
+            formControlName="firstName"
+            [attr.aria-invalid]="profileSubmitted() && profileForm.controls.firstName.invalid"
+            [attr.aria-describedby]="
+              getControlDescribedBy('firstName', {
+                invalid: profileSubmitted() && profileForm.controls.firstName.invalid,
+              })
+            "
+          />
+          @if (profileSubmitted() && profileForm.controls.firstName.invalid) {
+            <span id="firstName-error" class="settings-form__error">First name is required.</span>
+          }
+        </div>
+
+        <div class="settings-form__field">
+          <label class="settings-form__label" for="settings-last-name">Last name</label>
+          <input
+            id="settings-last-name"
+            class="settings-form__input"
+            type="text"
+            formControlName="lastName"
+            [attr.aria-invalid]="profileSubmitted() && profileForm.controls.lastName.invalid"
+            [attr.aria-describedby]="
+              getControlDescribedBy('lastName', {
+                invalid: profileSubmitted() && profileForm.controls.lastName.invalid,
+              })
+            "
+          />
+          @if (profileSubmitted() && profileForm.controls.lastName.invalid) {
+            <span id="lastName-error" class="settings-form__error">Last name is required.</span>
+          }
+        </div>
+
+        <button class="settings-form__submit" type="submit" [disabled]="profileSaving()">
+          {{ profileSaving() ? 'Saving...' : 'Save profile' }}
+        </button>
+      </form>
+    </section>
+
+    <section class="settings-page__card">
+      <h2 class="settings-page__card-title">Preferences</h2>
+
+      @if (preferencesError()) {
+        <div class="settings-page__alert settings-page__alert--error">{{ preferencesError() }}</div>
+      }
+
+      <form class="settings-form" [formGroup]="preferencesForm" (ngSubmit)="onSavePreferences()">
+        <div class="settings-form__field">
+          <label class="settings-form__label" for="settings-theme">Theme</label>
+          <select id="settings-theme" class="settings-form__input" formControlName="themePreference">
+            @for (option of themeOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="settings-form__field">
+          <label class="settings-form__label" for="settings-currency">Preferred currency</label>
+          <select id="settings-currency" class="settings-form__input" formControlName="preferredCurrency">
+            @for (currency of currencyOptions; track currency) {
+              <option [value]="currency">{{ currency }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="settings-form__field">
+          <label class="settings-form__label" for="settings-timezone">Timezone</label>
+          <select id="settings-timezone" class="settings-form__input" formControlName="timezone">
+            @for (timezone of timezoneOptions; track timezone) {
+              <option [value]="timezone">{{ timezone }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="settings-form__field">
+          <label class="settings-form__label" for="settings-locale">Locale</label>
+          <select id="settings-locale" class="settings-form__input" formControlName="locale">
+            @for (option of localeOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+
+        <button class="settings-form__submit" type="submit" [disabled]="preferencesSaving()">
+          {{ preferencesSaving() ? 'Saving...' : 'Save preferences' }}
+        </button>
+      </form>
+    </section>
+  }
+</div>

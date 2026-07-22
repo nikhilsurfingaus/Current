@@ -11,7 +11,10 @@
   </div>
 
   @if (accountsLoadError()) {
-    <div class="accounts-page__alert accounts-page__alert--error">{{ accountsLoadError() }}</div>
+    <div class="accounts-page__alert accounts-page__alert--error">
+      <p>{{ accountsLoadError() }}</p>
+      <button class="accounts-page__retry" type="button" (click)="loadAccounts()">Try again</button>
+    </div>
   }
 
   @if (createPanelOpen()) {
@@ -58,6 +61,7 @@
               id="account-balance"
               class="accounts-form__input"
               type="number"
+              inputmode="decimal"
               min="0"
               step="0.01"
               formControlName="currentBalance"
@@ -92,9 +96,17 @@
 
   <section class="accounts-page__table-card">
     @if (accountsLoading()) {
-      <p class="accounts-page__status">Loading accounts...</p>
+      <div class="accounts-page__skeleton" aria-busy="true" aria-live="polite">
+        @for (row of [1, 2, 3, 4]; track row) {
+          <app-skeleton-loader variant="text" />
+        }
+      </div>
     } @else if (userFacingAccounts().length === 0) {
-      <p class="accounts-page__status">No accounts yet. Create your first account to get started.</p>
+      <app-empty-state
+        message="No accounts yet. Create your first account to get started."
+        actionLabel="Create account"
+        actionRoute="/accounts"
+      />
     } @else {
       <div class="accounts-desktop">
         <table class="accounts-table">

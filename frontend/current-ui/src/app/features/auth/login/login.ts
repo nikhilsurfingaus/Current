@@ -8,6 +8,7 @@ import { ToastService } from '../../../core/services/toast.service';
 import { UserService } from '../../../core/services/user.service';
 import { AuthMarkComponent } from '../../../shared/components/auth-mark/auth-mark';
 import { ApiError } from '../../../shared/models';
+import { focusFirstInvalidControl } from '../../../shared/utils/form-accessibility.utils';
 
 @Component({
   selector: 'app-login',
@@ -53,6 +54,7 @@ export class LoginComponent implements OnInit {
     this.loginErrorMessage.set('');
 
     if (this.loginForm.invalid) {
+      focusFirstInvalidControl(this.loginForm);
       return;
     }
 

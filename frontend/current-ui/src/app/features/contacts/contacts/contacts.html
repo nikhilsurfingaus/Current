@@ -8,7 +8,10 @@
   </header>
 
   @if (contactsLoadError()) {
-    <div class="contacts-page__alert contacts-page__alert--error">{{ contactsLoadError() }}</div>
+    <div class="contacts-page__alert contacts-page__alert--error">
+      <p>{{ contactsLoadError() }}</p>
+      <button class="contacts-page__retry" type="button" (click)="loadContacts()">Try again</button>
+    </div>
   }
 
   <div class="contacts-page__columns">
@@ -78,9 +81,13 @@
       <h2 class="contacts-page__card-title">Saved contacts</h2>
 
       @if (contactsLoading()) {
-        <p class="contacts-page__status">Loading contacts...</p>
+        <div class="contacts-page__skeleton" aria-busy="true" aria-live="polite">
+          @for (row of [1, 2, 3]; track row) {
+            <app-skeleton-loader variant="text" />
+          }
+        </div>
       } @else if (contacts().length === 0) {
-        <p class="contacts-page__status">No contacts saved yet.</p>
+        <app-empty-state message="No contacts saved yet." />
       } @else {
         <ul class="contacts-list">
           @for (contact of contacts(); track contact.id) {

@@ -6,6 +6,8 @@ import { RouterLink } from '@angular/router';
 import { ContactService } from '../../../core/services/contact.service';
 import { PaymentService } from '../../../core/services/payment.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state';
+import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader';
 import { PaymentDirection, PaymentHistoryItem, TransactionStatus } from '../../../shared/models';
 import { resolveApiErrorMessage } from '../../../shared/utils/http-error.utils';
 import { getTransactionStatusLabel } from '../../../shared/utils/transaction-status.utils';
@@ -15,7 +17,7 @@ type PaymentHistoryFilter = 'all' | 'sent' | 'received';
 @Component({
   selector: 'app-payment-history',
   standalone: true,
-  imports: [CurrencyPipe, DatePipe, RouterLink],
+  imports: [CurrencyPipe, DatePipe, RouterLink, SkeletonLoaderComponent, EmptyStateComponent],
   templateUrl: './payment-history.html',
   styleUrl: './payment-history.scss',
 })

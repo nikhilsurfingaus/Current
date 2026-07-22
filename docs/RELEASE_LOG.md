@@ -302,9 +302,9 @@ Safely move money between users with ledger integrity, idempotency, and ownershi
 
 ## Phase 8 — UX Polish & Accessibility
 
-**Status:** In progress  
+**Status:** Complete  
 **Date started:** 2026-07-20  
-**Date completed:** —
+**Date completed:** 2026-07-22
 
 ### Goal
 Make every Current workflow intentionally usable on desktop, tablet, mobile, keyboard and screen reader—with polished loading, empty, error and motion states, then user preferences.
@@ -325,14 +325,14 @@ Make every Current workflow intentionally usable on desktop, tablet, mobile, key
 - [x] Part 1: tablet-friendly dashboard/analytics/goals grids
 - [x] Part 2: transactions/accounts/goal history table → mobile cards
 - [x] Part 2: analytics charts — flip cash flow, trim ticks, hide doughnut legend, mobile summaries
-- [ ] Part 3: forms + accessibility pass
-- [ ] Part 4: skeletons / empty / error states
-- [ ] Part 5: motion + `prefers-reduced-motion`
-- [ ] Part 6: profile / theme / currency / timezone / locale
+- [x] Part 3: forms + accessibility pass
+- [x] Part 4: skeletons / empty / error states
+- [x] Part 5: motion + `prefers-reduced-motion`
+- [x] Part 6: profile / theme / currency / timezone / locale
 
 ### Notes
 - Part 1 complete: intentional mobile shell instead of stacking all nav links
 - Part 2 complete: mobile card lists for dense tables; chart adaptations inspired by flip/trim/stack patterns
+- Parts 3–6 complete: shared skeleton/empty states, form a11y, fade-in cards, settings page with theme/locale/currency preferences
 - Drawer chosen over bottom nav because Current has eight primary destinations
-- User preferences deferred to Part 6 (needs backend fields + APIs)
 

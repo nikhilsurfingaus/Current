@@ -1,10 +1,20 @@
 <div class="dashboard-page">
   @if (dashboardLoadError()) {
-    <div class="dashboard-page__alert dashboard-page__alert--error">{{ dashboardLoadError() }}</div>
+    <div class="dashboard-page__alert dashboard-page__alert--error">
+      <p>{{ dashboardLoadError() }}</p>
+      <button class="dashboard-page__retry" type="button" (click)="loadDashboardData()">Try again</button>
+    </div>
   }
 
   @if (dashboardLoading()) {
-    <p class="dashboard-page__status">Loading dashboard...</p>
+    <div class="dashboard-page__skeleton" aria-busy="true" aria-live="polite">
+      <app-skeleton-loader variant="block" height="140px" />
+      <div class="dashboard-page__skeleton-row">
+        <app-skeleton-loader variant="block" height="120px" />
+        <app-skeleton-loader variant="block" height="120px" />
+      </div>
+      <app-skeleton-loader variant="block" height="200px" />
+    </div>
   } @else {
     <section class="dashboard-page__top-grid">
       @if (currencyBalanceTotals().length > 0) {
@@ -96,10 +106,11 @@
       </div>
 
       @if (activeGoalsPreview().length === 0) {
-        <p class="dashboard-page__empty">
-          No active goals yet.
-          <a class="dashboard-page__inline-link" routerLink="/goals">Create a goal</a>
-        </p>
+        <app-empty-state
+          message="No active goals yet."
+          actionLabel="Create a goal"
+          actionRoute="/goals"
+        />
       } @else {
         <ul class="dashboard-goals-list">
           @for (goal of activeGoalsPreview(); track goal.id) {
@@ -119,6 +130,11 @@
                   <div class="dashboard-goals-list__track">
                     <div
                       class="dashboard-goals-list__fill"
+                      role="progressbar"
+                      [attr.aria-valuenow]="goal.progressPercent"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                      [attr.aria-label]="goal.name + ' progress'"
                       [class.dashboard-goals-list__fill--completed]="goal.status === goalStatus.Completed"
                       [style.width.%]="goal.progressPercent"
                     ></div>
@@ -140,10 +156,11 @@
         </div>
 
         @if (userFacingAccounts().length === 0) {
-          <p class="dashboard-page__empty">
-            No accounts yet.
-            <a class="dashboard-page__inline-link" routerLink="/accounts">Create your first account</a>
-          </p>
+          <app-empty-state
+            message="No accounts yet."
+            actionLabel="Create your first account"
+            actionRoute="/accounts"
+          />
         } @else {
           <ul class="dashboard-account-list">
             @for (account of userFacingAccounts(); track account.id) {
@@ -178,10 +195,11 @@
         </div>
 
         @if (recentTransactions().length === 0) {
-          <p class="dashboard-page__empty">
-            No transactions yet.
-            <a class="dashboard-page__inline-link" routerLink="/transfer">Make a transfer</a>
-          </p>
+          <app-empty-state
+            message="No transactions yet."
+            actionLabel="Make a transfer"
+            actionRoute="/transfer"
+          />
         } @else {
           <ul class="dashboard-activity-list">
             @for (transaction of recentTransactions(); track transaction.id) {

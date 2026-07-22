@@ -10,7 +10,9 @@ import { AnalyticsService } from '../../../core/services/analytics.service';
 import { GoalService } from '../../../core/services/goal.service';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { AppChartComponent } from '../../../shared/components/app-chart/app-chart';
+import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state';
 import { GoalIconComponent } from '../../../shared/components/goal-icon/goal-icon';
+import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader';
 import {
   Account,
   ApiError,
@@ -31,7 +33,7 @@ const CHART_PRIMARY = '#2f80ed';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CurrencyPipe, RouterLink, GoalIconComponent, AppChartComponent],
+  imports: [CurrencyPipe, RouterLink, GoalIconComponent, AppChartComponent, SkeletonLoaderComponent, EmptyStateComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })

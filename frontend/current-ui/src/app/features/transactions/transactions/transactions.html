@@ -8,18 +8,26 @@
 
   @if (transactionsLoadError()) {
     <div class="transactions-page__alert transactions-page__alert--error">
-      {{ transactionsLoadError() }}
+      <p>{{ transactionsLoadError() }}</p>
+      <button class="transactions-page__retry" type="button" (click)="loadTransactionsPageData()">
+        Try again
+      </button>
     </div>
   }
 
   <section class="transactions-page__table-card">
     @if (transactionsLoading()) {
-      <p class="transactions-page__status">Loading transactions...</p>
+      <div class="transactions-page__skeleton" aria-busy="true" aria-live="polite">
+        @for (row of [1, 2, 3, 4, 5]; track row) {
+          <app-skeleton-loader variant="text" />
+        }
+      </div>
     } @else if (transactions().length === 0) {
-      <p class="transactions-page__status">
-        No transactions yet.
-        <a class="transactions-page__link" routerLink="/transfer">Make a transfer</a>
-      </p>
+      <app-empty-state
+        message="No transactions yet."
+        actionLabel="Make a transfer"
+        actionRoute="/transfer"
+      />
     } @else {
       <div class="transactions-desktop">
         <table class="transactions-table">
@@ -38,8 +46,13 @@
             @for (transaction of transactions(); track transaction.id) {
               <tr
                 class="transactions-table__row"
+                tabindex="0"
+                role="button"
+                [attr.aria-expanded]="isTransactionExpanded(transaction.id)"
                 [class.transactions-table__row--expanded]="isTransactionExpanded(transaction.id)"
                 (click)="toggleTransactionDetails(transaction.id)"
+                (keydown.enter)="toggleTransactionDetails(transaction.id); $event.preventDefault()"
+                (keydown.space)="toggleTransactionDetails(transaction.id); $event.preventDefault()"
               >
                 <td>{{ transaction.createdAt | date: 'medium' }}</td>
                 <td>{{ getAccountName(transaction.fromAccountId) }}</td>

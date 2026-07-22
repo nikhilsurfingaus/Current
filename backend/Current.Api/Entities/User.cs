@@ -16,6 +16,14 @@ public class User
 
     public UserRole Role { get; set; } = UserRole.User;
 
+    public ThemePreference ThemePreference { get; set; } = ThemePreference.System;
+
+    public string PreferredCurrency { get; set; } = "AUD";
+
+    public string Timezone { get; set; } = "Australia/Sydney";
+
+    public string Locale { get; set; } = "en-AU";
+
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }

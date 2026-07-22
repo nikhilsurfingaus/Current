@@ -5,7 +5,9 @@ import { ChartConfiguration, ChartData } from 'chart.js';
 import { forkJoin } from 'rxjs';
 
 import { AnalyticsService } from '../../../core/services/analytics.service';
+import { UserService } from '../../../core/services/user.service';
 import { AppChartComponent } from '../../../shared/components/app-chart/app-chart';
+import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader';
 import {
   AnalyticsOverview,
   CashFlowMonthPoint,
@@ -15,6 +17,7 @@ import {
   NetWorthHistoryPoint,
 } from '../../../shared/models';
 import { resolveApiErrorMessage } from '../../../shared/utils/http-error.utils';
+import { getPreferredCurrency } from '../../../shared/utils/user-preferences.utils';
 import { getTransactionCategoryLabel } from '../../../shared/utils/transaction-category.utils';
 
 const CHART_PRIMARY = '#2f80ed';
@@ -38,7 +41,7 @@ const CATEGORY_COLORS = [
 @Component({
   selector: 'app-analytics',
   standalone: true,
-  imports: [CurrencyPipe, PercentPipe, AppChartComponent],
+  imports: [CurrencyPipe, PercentPipe, AppChartComponent, SkeletonLoaderComponent],
   templateUrl: './analytics.html',
   styleUrl: './analytics.scss',
 })
@@ -57,6 +60,8 @@ export class AnalyticsComponent implements OnInit {
   monthlySummary = signal<MonthlySummaryResponse | null>(null);
 
   readonly getTransactionCategoryLabel = getTransactionCategoryLabel;
+
+  displayCurrency = computed(() => getPreferredCurrency(this.userService.currentUser()));
 
   chartHeight = computed(() => (this.isCompactViewport() ? '220px' : '280px'));
   categoryChartHeight = computed(() => (this.isCompactViewport() ? '200px' : '260px'));
@@ -91,6 +96,7 @@ export class AnalyticsComponent implements OnInit {
 
     if (compact) {
       return {
+        animation: false,
         indexAxis: 'y',
         plugins: {
           legend: {
@@ -116,6 +122,7 @@ export class AnalyticsComponent implements OnInit {
     }
 
     return {
+      animation: false,
       plugins: {
         legend: {
           position: 'bottom',
@@ -154,6 +161,7 @@ export class AnalyticsComponent implements OnInit {
   });
 
   categoryChartOptions = computed<ChartConfiguration['options']>(() => ({
+    animation: false,
     plugins: {
       legend: {
         display: !this.isCompactViewport(),
@@ -187,6 +195,7 @@ export class AnalyticsComponent implements OnInit {
     const compact = this.isCompactViewport();
 
     return {
+      animation: false,
       plugins: {
         legend: { display: false },
       },
@@ -249,7 +258,10 @@ export class AnalyticsComponent implements OnInit {
     });
   }
 
-  constructor(private analyticsService: AnalyticsService) {}
+  constructor(
+    private analyticsService: AnalyticsService,
+    private userService: UserService,
+  ) {}
 
   @HostListener('window:resize')
   onWindowResize(): void {

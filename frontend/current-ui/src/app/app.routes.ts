@@ -16,6 +16,7 @@ import { GoalDetailComponent } from './features/goals/goal-detail/goal-detail';
 import { PaymentHistoryComponent } from './features/payments/payment-history/payment-history';
 import { PaySomeoneComponent } from './features/payments/pay-someone/pay-someone';
 import { PaymentReceiptComponent } from './features/payments/payment-receipt/payment-receipt';
+import { SettingsComponent } from './features/settings/settings/settings';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout';
 
@@ -93,6 +94,11 @@ export const routes: Routes = [
         path: 'goals/:id',
         component: GoalDetailComponent,
         title: 'Goal',
+      },
+      {
+        path: 'settings',
+        component: SettingsComponent,
+        title: 'Settings',
       },
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
     ],

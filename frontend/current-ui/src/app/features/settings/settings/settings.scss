@@ -1,0 +1,126 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
+}
+
+.settings-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+}
+
+.settings-page__title {
+  @include app-page-header;
+}
+
+.settings-page__subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.settings-page__card {
+  @include app-card;
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.settings-page__card-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.settings-page__email-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.settings-page__email-value {
+  margin: 0;
+  font-size: 15px;
+  color: $text-primary;
+}
+
+.settings-page__hint {
+  margin: 0;
+  font-size: 13px;
+  color: $text-secondary;
+}
+
+.settings-page__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.settings-page__alert {
+  padding: 12px 14px;
+  border-radius: $radius-button;
+  font-size: 14px;
+
+  &--error {
+    background: color-mix(in srgb, $color-error-static 10%, transparent);
+    color: $color-error;
+    border: 1px solid color-mix(in srgb, $color-error-static 25%, transparent);
+  }
+
+  p {
+    margin: 0 0 8px;
+  }
+}
+
+.settings-page__retry {
+  @include app-outline-button;
+  min-height: 40px;
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.settings-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settings-form__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.settings-form__input {
+  @include app-input;
+  color: $text-primary;
+
+  option {
+    background: $bg-secondary;
+    color: $text-primary;
+  }
+}
+
+.settings-form__error {
+  font-size: 12px;
+  color: $color-error;
+}
+
+.settings-form__submit {
+  @include app-primary-button;
+  align-self: flex-start;
+}

@@ -14,9 +14,32 @@
 }
 
 .dashboard-page__alert--error {
-  background: rgba($color-error, 0.08);
+  background: rgba($color-error-static, 0.08);
   color: $color-error;
-  border: 1px solid rgba($color-error, 0.15);
+  border: 1px solid rgba($color-error-static, 0.15);
+
+  p {
+    margin: 0 0 8px;
+  }
+}
+
+.dashboard-page__retry {
+  @include app-outline-button;
+  min-height: 40px;
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+.dashboard-page__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.dashboard-page__skeleton-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $space-md;
 }
 
 .dashboard-page__status,

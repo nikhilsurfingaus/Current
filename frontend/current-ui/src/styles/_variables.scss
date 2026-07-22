@@ -1,28 +1,33 @@
-// Current — Light app shell (matches auth + dashboard mock)
+// Static tokens for Sass color functions (rgba, etc.)
+$color-primary-static: #2f80ed;
+$color-primary-hover-static: #2563eb;
+$color-success-static: #16a34a;
+$color-error-static: #dc2626;
 
-$bg-primary: #f9fafb;
-$bg-secondary: #ffffff;
-$bg-elevated: #f3f4f6;
-$bg-active: #eff6ff;
+// Theme tokens — runtime values in _theme.scss
+$bg-primary: var(--bg-primary);
+$bg-secondary: var(--bg-secondary);
+$bg-elevated: var(--bg-elevated);
+$bg-active: var(--bg-active);
 
-$border-color: #e5e7eb;
+$border-color: var(--border-color);
 $border-color-strong: #d1d5db;
 
-$color-primary: #2f80ed;
-$color-primary-hover: #2563eb;
-$color-accent: #2f80ed;
+$color-primary: var(--color-primary);
+$color-primary-hover: var(--color-primary-hover);
+$color-accent: var(--color-primary);
 
-$color-success: #16a34a;
-$color-error: #dc2626;
+$color-success: var(--color-success);
+$color-error: var(--color-error);
 
-$text-primary: #0f172a;
-$text-secondary: #64748b;
-$text-on-primary: #ffffff;
+$text-primary: var(--text-primary);
+$text-secondary: var(--text-secondary);
+$text-on-primary: var(--text-on-primary);
 
 $radius-card: 14px;
 $radius-button: 10px;
 
-$shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06);
+$shadow-card: var(--shadow-card);
 
 $font-family: 'Inter', system-ui, -apple-system, sans-serif;
 
