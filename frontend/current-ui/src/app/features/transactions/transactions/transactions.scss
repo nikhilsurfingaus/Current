@@ -127,6 +127,17 @@
   color: $color-error;
 }
 
+.transactions-table__branch-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, $color-primary-static 12%, transparent);
+  color: $color-primary;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .transactions-table__details-row td {
   padding: 0;
   border-bottom: 1px solid $border-color;

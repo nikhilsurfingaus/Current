@@ -4,6 +4,7 @@ export const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
   [AccountType.Everyday]: 'Everyday',
   [AccountType.Savings]: 'Savings',
   [AccountType.Investment]: 'Investment',
+  [AccountType.Branch]: 'Branch',
 };
 
 export const ACCOUNT_TYPE_OPTIONS = [

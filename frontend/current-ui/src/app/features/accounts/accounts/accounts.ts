@@ -1,11 +1,11 @@
-import { CurrencyPipe } from '@angular/common';
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CurrencyPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { AccountService } from '../../../core/services/account.service';
 import { GoalService } from '../../../core/services/goal.service';
-import { NormalizeAmountDirective } from '../../../shared/directives/normalize-amount.directive';
+import { ToastService } from '../../../core/services/toast.service';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state';
 import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader';
 import { Account, AccountType, ApiError, CreateAccountRequest, Goal } from '../../../shared/models';
@@ -19,7 +19,7 @@ import { focusFirstInvalidControl } from '../../../shared/utils/form-accessibili
 @Component({
   selector: 'app-accounts',
   standalone: true,
-  imports: [ReactiveFormsModule, CurrencyPipe, NormalizeAmountDirective, SkeletonLoaderComponent, EmptyStateComponent],
+  imports: [ReactiveFormsModule, CurrencyPipe, SkeletonLoaderComponent, EmptyStateComponent],
   templateUrl: './accounts.html',
   styleUrl: './accounts.scss',
 })
@@ -38,6 +38,8 @@ export class AccountsComponent implements OnInit {
 
   userFacingAccounts = computed(() => filterNonGoalAccounts(this.accounts(), this.goals()));
 
+  showWelcomeCreditHint = computed(() => this.userFacingAccounts().length === 0);
+
   createAccountForm = new FormGroup({
     name: new FormControl('', {
       nonNullable: true,
@@ -46,10 +48,6 @@ export class AccountsComponent implements OnInit {
     accountType: new FormControl(AccountType.Everyday, {
       nonNullable: true,
       validators: [Validators.required],
-    }),
-    currentBalance: new FormControl(0, {
-      nonNullable: true,
-      validators: [Validators.required, Validators.min(0)],
     }),
     currency: new FormControl('AUD', {
       nonNullable: true,
@@ -60,6 +58,7 @@ export class AccountsComponent implements OnInit {
   constructor(
     private accountService: AccountService,
     private goalService: GoalService,
+    private toastService: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -102,7 +101,6 @@ export class AccountsComponent implements OnInit {
     this.createAccountForm.reset({
       name: '',
       accountType: AccountType.Everyday,
-      currentBalance: 0,
       currency: 'AUD',
     });
   }
@@ -126,7 +124,6 @@ export class AccountsComponent implements OnInit {
     const createAccountRequest: CreateAccountRequest = {
       name: formValues.name.trim(),
       accountType: formValues.accountType,
-      currentBalance: formValues.currentBalance,
       currency: formValues.currency.trim().toUpperCase(),
     };
 
@@ -137,6 +134,15 @@ export class AccountsComponent implements OnInit {
         this.createRequestInFlight.set(false);
         this.closeCreatePanel();
         this.loadAccounts();
+
+        if (createdAccount.welcomeCreditAmount && createdAccount.welcomeCreditAmount > 0) {
+          this.toastService.showSuccess(
+            `Welcome credit of ${createdAccount.welcomeCreditAmount.toLocaleString('en-AU', {
+              style: 'currency',
+              currency: createdAccount.currency,
+            })} added from Current HQ.`,
+          );
+        }
       },
       error: (error: HttpErrorResponse) => {
         this.createRequestInFlight.set(false);

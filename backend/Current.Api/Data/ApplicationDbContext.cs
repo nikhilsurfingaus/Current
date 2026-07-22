@@ -27,6 +27,8 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Contact> Contacts => Set<Contact>();
 
+    public DbSet<Branch> Branches => Set<Branch>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(entity =>
@@ -283,6 +285,27 @@ public class ApplicationDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(contribution => contribution.TransactionId)
                 .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<Branch>(entity =>
+        {
+            entity.HasKey(branch => branch.Id);
+
+            entity.Property(branch => branch.Name)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.Property(branch => branch.Code)
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.HasIndex(branch => branch.Code)
+                .IsUnique();
+
+            entity.HasOne(branch => branch.TreasuryAccount)
+                .WithMany()
+                .HasForeignKey(branch => branch.TreasuryAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

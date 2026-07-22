@@ -16,6 +16,8 @@ public class AccountResponse
 
     public string Currency { get; set; } = string.Empty;
 
+    public decimal? WelcomeCreditAmount { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }

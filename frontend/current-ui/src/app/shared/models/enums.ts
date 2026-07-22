@@ -2,6 +2,7 @@ export enum AccountType {
   Everyday = 0,
   Savings = 1,
   Investment = 2,
+  Branch = 3,
 }
 
 export enum UserRole {

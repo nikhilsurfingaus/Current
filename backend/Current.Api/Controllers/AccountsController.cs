@@ -44,8 +44,15 @@ public class AccountsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<AccountResponse>> Create([FromBody] CreateAccountRequest request)
     {
-        var currentUserId = _currentUserService.GetCurrentUserId();
-        var account = await _accountService.CreateAccountAsync(request, currentUserId);
-        return CreatedAtAction(nameof(GetById), new { id = account.Id }, account);
+        try
+        {
+            var currentUserId = _currentUserService.GetCurrentUserId();
+            var account = await _accountService.CreateAccountAsync(request, currentUserId);
+            return CreatedAtAction(nameof(GetById), new { id = account.Id }, account);
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(new { message = exception.Message });
+        }
     }
 }

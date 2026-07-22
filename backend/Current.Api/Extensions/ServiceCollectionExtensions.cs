@@ -1,3 +1,4 @@
+using Current.Api.Configuration;
 using Current.Api.Data;
 using Current.Api.Entities;
 using Current.Api.Interfaces;
@@ -47,8 +48,11 @@ public static class ServiceCollectionExtensions
 
         services.AddAuthorization();
 
+        services.Configure<BranchOptions>(configuration.GetSection(BranchOptions.SectionName));
+
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IDisbursementService, DisbursementService>();
         services.AddScoped<ITransactionService, TransactionService>();
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IContactService, ContactService>();

@@ -8,6 +8,7 @@ import { EmptyStateComponent } from '../../../shared/components/empty-state/empt
 import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader';
 import { Account, ApiError, LedgerEntryType, Transaction, TransactionStatus } from '../../../shared/models';
 import { getTransactionStatusLabel } from '../../../shared/utils/transaction-status.utils';
+import { getBranchTransactionLabel, isBranchFundedTransaction } from '../../../shared/utils/branch-transaction.utils';
 
 @Component({
   selector: 'app-transactions',
@@ -24,6 +25,8 @@ export class TransactionsComponent implements OnInit {
   expandedTransactionId = signal<string | null>(null);
 
   readonly getTransactionStatusLabel = getTransactionStatusLabel;
+  readonly isBranchFundedTransaction = isBranchFundedTransaction;
+  readonly getBranchTransactionLabel = getBranchTransactionLabel;
   readonly TransactionStatus = TransactionStatus;
   readonly LedgerEntryType = LedgerEntryType;
 

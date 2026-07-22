@@ -8,7 +8,5 @@ public class CreateAccountRequest
 
     public AccountType AccountType { get; set; }
 
-    public decimal CurrentBalance { get; set; }
-
     public string Currency { get; set; } = string.Empty;
 }

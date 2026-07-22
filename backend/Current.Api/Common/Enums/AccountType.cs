@@ -4,5 +4,6 @@ public enum AccountType
 {
     Everyday,
     Savings,
-    Investment
+    Investment,
+    Branch
 }

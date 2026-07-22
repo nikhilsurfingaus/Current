@@ -60,7 +60,15 @@
                 <td>
                   {{ transaction.amount | currency: getAccountCurrency(transaction.fromAccountId) }}
                 </td>
-                <td>{{ transaction.description || '—' }}</td>
+                <td>
+                  @if (isBranchFundedTransaction(transaction.description)) {
+                    <span class="transactions-table__branch-label">
+                      {{ getBranchTransactionLabel(transaction.description) }}
+                    </span>
+                  } @else {
+                    {{ transaction.description || '—' }}
+                  }
+                </td>
                 <td>
                   <span
                     class="transactions-table__status"
@@ -154,7 +162,13 @@
               </div>
               <div class="transactions-card__meta">
                 <span>{{ transaction.createdAt | date: 'mediumDate' }}</span>
-                <span>{{ transaction.description || 'No description' }}</span>
+                <span>
+                  @if (isBranchFundedTransaction(transaction.description)) {
+                    {{ getBranchTransactionLabel(transaction.description) }}
+                  } @else {
+                    {{ transaction.description || 'No description' }}
+                  }
+                </span>
                 <span class="transactions-card__expand">
                   {{ isTransactionExpanded(transaction.id) ? 'Hide ledger' : 'Show ledger' }}
                 </span>

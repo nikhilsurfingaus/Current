@@ -336,3 +336,36 @@ Make every Current workflow intentionally usable on desktop, tablet, mobile, key
 - Parts 3–6 complete: shared skeleton/empty states, form a11y, fade-in cards, settings page with theme/locale/currency preferences
 - Drawer chosen over bottom nav because Current has eight primary destinations
 
+---
+
+## Phase 9 — Branch & Lending
+
+**Status:** In progress  
+**Date started:** 2026-07-22  
+**Date completed:** —
+
+### Goal
+Finite branch treasury with ledger-backed disbursements; stop client-side balance minting; welcome credit on first account.
+
+### Planned parts
+1. Treasury foundation
+2. Admin branch ops
+3. Loans core
+4. Loan UX
+5. Branch admin UI
+6. Automation
+
+### Delivered
+- [x] Part 1: `Branch` entity + Current HQ treasury ($10M seed)
+- [x] Part 1: `DisbursementService` — ledger debit/credit on treasury disbursements
+- [x] Part 1: accounts always start at $0; welcome **$2,500** on first user account
+- [x] Part 1: removed client-controlled `currentBalance` on create
+- [x] Part 1: frontend — hide starting balance, welcome hint + toast, branch label in transactions
+- [ ] Part 2: Admin disbursements API
+- [ ] Part 3–6: loans, UX, admin UI, automation
+
+### Notes
+- Treasury seeded via migration (`Current HQ`, code `HQ`, AUD)
+- Welcome credit uses `TransactionCategory.Income` and description `Welcome credit from Current HQ`
+- Config: `Branch:WelcomeCreditAmount`, `WelcomeCreditMaxAccounts`, `InitialTreasuryBalance`
+
