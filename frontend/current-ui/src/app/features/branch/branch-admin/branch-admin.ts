@@ -1,6 +1,6 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { BranchService } from '../../../core/services/branch.service';
@@ -9,7 +9,20 @@ import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loa
 import { BranchTreasury, CreateBranchDisbursementRequest, LoanAdmin, LoanStatus } from '../../../shared/models';
 import { focusFirstInvalidControl } from '../../../shared/utils/form-accessibility.utils';
 import { resolveApiErrorMessage } from '../../../shared/utils/http-error.utils';
-import { getLoanStatusLabel } from '../../../shared/utils/loan-status.utils';
+import {
+  LOAN_STATUS_FILTER_OPTIONS,
+  getLoanRepaymentProgressPercent,
+  getLoanStatusLabel,
+  sortLoansByDisplayPriority,
+} from '../../../shared/utils/loan-status.utils';
+
+export type BranchAdminTab = 'treasury' | 'topup' | 'loans';
+
+const BRANCH_ADMIN_TABS: { id: BranchAdminTab; label: string }[] = [
+  { id: 'treasury', label: 'Treasury' },
+  { id: 'topup', label: 'Top-up' },
+  { id: 'loans', label: 'Loans' },
+];
 
 @Component({
   selector: 'app-branch-admin',
@@ -26,16 +39,48 @@ export class BranchAdminComponent implements OnInit {
   disbursementInFlight = signal(false);
   disbursementError = signal('');
 
-  pendingLoansLoading = signal(false);
-  pendingLoansLoadError = signal('');
-  pendingLoans = signal<LoanAdmin[]>([]);
+  loansLoading = signal(false);
+  loansLoadError = signal('');
+  loans = signal<LoanAdmin[]>([]);
+  statusFilter = signal<LoanStatus | null>(null);
+  activeTab = signal<BranchAdminTab>('treasury');
   loanActionInFlightId = signal<string | null>(null);
   rejectPanelLoanId = signal<string | null>(null);
   rejectFormSubmitted = signal(false);
   rejectError = signal('');
 
   readonly getLoanStatusLabel = getLoanStatusLabel;
+  readonly getLoanRepaymentProgressPercent = getLoanRepaymentProgressPercent;
   readonly loanStatus = LoanStatus;
+  readonly statusFilterOptions = LOAN_STATUS_FILTER_OPTIONS;
+  readonly branchAdminTabs = BRANCH_ADMIN_TABS;
+
+  filteredLoans = computed(() => {
+    const selectedStatus = this.statusFilter();
+    const allLoans = this.loans();
+
+    if (selectedStatus === null) {
+      return sortLoansByDisplayPriority(allLoans);
+    }
+
+    return sortLoansByDisplayPriority(allLoans.filter((loan) => loan.status === selectedStatus));
+  });
+
+  pendingLoansCount = computed(
+    () => this.loans().filter((loan) => loan.status === LoanStatus.Pending).length,
+  );
+
+  activeLoansCount = computed(
+    () => this.loans().filter((loan) => loan.status === LoanStatus.Active || loan.status === LoanStatus.Overdue).length,
+  );
+
+  totalOutstanding = computed(() =>
+    this.loans()
+      .filter((loan) => loan.status === LoanStatus.Active || loan.status === LoanStatus.Overdue)
+      .reduce((sum, loan) => sum + loan.outstandingPrincipal, 0),
+  );
+
+  summaryCurrency = computed(() => this.loans()[0]?.currency ?? this.treasury()?.currency ?? 'AUD');
 
   disbursementForm = new FormGroup({
     recipientEmail: new FormControl('', {
@@ -66,7 +111,7 @@ export class BranchAdminComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTreasury();
-    this.loadPendingLoans();
+    this.loadLoans();
   }
 
   loadTreasury(): void {
@@ -131,22 +176,43 @@ export class BranchAdminComponent implements OnInit {
     });
   }
 
-  loadPendingLoans(): void {
-    this.pendingLoansLoading.set(true);
-    this.pendingLoansLoadError.set('');
+  loadLoans(): void {
+    this.loansLoading.set(true);
+    this.loansLoadError.set('');
 
-    this.branchService.getLoans(LoanStatus.Pending).subscribe({
+    this.branchService.getLoans().subscribe({
       next: (loans) => {
-        this.pendingLoans.set(loans);
-        this.pendingLoansLoading.set(false);
+        this.loans.set(sortLoansByDisplayPriority(loans));
+        this.loansLoading.set(false);
       },
       error: (error: HttpErrorResponse) => {
-        this.pendingLoansLoading.set(false);
-        this.pendingLoansLoadError.set(
-          resolveApiErrorMessage(error, 'Unable to load pending loans.'),
+        this.loansLoading.set(false);
+        this.loansLoadError.set(
+          resolveApiErrorMessage(error, 'Unable to load loans.'),
         );
       },
     });
+  }
+
+  setStatusFilter(status: LoanStatus | null): void {
+    this.statusFilter.set(status);
+    this.closeRejectPanel();
+  }
+
+  setActiveTab(tab: BranchAdminTab): void {
+    this.activeTab.set(tab);
+
+    if (tab !== 'loans') {
+      this.closeRejectPanel();
+    }
+  }
+
+  isActiveTab(tab: BranchAdminTab): boolean {
+    return this.activeTab() === tab;
+  }
+
+  isStatusFilterActive(status: LoanStatus | null): boolean {
+    return this.statusFilter() === status;
   }
 
   onApproveLoan(loanId: string): void {
@@ -156,7 +222,7 @@ export class BranchAdminComponent implements OnInit {
       next: () => {
         this.loanActionInFlightId.set(null);
         this.loadTreasury();
-        this.loadPendingLoans();
+        this.loadLoans();
         this.toastService.showSuccess('Loan approved and disbursed.');
       },
       error: (error: HttpErrorResponse) => {
@@ -167,6 +233,11 @@ export class BranchAdminComponent implements OnInit {
   }
 
   openRejectPanel(loanId: string): void {
+    if (this.rejectPanelLoanId() === loanId) {
+      this.closeRejectPanel();
+      return;
+    }
+
     this.rejectPanelLoanId.set(loanId);
     this.rejectFormSubmitted.set(false);
     this.rejectError.set('');
@@ -201,7 +272,7 @@ export class BranchAdminComponent implements OnInit {
       next: () => {
         this.loanActionInFlightId.set(null);
         this.closeRejectPanel();
-        this.loadPendingLoans();
+        this.loadLoans();
         this.toastService.showSuccess('Loan request rejected.');
       },
       error: (error: HttpErrorResponse) => {

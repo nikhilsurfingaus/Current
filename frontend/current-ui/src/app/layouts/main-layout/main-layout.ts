@@ -87,6 +87,8 @@ export class MainLayoutComponent implements OnInit {
 
   isDashboardRoute = computed(() => this.currentUrl().startsWith('/dashboard'));
 
+  isAdminSlimNav = computed(() => this.isAdminUser());
+
   isAdminUser = computed(
     () => this.authService.getAuthResponse()?.role === UserRole.Admin,
   );

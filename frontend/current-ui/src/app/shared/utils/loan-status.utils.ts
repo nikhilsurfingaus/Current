@@ -16,6 +16,7 @@ export const LOAN_STATUS_FILTER_OPTIONS = [
   { value: LoanStatus.Active, label: LOAN_STATUS_LABELS[LoanStatus.Active] },
   { value: LoanStatus.Overdue, label: LOAN_STATUS_LABELS[LoanStatus.Overdue] },
   { value: LoanStatus.Paid, label: LOAN_STATUS_LABELS[LoanStatus.Paid] },
+  { value: LoanStatus.Defaulted, label: LOAN_STATUS_LABELS[LoanStatus.Defaulted] },
   { value: LoanStatus.Rejected, label: LOAN_STATUS_LABELS[LoanStatus.Rejected] },
   { value: LoanStatus.Cancelled, label: LOAN_STATUS_LABELS[LoanStatus.Cancelled] },
 ] as const;
@@ -72,6 +73,33 @@ export function isLoanRepayable(loanStatus: LoanStatus): boolean {
 
 export function isLoanCancellable(loanStatus: LoanStatus): boolean {
   return loanStatus === LoanStatus.Pending;
+}
+
+const LOAN_STATUS_DISPLAY_ORDER: Record<LoanStatus, number> = {
+  [LoanStatus.Overdue]: 0,
+  [LoanStatus.Active]: 1,
+  [LoanStatus.Pending]: 2,
+  [LoanStatus.Defaulted]: 3,
+  [LoanStatus.Paid]: 4,
+  [LoanStatus.Rejected]: 5,
+  [LoanStatus.Cancelled]: 6,
+};
+
+export function compareLoansByDisplayPriority(
+  left: { status: LoanStatus; createdAt: string },
+  right: { status: LoanStatus; createdAt: string },
+): number {
+  const statusOrderDiff = LOAN_STATUS_DISPLAY_ORDER[left.status] - LOAN_STATUS_DISPLAY_ORDER[right.status];
+
+  if (statusOrderDiff !== 0) {
+    return statusOrderDiff;
+  }
+
+  return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
+}
+
+export function sortLoansByDisplayPriority<T extends { status: LoanStatus; createdAt: string }>(loans: T[]): T[] {
+  return [...loans].sort(compareLoansByDisplayPriority);
 }
 
 export function getLoanRepaymentProgressPercent(loan: {

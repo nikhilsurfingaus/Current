@@ -100,6 +100,10 @@
           <button class="loan-detail-page__panel-close" type="button" (click)="closeRepayPanel()">Close</button>
         </div>
 
+        @if (actionErrorMessage()) {
+          <div class="loan-detail-page__alert loan-detail-page__alert--error">{{ actionErrorMessage() }}</div>
+        }
+
         <form class="loan-detail-form" [formGroup]="repayForm" (ngSubmit)="onSubmitRepayment()">
           <div class="loan-detail-form__field">
             <label class="loan-detail-form__label" for="repay-amount">Amount</label>
@@ -109,11 +113,22 @@
               type="number"
               inputmode="decimal"
               min="0.01"
+              [max]="loanData.outstandingPrincipal"
               step="0.01"
               formControlName="amount"
               appNormalizeAmount
             />
-            @if (repayFormSubmitted() && repayForm.controls.amount.invalid) {
+            <span class="loan-detail-form__hint">
+              Outstanding: {{ loanData.outstandingPrincipal | currency: loanData.currency }}
+            </span>
+            @if (repayFormSubmitted() && repayForm.controls.amount.errors?.['max']) {
+              <span class="loan-detail-form__error">
+                Amount cannot exceed the outstanding balance of
+                {{ loanData.outstandingPrincipal | currency: loanData.currency }}.
+              </span>
+            } @else if (repayFormSubmitted() && repayForm.controls.amount.errors?.['insufficientFunds']) {
+              <span class="loan-detail-form__error">Insufficient funds in the selected account.</span>
+            } @else if (repayFormSubmitted() && repayForm.controls.amount.invalid) {
               <span class="loan-detail-form__error">Enter an amount greater than zero.</span>
             }
           </div>
@@ -122,9 +137,16 @@
             <label class="loan-detail-form__label" for="repay-source-account">From account</label>
             <select id="repay-source-account" class="loan-detail-form__input" formControlName="sourceAccountId">
               @for (account of sourceAccounts(); track account.id) {
-                <option [value]="account.id">{{ account.name }} ({{ account.currency }})</option>
+                <option [value]="account.id">
+                  {{ account.name }} ({{ account.currentBalance | currency: account.currency }})
+                </option>
               }
             </select>
+            @if (selectedSourceAccount; as sourceAccount) {
+              <span class="loan-detail-form__hint">
+                Available: {{ sourceAccount.currentBalance | currency: sourceAccount.currency }}
+              </span>
+            }
           </div>
 
           <button class="loan-detail-page__primary-btn" type="submit" [disabled]="repayRequestInFlight()">

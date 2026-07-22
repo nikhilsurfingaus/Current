@@ -19,6 +19,7 @@ import {
   LOAN_STATUS_FILTER_OPTIONS,
   getLoanRepaymentProgressPercent,
   getLoanStatusLabel,
+  sortLoansByDisplayPriority,
 } from '../../../shared/utils/loan-status.utils';
 import { getLoanTierEmoji, getLoanTierSlug } from '../../../shared/utils/loan-tier.utils';
 
@@ -58,12 +59,13 @@ export class LoansComponent implements OnInit {
 
   filteredLoans = computed(() => {
     const selectedStatus = this.statusFilter();
+    const allLoans = this.loans();
 
     if (selectedStatus === null) {
-      return this.loans();
+      return sortLoansByDisplayPriority(allLoans);
     }
 
-    return this.loans().filter((loan) => loan.status === selectedStatus);
+    return sortLoansByDisplayPriority(allLoans.filter((loan) => loan.status === selectedStatus));
   });
 
   activeLoansCount = computed(
@@ -117,7 +119,7 @@ export class LoansComponent implements OnInit {
 
     this.loanService.getAllLoans().subscribe({
       next: (loans) => {
-        this.loans.set(loans);
+        this.loans.set(sortLoansByDisplayPriority(loans));
         this.loadFundingAccounts();
         this.loadLoanLimits();
       },
@@ -192,7 +194,7 @@ export class LoansComponent implements OnInit {
     this.loanService.createLoanRequest(createLoanRequest).subscribe({
       next: (createdLoan) => {
         this.requestInFlight.set(false);
-        this.loans.set([createdLoan, ...this.loans()]);
+        this.loans.set(sortLoansByDisplayPriority([createdLoan, ...this.loans()]));
         this.loadLoanLimits();
         this.closeRequestPanel();
       },

@@ -64,6 +64,11 @@ export class LoanDetailComponent implements OnInit {
     return currentLoan ? getLoanRepaymentProgressPercent(currentLoan) : 0;
   });
 
+  get selectedSourceAccount(): Account | undefined {
+    const sourceAccountId = this.repayForm.controls.sourceAccountId.value;
+    return this.sourceAccounts().find((account) => account.id === sourceAccountId);
+  }
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -113,6 +118,7 @@ export class LoanDetailComponent implements OnInit {
     this.repayPanelOpen.set(true);
     this.repayFormSubmitted.set(false);
     this.actionErrorMessage.set('');
+    this.syncRepayAmountValidators(currentLoan.outstandingPrincipal);
     this.repayForm.reset({
       amount: Math.min(currentLoan.monthlyPayment, currentLoan.outstandingPrincipal),
       sourceAccountId: this.sourceAccounts()[0]?.id ?? '',
@@ -140,6 +146,14 @@ export class LoanDetailComponent implements OnInit {
     }
 
     const formValues = this.repayForm.getRawValue();
+    const selectedAccount = this.selectedSourceAccount;
+
+    if (selectedAccount && formValues.amount > selectedAccount.currentBalance) {
+      this.repayForm.controls.amount.setErrors({ insufficientFunds: true });
+      focusFirstInvalidControl(this.repayForm);
+      return;
+    }
+
     const repayLoanRequest: RepayLoanRequest = {
       amount: formValues.amount,
       sourceAccountId: formValues.sourceAccountId,
@@ -193,6 +207,15 @@ export class LoanDetailComponent implements OnInit {
         this.sourceAccounts.set(filterNonGoalAccounts(accounts, goals));
       },
     });
+  }
+
+  private syncRepayAmountValidators(outstandingPrincipal: number): void {
+    this.repayForm.controls.amount.setValidators([
+      Validators.required,
+      Validators.min(0.01),
+      Validators.max(outstandingPrincipal),
+    ]);
+    this.repayForm.controls.amount.updateValueAndValidity({ emitEvent: false });
   }
 
   private loadRepaymentHistory(loanId: string): void {
