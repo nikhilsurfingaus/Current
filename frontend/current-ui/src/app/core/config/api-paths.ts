@@ -53,6 +53,7 @@ export const API_PATHS = {
   },
   loans: {
     list: '/loans',
+    limits: '/loans/limits',
     byId: (loanId: string) => `/loans/${loanId}`,
     repay: (loanId: string) => `/loans/${loanId}/repay`,
     repayments: (loanId: string) => `/loans/${loanId}/repayments`,

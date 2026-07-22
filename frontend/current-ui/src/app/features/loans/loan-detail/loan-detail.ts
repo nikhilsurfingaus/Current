@@ -3,8 +3,10 @@ import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
 
 import { AccountService } from '../../../core/services/account.service';
+import { GoalService } from '../../../core/services/goal.service';
 import { LoanService } from '../../../core/services/loan.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { NormalizeAmountDirective } from '../../../shared/directives/normalize-amount.directive';
@@ -67,6 +69,7 @@ export class LoanDetailComponent implements OnInit {
     private router: Router,
     private loanService: LoanService,
     private accountService: AccountService,
+    private goalService: GoalService,
     private toastService: ToastService,
   ) {}
 
@@ -182,9 +185,12 @@ export class LoanDetailComponent implements OnInit {
   }
 
   private loadSourceAccounts(): void {
-    this.accountService.getAllAccounts().subscribe({
-      next: (accounts) => {
-        this.sourceAccounts.set(filterNonGoalAccounts(accounts, []));
+    forkJoin({
+      accounts: this.accountService.getAllAccounts(),
+      goals: this.goalService.getAllGoals(),
+    }).subscribe({
+      next: ({ accounts, goals }) => {
+        this.sourceAccounts.set(filterNonGoalAccounts(accounts, goals));
       },
     });
   }

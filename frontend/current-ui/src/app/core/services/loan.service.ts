@@ -6,6 +6,7 @@ import { ApiService } from './api.service';
 import {
   CreateLoanRequest,
   Loan,
+  LoanLimits,
   LoanRepayment,
   RepayLoanRequest,
 } from '../../shared/models';
@@ -24,6 +25,10 @@ export class LoanService {
     return this.apiService
       .get<Loan[]>(API_PATHS.loans.list)
       .pipe(map((loans) => loans.map((loan) => normalizeLoanResponse(loan))));
+  }
+
+  getLoanLimits(): Observable<LoanLimits> {
+    return this.apiService.get<LoanLimits>(API_PATHS.loans.limits);
   }
 
   getLoanById(loanId: string): Observable<Loan> {

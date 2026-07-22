@@ -38,3 +38,15 @@ export interface LoanRepayment {
   interestPortion: number;
   createdAt: string;
 }
+
+export interface LoanLimits {
+  currency: string;
+  totalHoldings: number;
+  tierLabel: string;
+  maxSingleLoan: number;
+  maxTotalOutstanding: number;
+  maxOpenLoans: number;
+  openLoanCount: number;
+  currentOutstandingExposure: number;
+  availableBorrowingCapacity: number;
+}

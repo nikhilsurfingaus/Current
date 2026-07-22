@@ -27,6 +27,14 @@ public class LoansController : ControllerBase
         return Ok(loans);
     }
 
+    [HttpGet("limits")]
+    public async Task<ActionResult<LoanLimitsResponse>> GetLimits()
+    {
+        var currentUserId = _currentUserService.GetCurrentUserId();
+        var loanLimits = await _loanService.GetUserLoanLimitsAsync(currentUserId);
+        return Ok(loanLimits);
+    }
+
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<LoanResponse>> GetById(Guid id)
     {

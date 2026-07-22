@@ -28,6 +28,21 @@
         <div class="loans-page__alert loans-page__alert--error">{{ requestErrorMessage() }}</div>
       }
 
+      @if (loanLimits(); as limits) {
+        <div [class]="'loans-page__limits-hint loans-page__limits-hint--' + getLoanTierSlug(limits.tierLabel)">
+          <p class="loans-page__limits-tier">
+            <span class="loans-page__limits-emoji" aria-hidden="true">{{ getLoanTierEmoji(limits.tierLabel) }}</span>
+            {{ limits.tierLabel }} tier
+          </p>
+          <p class="loans-page__limits-copy">
+            Holdings {{ limits.totalHoldings | currency: limits.currency }} ·
+            up to {{ limits.maxSingleLoan | currency: limits.currency }} per loan ·
+            {{ limits.availableBorrowingCapacity | currency: limits.currency }} capacity left ·
+            {{ limits.openLoanCount }}/{{ limits.maxOpenLoans }} open loans
+          </p>
+        </div>
+      }
+
       <form class="loans-form" [formGroup]="requestLoanForm" (ngSubmit)="onSubmitLoanRequest()">
         <div class="loans-form__row">
           <div class="loans-form__field">
@@ -43,7 +58,13 @@
               appNormalizeAmount
             />
             @if (requestFormSubmitted() && requestLoanForm.controls.principal.invalid) {
-              <span class="loans-form__error">Enter an amount of at least $500.</span>
+              <span class="loans-form__error">
+                @if (requestLoanForm.controls.principal.errors?.['max']) {
+                  Amount exceeds your tier limit of {{ loanLimits()?.maxSingleLoan | currency: loanLimits()?.currency ?? 'AUD' }}.
+                } @else {
+                  Enter an amount of at least $500.
+                }
+              </span>
             }
           </div>
 

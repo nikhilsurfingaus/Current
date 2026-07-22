@@ -9,6 +9,8 @@ public interface ILoanService
 
     Task<LoanResponse?> GetUserLoanByIdAsync(Guid loanId, Guid currentUserId);
 
+    Task<LoanLimitsResponse> GetUserLoanLimitsAsync(Guid currentUserId);
+
     Task<LoanResponse> CreateLoanRequestAsync(CreateLoanRequest request, Guid currentUserId);
 
     Task<LoanResponse?> CancelLoanRequestAsync(Guid loanId, Guid currentUserId);

@@ -381,4 +381,5 @@ Finite branch treasury with ledger-backed disbursements; stop client-side balanc
 - Part 3: test via Swagger — `POST /loans`, `GET /branch/loans?status=Pending`, `POST /branch/loans/{id}/approve`
 - Part 4–5: user flow at `/loans`; admin loan queue on `/branch/admin`
 - Part 6 deferred: overdue badge uses API `isOverdue` on fetch (no cron/background jobs until deploy infra exists)
+- Loan limits: holdings tiers in `Branch:LoanLimitTiers` — max single loan, total outstanding, max open loans per tier
 

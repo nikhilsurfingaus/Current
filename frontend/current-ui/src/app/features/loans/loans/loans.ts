@@ -3,13 +3,15 @@ import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
 
 import { AccountService } from '../../../core/services/account.service';
+import { GoalService } from '../../../core/services/goal.service';
 import { LoanService } from '../../../core/services/loan.service';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state';
 import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader';
 import { NormalizeAmountDirective } from '../../../shared/directives/normalize-amount.directive';
-import { Account, CreateLoanRequest, Loan, LoanStatus } from '../../../shared/models';
+import { Account, CreateLoanRequest, Loan, LoanLimits, LoanStatus } from '../../../shared/models';
 import { filterNonGoalAccounts } from '../../../shared/utils/goal-account.utils';
 import { focusFirstInvalidControl } from '../../../shared/utils/form-accessibility.utils';
 import { resolveApiErrorMessage } from '../../../shared/utils/http-error.utils';
@@ -18,6 +20,7 @@ import {
   getLoanRepaymentProgressPercent,
   getLoanStatusLabel,
 } from '../../../shared/utils/loan-status.utils';
+import { getLoanTierEmoji, getLoanTierSlug } from '../../../shared/utils/loan-tier.utils';
 
 @Component({
   selector: 'app-loans',
@@ -36,6 +39,7 @@ import {
 })
 export class LoansComponent implements OnInit {
   loans = signal<Loan[]>([]);
+  loanLimits = signal<LoanLimits | null>(null);
   fundingAccounts = signal<Account[]>([]);
   loansLoading = signal(false);
   loansLoadError = signal('');
@@ -49,6 +53,8 @@ export class LoansComponent implements OnInit {
   readonly loanStatus = LoanStatus;
   readonly getLoanStatusLabel = getLoanStatusLabel;
   readonly getLoanRepaymentProgressPercent = getLoanRepaymentProgressPercent;
+  readonly getLoanTierEmoji = getLoanTierEmoji;
+  readonly getLoanTierSlug = getLoanTierSlug;
 
   filteredLoans = computed(() => {
     const selectedStatus = this.statusFilter();
@@ -98,6 +104,7 @@ export class LoansComponent implements OnInit {
   constructor(
     private loanService: LoanService,
     private accountService: AccountService,
+    private goalService: GoalService,
   ) {}
 
   ngOnInit(): void {
@@ -112,6 +119,7 @@ export class LoansComponent implements OnInit {
       next: (loans) => {
         this.loans.set(loans);
         this.loadFundingAccounts();
+        this.loadLoanLimits();
       },
       error: (error: HttpErrorResponse) => {
         this.loansLoading.set(false);
@@ -132,8 +140,20 @@ export class LoansComponent implements OnInit {
     this.requestPanelOpen.set(true);
     this.requestFormSubmitted.set(false);
     this.requestErrorMessage.set('');
+
+    const limits = this.loanLimits();
+    const maxPrincipal = limits?.maxSingleLoan ?? 25000;
+    const defaultPrincipal = Math.min(5000, maxPrincipal);
+
+    this.requestLoanForm.controls.principal.setValidators([
+      Validators.required,
+      Validators.min(500),
+      Validators.max(maxPrincipal),
+    ]);
+    this.requestLoanForm.controls.principal.updateValueAndValidity();
+
     this.requestLoanForm.reset({
-      principal: 5000,
+      principal: defaultPrincipal,
       termMonths: 12,
       fundedAccountId: this.fundingAccounts()[0]?.id ?? '',
       purpose: '',
@@ -173,6 +193,7 @@ export class LoansComponent implements OnInit {
       next: (createdLoan) => {
         this.requestInFlight.set(false);
         this.loans.set([createdLoan, ...this.loans()]);
+        this.loadLoanLimits();
         this.closeRequestPanel();
       },
       error: (error: HttpErrorResponse) => {
@@ -182,10 +203,19 @@ export class LoansComponent implements OnInit {
     });
   }
 
+  private loadLoanLimits(): void {
+    this.loanService.getLoanLimits().subscribe({
+      next: (limits) => this.loanLimits.set(limits),
+    });
+  }
+
   private loadFundingAccounts(): void {
-    this.accountService.getAllAccounts().subscribe({
-      next: (accounts) => {
-        this.fundingAccounts.set(filterNonGoalAccounts(accounts, []));
+    forkJoin({
+      accounts: this.accountService.getAllAccounts(),
+      goals: this.goalService.getAllGoals(),
+    }).subscribe({
+      next: ({ accounts, goals }) => {
+        this.fundingAccounts.set(filterNonGoalAccounts(accounts, goals));
         this.loansLoading.set(false);
       },
       error: (error: HttpErrorResponse) => {

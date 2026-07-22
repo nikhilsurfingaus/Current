@@ -44,10 +44,35 @@ public class LoanService : ILoanService
         return loan?.ToResponse();
     }
 
+    public async Task<LoanLimitsResponse> GetUserLoanLimitsAsync(Guid currentUserId)
+    {
+        var branch = await _disbursementService.GetDefaultBranchAsync();
+        var loanCurrency = branch.TreasuryAccount.Currency;
+        var totalHoldings = await GetUserHoldingsAsync(currentUserId, loanCurrency);
+        var tier = ResolveLoanLimitTier(totalHoldings);
+        var openLoanExposure = await GetOpenLoanExposureAsync(currentUserId);
+
+        var maxSingleLoan = Math.Min(tier.MaxSingleLoan, _branchOptions.MaxLoanAmount);
+        var maxTotalOutstanding = tier.MaxTotalOutstanding;
+        var maxOpenLoans = Math.Min(tier.MaxOpenLoans, _branchOptions.MaxActiveLoansPerUser);
+        var availableBorrowingCapacity = Math.Max(0, maxTotalOutstanding - openLoanExposure.TotalExposure);
+
+        return new LoanLimitsResponse
+        {
+            Currency = loanCurrency,
+            TotalHoldings = totalHoldings,
+            TierLabel = tier.Label,
+            MaxSingleLoan = maxSingleLoan,
+            MaxTotalOutstanding = maxTotalOutstanding,
+            MaxOpenLoans = maxOpenLoans,
+            OpenLoanCount = openLoanExposure.OpenLoanCount,
+            CurrentOutstandingExposure = openLoanExposure.TotalExposure,
+            AvailableBorrowingCapacity = availableBorrowingCapacity
+        };
+    }
+
     public async Task<LoanResponse> CreateLoanRequestAsync(CreateLoanRequest request, Guid currentUserId)
     {
-        ValidateLoanRequestAmounts(request.Principal, request.TermMonths);
-
         var branch = await _disbursementService.GetDefaultBranchAsync();
         var fundedAccount = request.FundedAccountId.HasValue
             ? await ResolveOwnedFundedAccountAsync(request.FundedAccountId.Value, currentUserId)
@@ -58,15 +83,19 @@ public class LoanService : ILoanService
             throw new InvalidOperationException("Loan currency must match the branch treasury currency.");
         }
 
-        var openLoanCount = await _dbContext.Loans.CountAsync(loan =>
-            loan.UserId == currentUserId &&
-            (loan.Status == LoanStatus.Pending ||
-             loan.Status == LoanStatus.Active ||
-             loan.Status == LoanStatus.Overdue));
+        var loanLimits = await GetUserLoanLimitsAsync(currentUserId);
+        ValidateLoanRequestAmounts(request.Principal, request.TermMonths, loanLimits.MaxSingleLoan);
 
-        if (openLoanCount >= _branchOptions.MaxActiveLoansPerUser)
+        if (loanLimits.OpenLoanCount >= loanLimits.MaxOpenLoans)
         {
-            throw new InvalidOperationException("You already have an open loan request or active loan.");
+            throw new InvalidOperationException(
+                $"You can have at most {loanLimits.MaxOpenLoans} open loan requests or active loans at your {loanLimits.TierLabel} tier.");
+        }
+
+        if (request.Principal > loanLimits.AvailableBorrowingCapacity)
+        {
+            throw new InvalidOperationException(
+                $"This loan would exceed your {loanLimits.TierLabel} tier borrowing limit of {loanLimits.MaxTotalOutstanding:0.##} {loanLimits.Currency}.");
         }
 
         var utcNow = DateTime.UtcNow;
@@ -469,7 +498,7 @@ public class LoanService : ILoanService
         return fundedAccount;
     }
 
-    private void ValidateLoanRequestAmounts(decimal principal, int termMonths)
+    private void ValidateLoanRequestAmounts(decimal principal, int termMonths, decimal maxSingleLoan)
     {
         if (principal < _branchOptions.MinLoanAmount)
         {
@@ -477,10 +506,11 @@ public class LoanService : ILoanService
                 $"Loan amount must be at least {_branchOptions.MinLoanAmount:0.##}.");
         }
 
-        if (principal > _branchOptions.MaxLoanAmount)
+        var effectiveMaxSingleLoan = Math.Min(maxSingleLoan, _branchOptions.MaxLoanAmount);
+        if (principal > effectiveMaxSingleLoan)
         {
             throw new InvalidOperationException(
-                $"Loan amount cannot exceed {_branchOptions.MaxLoanAmount:0.##}.");
+                $"Loan amount cannot exceed {effectiveMaxSingleLoan:0.##} for your current tier.");
         }
 
         if (termMonths <= 0)
@@ -493,6 +523,66 @@ public class LoanService : ILoanService
             throw new InvalidOperationException(
                 $"Loan term cannot exceed {_branchOptions.MaxTermMonths} months.");
         }
+    }
+
+    private async Task<decimal> GetUserHoldingsAsync(Guid currentUserId, string currency)
+    {
+        var goalAccountIds = await _dbContext.Goals
+            .AsNoTracking()
+            .Where(goal => goal.UserId == currentUserId)
+            .Select(goal => goal.GoalAccountId)
+            .ToListAsync();
+
+        return await _dbContext.Accounts
+            .AsNoTracking()
+            .Where(account =>
+                account.UserId == currentUserId &&
+                account.AccountType != AccountType.Branch &&
+                !goalAccountIds.Contains(account.Id) &&
+                account.Currency == currency)
+            .SumAsync(account => account.CurrentBalance);
+    }
+
+    private LoanLimitTierOptions ResolveLoanLimitTier(decimal totalHoldings)
+    {
+        var configuredTiers = _branchOptions.LoanLimitTiers
+            .Where(tier => tier.MaxOpenLoans > 0 && tier.MaxSingleLoan > 0 && tier.MaxTotalOutstanding > 0)
+            .OrderByDescending(tier => tier.MinHoldings)
+            .ToList();
+
+        if (configuredTiers.Count == 0)
+        {
+            return new LoanLimitTierOptions
+            {
+                MinHoldings = 0,
+                Label = "Standard",
+                MaxSingleLoan = _branchOptions.MaxLoanAmount,
+                MaxTotalOutstanding = _branchOptions.MaxLoanAmount * _branchOptions.MaxActiveLoansPerUser,
+                MaxOpenLoans = _branchOptions.MaxActiveLoansPerUser
+            };
+        }
+
+        var matchedTier = configuredTiers.FirstOrDefault(tier => totalHoldings >= tier.MinHoldings)
+            ?? configuredTiers[^1];
+
+        return matchedTier;
+    }
+
+    private async Task<(int OpenLoanCount, decimal TotalExposure)> GetOpenLoanExposureAsync(Guid currentUserId)
+    {
+        var openLoans = await _dbContext.Loans
+            .AsNoTracking()
+            .Where(loan =>
+                loan.UserId == currentUserId &&
+                (loan.Status == LoanStatus.Pending ||
+                 loan.Status == LoanStatus.Active ||
+                 loan.Status == LoanStatus.Overdue))
+            .ToListAsync();
+
+        var totalExposure = openLoans.Sum(loan =>
+            loan.Status == LoanStatus.Pending ? loan.Principal : loan.OutstandingPrincipal);
+
+        return (openLoans.Count, totalExposure);
     }
 
     internal static decimal CalculateMonthlyPayment(

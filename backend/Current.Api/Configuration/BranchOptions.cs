@@ -19,4 +19,6 @@ public class BranchOptions
     public int MaxActiveLoansPerUser { get; set; }
 
     public int MaxTermMonths { get; set; }
+
+    public List<LoanLimitTierOptions> LoanLimitTiers { get; set; } = [];
 }
