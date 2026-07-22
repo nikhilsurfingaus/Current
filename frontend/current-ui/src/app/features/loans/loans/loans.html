@@ -1,0 +1,188 @@
+<div class="loans-page">
+  <header class="loans-page__header">
+    <h1 class="loans-page__title">Loans</h1>
+  </header>
+
+  <div class="loans-page__intro">
+    <p class="loans-page__subtitle">Request lending from Current HQ and track repayments</p>
+    <button class="loans-page__create-btn" type="button" (click)="openRequestPanel()">
+      Request loan
+    </button>
+  </div>
+
+  @if (loansLoadError()) {
+    <div class="loans-page__alert loans-page__alert--error">
+      <p>{{ loansLoadError() }}</p>
+      <button class="loans-page__retry" type="button" (click)="loadLoansPageData()">Try again</button>
+    </div>
+  }
+
+  @if (requestPanelOpen()) {
+    <section class="loans-page__panel">
+      <div class="loans-page__panel-header">
+        <h2 class="loans-page__panel-title">Request loan</h2>
+        <button class="loans-page__panel-close" type="button" (click)="closeRequestPanel()">Close</button>
+      </div>
+
+      @if (requestErrorMessage()) {
+        <div class="loans-page__alert loans-page__alert--error">{{ requestErrorMessage() }}</div>
+      }
+
+      <form class="loans-form" [formGroup]="requestLoanForm" (ngSubmit)="onSubmitLoanRequest()">
+        <div class="loans-form__row">
+          <div class="loans-form__field">
+            <label class="loans-form__label" for="loan-principal">Amount</label>
+            <input
+              id="loan-principal"
+              class="loans-form__input"
+              type="number"
+              inputmode="decimal"
+              min="500"
+              step="0.01"
+              formControlName="principal"
+              appNormalizeAmount
+            />
+            @if (requestFormSubmitted() && requestLoanForm.controls.principal.invalid) {
+              <span class="loans-form__error">Enter an amount of at least $500.</span>
+            }
+          </div>
+
+          <div class="loans-form__field">
+            <label class="loans-form__label" for="loan-term">Term (months)</label>
+            <input
+              id="loan-term"
+              class="loans-form__input"
+              type="number"
+              min="1"
+              max="60"
+              step="1"
+              formControlName="termMonths"
+            />
+            @if (requestFormSubmitted() && requestLoanForm.controls.termMonths.invalid) {
+              <span class="loans-form__error">Enter a term between 1 and 60 months.</span>
+            }
+          </div>
+        </div>
+
+        <div class="loans-form__field">
+          <label class="loans-form__label" for="loan-funded-account">Fund into account</label>
+          <select id="loan-funded-account" class="loans-form__input" formControlName="fundedAccountId">
+            @for (account of fundingAccounts(); track account.id) {
+              <option [value]="account.id">{{ account.name }} ({{ account.currency }})</option>
+            }
+          </select>
+        </div>
+
+        <div class="loans-form__field">
+          <label class="loans-form__label" for="loan-purpose">Purpose (optional)</label>
+          <textarea
+            id="loan-purpose"
+            class="loans-form__input loans-form__textarea"
+            rows="2"
+            formControlName="purpose"
+            placeholder="What is this loan for?"
+          ></textarea>
+        </div>
+
+        <button class="loans-form__submit" type="submit" [disabled]="requestInFlight()">
+          {{ requestInFlight() ? 'Submitting...' : 'Submit request' }}
+        </button>
+      </form>
+    </section>
+  }
+
+  <section class="loans-page__summary-grid">
+    <article class="loans-summary-card">
+      <p class="loans-summary-card__label">Outstanding</p>
+      <p class="loans-summary-card__value">{{ totalOutstanding() | currency: summaryCurrency() }}</p>
+    </article>
+    <article class="loans-summary-card">
+      <p class="loans-summary-card__label">Active loans</p>
+      <p class="loans-summary-card__value">{{ activeLoansCount() }}</p>
+    </article>
+    <article class="loans-summary-card">
+      <p class="loans-summary-card__label">Pending requests</p>
+      <p class="loans-summary-card__value">{{ pendingLoansCount() }}</p>
+    </article>
+  </section>
+
+  <div class="loans-page__tabs">
+    @for (option of statusFilterOptions; track option.label) {
+      <button
+        class="loans-page__tab"
+        [class.loans-page__tab--active]="isStatusFilterActive(option.value)"
+        type="button"
+        [attr.aria-pressed]="isStatusFilterActive(option.value)"
+        (click)="setStatusFilter(option.value)"
+      >
+        {{ option.label }}
+      </button>
+    }
+  </div>
+
+  @if (loansLoading()) {
+    <div class="loans-page__skeleton" aria-busy="true" aria-live="polite">
+      @for (card of [1, 2, 3]; track card) {
+        <app-skeleton-loader variant="block" height="160px" />
+      }
+    </div>
+  } @else if (filteredLoans().length === 0) {
+    <section class="loans-page__empty-card">
+      @if (loans().length === 0) {
+        <app-empty-state
+          message="No loans yet. Submit a request to borrow from Current HQ."
+          actionLabel="Request loan"
+          actionRoute="/loans"
+        />
+      } @else {
+        <p class="loans-page__status">No loans match this filter.</p>
+      }
+    </section>
+  } @else {
+    <section class="loans-page__grid">
+      @for (loan of filteredLoans(); track loan.id) {
+        <a class="loan-card" [routerLink]="['/loans', loan.id]">
+          <div class="loan-card__header">
+            <div class="loan-card__heading">
+              <h2 class="loan-card__amount">{{ loan.principal | currency: loan.currency }}</h2>
+              <span
+                class="loan-card__status loan-card__status--{{ loan.status }}"
+                [class.loan-card__status--overdue]="loan.isOverdue"
+              >
+                {{ loan.isOverdue ? 'Overdue' : getLoanStatusLabel(loan.status) }}
+              </span>
+            </div>
+          </div>
+
+          <p class="loan-card__purpose">{{ loan.purpose || 'Loan from Current HQ' }}</p>
+
+          @if (loan.status === loanStatus.Active || loan.status === loanStatus.Overdue || loan.status === loanStatus.Paid) {
+            <div class="loan-card__progress">
+              <div class="loan-card__progress-track">
+                <div
+                  class="loan-card__progress-fill"
+                  role="progressbar"
+                  [attr.aria-valuenow]="getLoanRepaymentProgressPercent(loan)"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  [style.width.%]="getLoanRepaymentProgressPercent(loan)"
+                ></div>
+              </div>
+              <div class="loan-card__progress-meta">
+                <span>{{ loan.outstandingPrincipal | currency: loan.currency }} left</span>
+                <span>{{ getLoanRepaymentProgressPercent(loan) }}% repaid</span>
+              </div>
+            </div>
+          }
+
+          <div class="loan-card__footer">
+            <span>{{ loan.termMonths }} months @ {{ loan.interestRatePercent }}% p.a.</span>
+            @if (loan.nextDueDate && (loan.status === loanStatus.Active || loan.status === loanStatus.Overdue)) {
+              <span>Due {{ loan.nextDueDate | date: 'mediumDate' }}</span>
+            }
+          </div>
+        </a>
+      }
+    </section>
+  }
+</div>

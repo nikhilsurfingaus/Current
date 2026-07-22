@@ -47,5 +47,14 @@ export const API_PATHS = {
   branch: {
     treasury: '/branch/treasury',
     disbursements: '/branch/disbursements',
+    loans: '/branch/loans',
+    approveLoan: (loanId: string) => `/branch/loans/${loanId}/approve`,
+    rejectLoan: (loanId: string) => `/branch/loans/${loanId}/reject`,
+  },
+  loans: {
+    list: '/loans',
+    byId: (loanId: string) => `/loans/${loanId}`,
+    repay: (loanId: string) => `/loans/${loanId}/repay`,
+    repayments: (loanId: string) => `/loans/${loanId}/repayments`,
   },
 } as const;

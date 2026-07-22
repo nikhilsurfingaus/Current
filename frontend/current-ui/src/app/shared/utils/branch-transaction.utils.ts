@@ -22,7 +22,8 @@ export function isBranchFundedTransaction(transaction: BranchTransactionLike): b
   return normalizedDescription.includes('current hq')
     || normalizedDescription.includes('welcome credit')
     || normalizedDescription.includes('branch top-up')
-    || normalizedDescription.includes('loan disbursement');
+    || normalizedDescription.includes('loan disbursement')
+    || normalizedDescription.includes('loan repayment');
 }
 
 export function getBranchTransactionLabel(transaction: BranchTransactionLike): string {

@@ -61,3 +61,13 @@ export enum ThemePreference {
   Dark = 1,
   System = 2,
 }
+
+export enum LoanStatus {
+  Pending = 0,
+  Active = 1,
+  Paid = 2,
+  Overdue = 3,
+  Defaulted = 4,
+  Rejected = 5,
+  Cancelled = 6,
+}

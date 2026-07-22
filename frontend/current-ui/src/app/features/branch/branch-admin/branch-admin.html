@@ -1,7 +1,7 @@
 <div class="branch-admin-page">
   <header class="branch-admin-page__header">
     <h1 class="branch-admin-page__title">Branch admin</h1>
-    <p class="branch-admin-page__subtitle">Manage Current HQ treasury and send branch top-ups</p>
+    <p class="branch-admin-page__subtitle">Manage Current HQ treasury, top-ups, and loan requests</p>
   </header>
 
   @if (treasuryLoadError()) {
@@ -79,6 +79,94 @@
           {{ disbursementInFlight() ? 'Sending...' : 'Send top-up' }}
         </button>
       </form>
+    </section>
+
+    <section class="branch-admin-page__card">
+      <div class="branch-admin-page__card-header">
+        <h2 class="branch-admin-page__card-title">Pending loan requests</h2>
+        <button class="branch-admin-page__retry" type="button" (click)="loadPendingLoans()">Refresh</button>
+      </div>
+
+      @if (pendingLoansLoadError()) {
+        <div class="branch-admin-page__alert branch-admin-page__alert--error">
+          <p>{{ pendingLoansLoadError() }}</p>
+        </div>
+      }
+
+      @if (pendingLoansLoading()) {
+        <app-skeleton-loader variant="block" height="120px" />
+      } @else if (pendingLoans().length === 0) {
+        <p class="branch-admin-page__hint">No pending loan requests.</p>
+      } @else {
+        <ul class="branch-admin-loans">
+          @for (loan of pendingLoans(); track loan.id) {
+            <li class="branch-admin-loans__item">
+              <div class="branch-admin-loans__main">
+                <p class="branch-admin-loans__amount">{{ loan.principal | currency: loan.currency }}</p>
+                <p class="branch-admin-loans__borrower">{{ loan.borrowerName }} · {{ loan.borrowerEmail }}</p>
+                <p class="branch-admin-loans__meta">
+                  {{ loan.termMonths }} months @ {{ loan.interestRatePercent }}% ·
+                  Est. {{ loan.monthlyPayment | currency: loan.currency }}/mo
+                </p>
+                @if (loan.purpose) {
+                  <p class="branch-admin-loans__purpose">{{ loan.purpose }}</p>
+                }
+              </div>
+              <div class="branch-admin-loans__actions">
+                <button
+                  class="branch-admin-loans__approve"
+                  type="button"
+                  [disabled]="loanActionInFlightId() === loan.id"
+                  (click)="onApproveLoan(loan.id)"
+                >
+                  {{ loanActionInFlightId() === loan.id ? 'Working...' : 'Approve' }}
+                </button>
+                <button
+                  class="branch-admin-loans__reject"
+                  type="button"
+                  [disabled]="loanActionInFlightId() === loan.id"
+                  (click)="openRejectPanel(loan.id)"
+                >
+                  Reject
+                </button>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (rejectPanelLoanId(); as rejectLoanId) {
+        <div class="branch-admin-loans__reject-panel">
+          <h3 class="branch-admin-loans__reject-title">Reject loan request</h3>
+
+          @if (rejectError()) {
+            <div class="branch-admin-page__alert branch-admin-page__alert--error">{{ rejectError() }}</div>
+          }
+
+          <form class="branch-admin-form" [formGroup]="rejectLoanForm" (ngSubmit)="onSubmitRejectLoan()">
+            <div class="branch-admin-form__field">
+              <label class="branch-admin-form__label" for="reject-reason">Reason</label>
+              <textarea
+                id="reject-reason"
+                class="branch-admin-form__input"
+                rows="3"
+                formControlName="reason"
+                placeholder="Explain why this request is declined"
+              ></textarea>
+              @if (rejectFormSubmitted() && rejectLoanForm.controls.reason.invalid) {
+                <span class="branch-admin-form__error">Rejection reason is required.</span>
+              }
+            </div>
+
+            <div class="branch-admin-loans__reject-actions">
+              <button class="branch-admin-loans__approve" type="submit" [disabled]="loanActionInFlightId() === rejectLoanId">
+                Confirm reject
+              </button>
+              <button class="branch-admin-loans__reject" type="button" (click)="closeRejectPanel()">Cancel</button>
+            </div>
+          </form>
+        </div>
+      }
     </section>
   }
 </div>

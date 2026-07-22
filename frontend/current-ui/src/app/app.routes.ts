@@ -19,6 +19,8 @@ import { PaySomeoneComponent } from './features/payments/pay-someone/pay-someone
 import { PaymentReceiptComponent } from './features/payments/payment-receipt/payment-receipt';
 import { SettingsComponent } from './features/settings/settings/settings';
 import { BranchAdminComponent } from './features/branch/branch-admin/branch-admin';
+import { LoansComponent } from './features/loans/loans/loans';
+import { LoanDetailComponent } from './features/loans/loan-detail/loan-detail';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout';
 
@@ -96,6 +98,16 @@ export const routes: Routes = [
         path: 'goals/:id',
         component: GoalDetailComponent,
         title: 'Goal',
+      },
+      {
+        path: 'loans',
+        component: LoansComponent,
+        title: 'Loans',
+      },
+      {
+        path: 'loans/:id',
+        component: LoanDetailComponent,
+        title: 'Loan',
       },
       {
         path: 'settings',

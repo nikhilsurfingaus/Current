@@ -1,0 +1,163 @@
+<div class="loan-detail-page">
+  <a class="loan-detail-page__back" routerLink="/loans">← Back to loans</a>
+
+  @if (pageLoadError()) {
+    <div class="loan-detail-page__alert loan-detail-page__alert--error">
+      <p>{{ pageLoadError() }}</p>
+    </div>
+  }
+
+  @if (pageLoading()) {
+    <p class="loan-detail-page__loading">Loading loan...</p>
+  } @else if (loan(); as loanData) {
+    <header class="loan-detail-page__header">
+      <div>
+        <h1 class="loan-detail-page__title">{{ loanData.principal | currency: loanData.currency }}</h1>
+        <p class="loan-detail-page__subtitle">{{ loanData.purpose || 'Loan from Current HQ' }}</p>
+      </div>
+      <span
+        class="loan-detail-page__status loan-detail-page__status--{{ loanData.status }}"
+        [class.loan-detail-page__status--overdue]="loanData.isOverdue"
+      >
+        {{ loanData.isOverdue ? 'Overdue' : getLoanStatusLabel(loanData.status) }}
+      </span>
+    </header>
+
+    @if (actionErrorMessage()) {
+      <div class="loan-detail-page__alert loan-detail-page__alert--error">{{ actionErrorMessage() }}</div>
+    }
+
+    <section class="loan-detail-page__card">
+      <h2 class="loan-detail-page__card-title">Loan summary</h2>
+      <dl class="loan-detail-page__facts">
+        <div>
+          <dt>Outstanding</dt>
+          <dd>{{ loanData.outstandingPrincipal | currency: loanData.currency }}</dd>
+        </div>
+        <div>
+          <dt>Monthly payment</dt>
+          <dd>{{ loanData.monthlyPayment | currency: loanData.currency }}</dd>
+        </div>
+        <div>
+          <dt>Interest rate</dt>
+          <dd>{{ loanData.interestRatePercent }}% p.a.</dd>
+        </div>
+        <div>
+          <dt>Term</dt>
+          <dd>{{ loanData.termMonths }} months</dd>
+        </div>
+        @if (loanData.nextDueDate && isLoanRepayable(loanData.status)) {
+          <div>
+            <dt>Next due</dt>
+            <dd>{{ loanData.nextDueDate | date: 'mediumDate' }}</dd>
+          </div>
+        }
+        @if (loanData.maturityDate) {
+          <div>
+            <dt>Maturity</dt>
+            <dd>{{ loanData.maturityDate | date: 'mediumDate' }}</dd>
+          </div>
+        }
+      </dl>
+
+      @if (loanData.status === loanStatus.Active || loanData.status === loanStatus.Overdue || loanData.status === loanStatus.Paid) {
+        <div class="loan-detail-page__progress">
+          <div class="loan-detail-page__progress-track">
+            <div class="loan-detail-page__progress-fill" [style.width.%]="repaymentProgressPercent()"></div>
+          </div>
+          <p class="loan-detail-page__progress-label">{{ repaymentProgressPercent() }}% repaid</p>
+        </div>
+      }
+
+      @if (loanData.rejectionReason) {
+        <p class="loan-detail-page__rejection">Rejected: {{ loanData.rejectionReason }}</p>
+      }
+    </section>
+
+    <div class="loan-detail-page__actions">
+      @if (isLoanRepayable(loanData.status)) {
+        <button class="loan-detail-page__primary-btn" type="button" (click)="openRepayPanel()">
+          Make repayment
+        </button>
+      }
+
+      @if (isLoanCancellable(loanData.status)) {
+        <button
+          class="loan-detail-page__secondary-btn"
+          type="button"
+          [disabled]="cancelRequestInFlight()"
+          (click)="onCancelLoanRequest()"
+        >
+          {{ cancelRequestInFlight() ? 'Cancelling...' : 'Cancel request' }}
+        </button>
+      }
+    </div>
+
+    @if (repayPanelOpen()) {
+      <section class="loan-detail-page__card">
+        <div class="loan-detail-page__panel-header">
+          <h2 class="loan-detail-page__card-title">Make repayment</h2>
+          <button class="loan-detail-page__panel-close" type="button" (click)="closeRepayPanel()">Close</button>
+        </div>
+
+        <form class="loan-detail-form" [formGroup]="repayForm" (ngSubmit)="onSubmitRepayment()">
+          <div class="loan-detail-form__field">
+            <label class="loan-detail-form__label" for="repay-amount">Amount</label>
+            <input
+              id="repay-amount"
+              class="loan-detail-form__input"
+              type="number"
+              inputmode="decimal"
+              min="0.01"
+              step="0.01"
+              formControlName="amount"
+              appNormalizeAmount
+            />
+            @if (repayFormSubmitted() && repayForm.controls.amount.invalid) {
+              <span class="loan-detail-form__error">Enter an amount greater than zero.</span>
+            }
+          </div>
+
+          <div class="loan-detail-form__field">
+            <label class="loan-detail-form__label" for="repay-source-account">From account</label>
+            <select id="repay-source-account" class="loan-detail-form__input" formControlName="sourceAccountId">
+              @for (account of sourceAccounts(); track account.id) {
+                <option [value]="account.id">{{ account.name }} ({{ account.currency }})</option>
+              }
+            </select>
+          </div>
+
+          <button class="loan-detail-page__primary-btn" type="submit" [disabled]="repayRequestInFlight()">
+            {{ repayRequestInFlight() ? 'Processing...' : 'Submit repayment' }}
+          </button>
+        </form>
+      </section>
+    }
+
+    <section class="loan-detail-page__card">
+      <h2 class="loan-detail-page__card-title">Repayment history</h2>
+
+      @if (historyLoading()) {
+        <p class="loan-detail-page__loading">Loading history...</p>
+      } @else if (repaymentHistory().length === 0) {
+        <p class="loan-detail-page__empty">No repayments yet.</p>
+      } @else {
+        <ul class="loan-detail-page__history">
+          @for (repayment of repaymentHistory(); track repayment.id) {
+            <li class="loan-detail-page__history-item">
+              <div>
+                <p class="loan-detail-page__history-amount">
+                  {{ repayment.amount | currency: loanData.currency }}
+                </p>
+                <p class="loan-detail-page__history-date">{{ repayment.createdAt | date: 'medium' }}</p>
+              </div>
+              <span class="loan-detail-page__history-meta">
+                Principal {{ repayment.principalPortion | currency: loanData.currency }}
+              </span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+</div>

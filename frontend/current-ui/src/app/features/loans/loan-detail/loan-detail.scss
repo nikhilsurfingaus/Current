@@ -1,0 +1,240 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.loan-detail-page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
+}
+
+.loan-detail-page__back {
+  width: fit-content;
+  font-size: 14px;
+  font-weight: 600;
+  color: $color-primary;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.loan-detail-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-md;
+}
+
+.loan-detail-page__title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.loan-detail-page__subtitle {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.loan-detail-page__status {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: $bg-elevated;
+  color: $text-secondary;
+
+  &--overdue {
+    background: color-mix(in srgb, $color-error-static 12%, transparent);
+    color: $color-error;
+  }
+}
+
+.loan-detail-page__card {
+  @include app-card;
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.loan-detail-page__card-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.loan-detail-page__facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $space-md;
+  margin: 0;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  dt {
+    font-size: 12px;
+    color: $text-secondary;
+  }
+
+  dd {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.loan-detail-page__progress-track {
+  height: 10px;
+  border-radius: 999px;
+  background: $bg-elevated;
+  overflow: hidden;
+}
+
+.loan-detail-page__progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, $color-primary-static, #60a5fa);
+}
+
+.loan-detail-page__progress-label {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: $text-secondary;
+}
+
+.loan-detail-page__rejection {
+  margin: 0;
+  font-size: 14px;
+  color: $color-error;
+}
+
+.loan-detail-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-sm;
+}
+
+.loan-detail-page__primary-btn {
+  @include app-primary-button;
+}
+
+.loan-detail-page__secondary-btn {
+  @include app-outline-button;
+  min-height: 44px;
+  padding: 10px 16px;
+}
+
+.loan-detail-page__panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.loan-detail-page__panel-close {
+  padding: 6px 10px;
+  border: 1px solid $border-color;
+  border-radius: $radius-button;
+  background: $bg-secondary;
+  color: $text-secondary;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.loan-detail-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.loan-detail-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.loan-detail-form__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.loan-detail-form__input {
+  @include app-input;
+}
+
+.loan-detail-form__error {
+  font-size: 12px;
+  color: $color-error;
+}
+
+.loan-detail-page__alert {
+  padding: 10px 12px;
+  border-radius: $radius-button;
+  font-size: 13px;
+}
+
+.loan-detail-page__alert--error {
+  background: rgba($color-error, 0.08);
+  color: $color-error;
+  border: 1px solid rgba($color-error, 0.15);
+}
+
+.loan-detail-page__loading,
+.loan-detail-page__empty {
+  margin: 0;
+  color: $text-secondary;
+}
+
+.loan-detail-page__history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+}
+
+.loan-detail-page__history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-md;
+  padding: 12px 0;
+  border-bottom: 1px solid $border-color;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.loan-detail-page__history-amount {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.loan-detail-page__history-date {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: $text-secondary;
+}
+
+.loan-detail-page__history-meta {
+  font-size: 12px;
+  color: $text-secondary;
+}

@@ -8,6 +8,7 @@ import { forkJoin } from 'rxjs';
 import { AccountService } from '../../../core/services/account.service';
 import { AnalyticsService } from '../../../core/services/analytics.service';
 import { GoalService } from '../../../core/services/goal.service';
+import { LoanService } from '../../../core/services/loan.service';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { AppChartComponent } from '../../../shared/components/app-chart/app-chart';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state';
@@ -18,6 +19,8 @@ import {
   ApiError,
   Goal,
   GoalStatus,
+  Loan,
+  LoanStatus,
   NetWorthHistoryPoint,
   Transaction,
 } from '../../../shared/models';
@@ -26,9 +29,11 @@ import { getAccountTypeLabel } from '../../../shared/utils/account-type.utils';
 import { buildCurrencyBalanceTotals } from '../../../shared/utils/currency-balance.utils';
 import { getTransactionStatusLabel } from '../../../shared/utils/transaction-status.utils';
 import { getTransactionFromDisplayName } from '../../../shared/utils/branch-transaction.utils';
+import { getLoanStatusLabel } from '../../../shared/utils/loan-status.utils';
 
 const RECENT_TRANSACTION_LIMIT = 5;
 const DASHBOARD_GOALS_LIMIT = 3;
+const DASHBOARD_LOANS_LIMIT = 2;
 const CHART_PRIMARY = '#2f80ed';
 
 @Component({
@@ -41,6 +46,7 @@ const CHART_PRIMARY = '#2f80ed';
 export class DashboardComponent implements OnInit {
   accounts = signal<Account[]>([]);
   goals = signal<Goal[]>([]);
+  loans = signal<Loan[]>([]);
   recentTransactions = signal<Transaction[]>([]);
   netWorthPoints = signal<NetWorthHistoryPoint[]>([]);
   dashboardLoading = signal(false);
@@ -49,6 +55,8 @@ export class DashboardComponent implements OnInit {
   readonly getAccountTypeLabel = getAccountTypeLabel;
   readonly getTransactionStatusLabel = getTransactionStatusLabel;
   readonly goalStatus = GoalStatus;
+  readonly loanStatus = LoanStatus;
+  readonly getLoanStatusLabel = getLoanStatusLabel;
 
   userFacingAccounts = computed(() => filterNonGoalAccounts(this.accounts(), this.goals()));
 
@@ -59,6 +67,13 @@ export class DashboardComponent implements OnInit {
       .filter((goal) => goal.status === GoalStatus.Active)
       .sort((left, right) => right.progressPercent - left.progressPercent)
       .slice(0, DASHBOARD_GOALS_LIMIT),
+  );
+
+  activeLoansPreview = computed(() =>
+    this.loans()
+      .filter((loan) => loan.status === LoanStatus.Active || loan.status === LoanStatus.Overdue || loan.isOverdue)
+      .sort((left, right) => Number(right.isOverdue) - Number(left.isOverdue))
+      .slice(0, DASHBOARD_LOANS_LIMIT),
   );
 
   netWorthSparklineData = computed<ChartData>(() => {
@@ -127,6 +142,7 @@ export class DashboardComponent implements OnInit {
     private accountService: AccountService,
     private analyticsService: AnalyticsService,
     private goalService: GoalService,
+    private loanService: LoanService,
     private transactionService: TransactionService,
   ) {}
 
@@ -141,12 +157,14 @@ export class DashboardComponent implements OnInit {
     forkJoin({
       accounts: this.accountService.getAllAccounts(),
       goals: this.goalService.getAllGoals(),
+      loans: this.loanService.getAllLoans(),
       transactions: this.transactionService.getAllTransactions(),
       netWorthHistory: this.analyticsService.getNetWorthHistory(),
     }).subscribe({
       next: (dashboardBundle) => {
         this.accounts.set(dashboardBundle.accounts);
         this.goals.set(dashboardBundle.goals);
+        this.loans.set(dashboardBundle.loans);
         this.recentTransactions.set(dashboardBundle.transactions.slice(0, RECENT_TRANSACTION_LIMIT));
         this.netWorthPoints.set(dashboardBundle.netWorthHistory.points);
         this.dashboardLoading.set(false);

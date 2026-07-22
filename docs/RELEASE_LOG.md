@@ -368,7 +368,9 @@ Finite branch treasury with ledger-backed disbursements; stop client-side balanc
 - [x] Part 3: user loan APIs — request, list, detail, cancel, repay, repayment history
 - [x] Part 3: admin loan APIs — list (`?status=Pending`), approve (treasury disburse), reject
 - [x] Part 3: loan config — `MinLoanAmount`, `MaxLoanAmount`, `DefaultInterestRatePercent`, `MaxActiveLoansPerUser`, `MaxTermMonths`
-- [ ] Part 4–6: loan UX, admin UI, automation
+- [x] Part 4: `/loans` list + request form, loan detail with repay + history, dashboard widget, sidebar nav
+- [x] Part 5: branch admin pending loan queue — approve/reject UI
+- [ ] Part 6: automation (deferred — no hosted job runner; overdue computed on read)
 
 ### Notes
 - Treasury seeded via migration (`Current HQ`, code `HQ`, AUD)
@@ -377,4 +379,6 @@ Finite branch treasury with ledger-backed disbursements; stop client-side balanc
 - Part 2: promote a user to Admin (`UPDATE "Users" SET "Role" = 'Admin' WHERE "Email" = '...'`) then log in again for branch admin access
 - Part 3: loan disbursements use `Loan disbursement from Current HQ` / repayments use `Loan repayment to Current HQ`; references `BRANCH-*` (disburse) and `LOAN-REPAY-*` (repay)
 - Part 3: test via Swagger — `POST /loans`, `GET /branch/loans?status=Pending`, `POST /branch/loans/{id}/approve`
+- Part 4–5: user flow at `/loans`; admin loan queue on `/branch/admin`
+- Part 6 deferred: overdue badge uses API `isOverdue` on fetch (no cron/background jobs until deploy infra exists)
 

@@ -117,3 +117,86 @@
   @include app-primary-button;
   align-self: flex-start;
 }
+
+.branch-admin-page__card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-sm;
+}
+
+.branch-admin-loans {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.branch-admin-loans__item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-md;
+  padding: 14px 0;
+  border-bottom: 1px solid $border-color;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  @media (max-width: 700px) {
+    flex-direction: column;
+  }
+}
+
+.branch-admin-loans__amount {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.branch-admin-loans__borrower,
+.branch-admin-loans__meta,
+.branch-admin-loans__purpose {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: $text-secondary;
+}
+
+.branch-admin-loans__actions,
+.branch-admin-loans__reject-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-sm;
+}
+
+.branch-admin-loans__approve {
+  @include app-primary-button;
+  min-height: 40px;
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+.branch-admin-loans__reject {
+  @include app-outline-button;
+  min-height: 40px;
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+.branch-admin-loans__reject-panel {
+  margin-top: $space-md;
+  padding-top: $space-md;
+  border-top: 1px solid $border-color;
+}
+
+.branch-admin-loans__reject-title {
+  margin: 0 0 $space-md;
+  font-size: 16px;
+  font-weight: 600;
+  color: $text-primary;
+}

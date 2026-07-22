@@ -1,4 +1,4 @@
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -6,14 +6,15 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { BranchService } from '../../../core/services/branch.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader';
-import { BranchTreasury, CreateBranchDisbursementRequest } from '../../../shared/models';
+import { BranchTreasury, CreateBranchDisbursementRequest, LoanAdmin, LoanStatus } from '../../../shared/models';
 import { focusFirstInvalidControl } from '../../../shared/utils/form-accessibility.utils';
 import { resolveApiErrorMessage } from '../../../shared/utils/http-error.utils';
+import { getLoanStatusLabel } from '../../../shared/utils/loan-status.utils';
 
 @Component({
   selector: 'app-branch-admin',
   standalone: true,
-  imports: [ReactiveFormsModule, CurrencyPipe, SkeletonLoaderComponent],
+  imports: [ReactiveFormsModule, CurrencyPipe, DatePipe, SkeletonLoaderComponent],
   templateUrl: './branch-admin.html',
   styleUrl: './branch-admin.scss',
 })
@@ -24,6 +25,17 @@ export class BranchAdminComponent implements OnInit {
   disbursementSubmitted = signal(false);
   disbursementInFlight = signal(false);
   disbursementError = signal('');
+
+  pendingLoansLoading = signal(false);
+  pendingLoansLoadError = signal('');
+  pendingLoans = signal<LoanAdmin[]>([]);
+  loanActionInFlightId = signal<string | null>(null);
+  rejectPanelLoanId = signal<string | null>(null);
+  rejectFormSubmitted = signal(false);
+  rejectError = signal('');
+
+  readonly getLoanStatusLabel = getLoanStatusLabel;
+  readonly loanStatus = LoanStatus;
 
   disbursementForm = new FormGroup({
     recipientEmail: new FormControl('', {
@@ -40,6 +52,13 @@ export class BranchAdminComponent implements OnInit {
     }),
   });
 
+  rejectLoanForm = new FormGroup({
+    reason: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(500)],
+    }),
+  });
+
   constructor(
     private branchService: BranchService,
     private toastService: ToastService,
@@ -47,6 +66,7 @@ export class BranchAdminComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTreasury();
+    this.loadPendingLoans();
   }
 
   loadTreasury(): void {
@@ -107,6 +127,86 @@ export class BranchAdminComponent implements OnInit {
         this.disbursementError.set(
           resolveApiErrorMessage(error, 'Unable to create disbursement.'),
         );
+      },
+    });
+  }
+
+  loadPendingLoans(): void {
+    this.pendingLoansLoading.set(true);
+    this.pendingLoansLoadError.set('');
+
+    this.branchService.getLoans(LoanStatus.Pending).subscribe({
+      next: (loans) => {
+        this.pendingLoans.set(loans);
+        this.pendingLoansLoading.set(false);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.pendingLoansLoading.set(false);
+        this.pendingLoansLoadError.set(
+          resolveApiErrorMessage(error, 'Unable to load pending loans.'),
+        );
+      },
+    });
+  }
+
+  onApproveLoan(loanId: string): void {
+    this.loanActionInFlightId.set(loanId);
+
+    this.branchService.approveLoan(loanId).subscribe({
+      next: () => {
+        this.loanActionInFlightId.set(null);
+        this.loadTreasury();
+        this.loadPendingLoans();
+        this.toastService.showSuccess('Loan approved and disbursed.');
+      },
+      error: (error: HttpErrorResponse) => {
+        this.loanActionInFlightId.set(null);
+        this.toastService.showError(resolveApiErrorMessage(error, 'Unable to approve loan.'));
+      },
+    });
+  }
+
+  openRejectPanel(loanId: string): void {
+    this.rejectPanelLoanId.set(loanId);
+    this.rejectFormSubmitted.set(false);
+    this.rejectError.set('');
+    this.rejectLoanForm.reset({ reason: '' });
+  }
+
+  closeRejectPanel(): void {
+    this.rejectPanelLoanId.set(null);
+    this.rejectFormSubmitted.set(false);
+    this.rejectError.set('');
+  }
+
+  onSubmitRejectLoan(): void {
+    const loanId = this.rejectPanelLoanId();
+    if (!loanId) {
+      return;
+    }
+
+    this.rejectFormSubmitted.set(true);
+    this.rejectError.set('');
+
+    if (this.rejectLoanForm.invalid) {
+      focusFirstInvalidControl(this.rejectLoanForm);
+      return;
+    }
+
+    this.loanActionInFlightId.set(loanId);
+
+    this.branchService.rejectLoan(loanId, {
+      reason: this.rejectLoanForm.controls.reason.value.trim(),
+    }).subscribe({
+      next: () => {
+        this.loanActionInFlightId.set(null);
+        this.closeRejectPanel();
+        this.loadPendingLoans();
+        this.toastService.showSuccess('Loan request rejected.');
+      },
+      error: (error: HttpErrorResponse) => {
+        this.loanActionInFlightId.set(null);
+        this.rejectError.set(resolveApiErrorMessage(error, 'Unable to reject loan.'));
       },
     });
   }

@@ -148,6 +148,42 @@
       }
     </section>
 
+    <section class="dashboard-page__card dashboard-loans-card">
+      <div class="dashboard-page__card-header">
+        <h2 class="dashboard-page__card-title">Loans</h2>
+        <a class="dashboard-page__card-link" routerLink="/loans">View all</a>
+      </div>
+
+      @if (activeLoansPreview().length === 0) {
+        <app-empty-state
+          message="No active loans."
+          actionLabel="Request a loan"
+          actionRoute="/loans"
+        />
+      } @else {
+        <ul class="dashboard-loans-list">
+          @for (loan of activeLoansPreview(); track loan.id) {
+            <li>
+              <a class="dashboard-loans-list__item" [routerLink]="['/loans', loan.id]">
+                <div class="dashboard-loans-list__leading">
+                  <p class="dashboard-loans-list__amount">{{ loan.outstandingPrincipal | currency: loan.currency }}</p>
+                  <p class="dashboard-loans-list__meta">
+                    {{ loan.principal | currency: loan.currency }} @ {{ loan.interestRatePercent }}%
+                  </p>
+                </div>
+                <span
+                  class="dashboard-loans-list__status"
+                  [class.dashboard-loans-list__status--overdue]="loan.isOverdue"
+                >
+                  {{ loan.isOverdue ? 'Overdue' : getLoanStatusLabel(loan.status) }}
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
     <div class="dashboard-page__columns">
       <section class="dashboard-page__card">
         <div class="dashboard-page__card-header">
