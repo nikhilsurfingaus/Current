@@ -31,4 +31,6 @@ public class User
     public ICollection<Account> Accounts { get; set; } = new List<Account>();
 
     public ICollection<Goal> Goals { get; set; } = new List<Goal>();
+
+    public ICollection<Loan> Loans { get; set; } = new List<Loan>();
 }

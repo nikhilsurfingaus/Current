@@ -29,6 +29,10 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Branch> Branches => Set<Branch>();
 
+    public DbSet<Loan> Loans => Set<Loan>();
+
+    public DbSet<LoanRepayment> LoanRepayments => Set<LoanRepayment>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(entity =>
@@ -306,6 +310,82 @@ public class ApplicationDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(branch => branch.TreasuryAccountId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Loan>(entity =>
+        {
+            entity.HasKey(loan => loan.Id);
+
+            entity.Property(loan => loan.Principal)
+                .HasPrecision(18, 2);
+
+            entity.Property(loan => loan.OutstandingPrincipal)
+                .HasPrecision(18, 2);
+
+            entity.Property(loan => loan.InterestRatePercent)
+                .HasPrecision(8, 4);
+
+            entity.Property(loan => loan.MonthlyPayment)
+                .HasPrecision(18, 2);
+
+            entity.Property(loan => loan.Currency)
+                .HasMaxLength(3)
+                .IsRequired();
+
+            entity.Property(loan => loan.Status)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(loan => loan.Purpose)
+                .HasMaxLength(500);
+
+            entity.Property(loan => loan.RejectionReason)
+                .HasMaxLength(500);
+
+            entity.HasOne(loan => loan.User)
+                .WithMany(user => user.Loans)
+                .HasForeignKey(loan => loan.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(loan => loan.Branch)
+                .WithMany()
+                .HasForeignKey(loan => loan.BranchId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(loan => loan.FundedAccount)
+                .WithMany()
+                .HasForeignKey(loan => loan.FundedAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(loan => loan.DisbursementTransaction)
+                .WithMany()
+                .HasForeignKey(loan => loan.DisbursementTransactionId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<LoanRepayment>(entity =>
+        {
+            entity.HasKey(repayment => repayment.Id);
+
+            entity.Property(repayment => repayment.Amount)
+                .HasPrecision(18, 2);
+
+            entity.Property(repayment => repayment.PrincipalPortion)
+                .HasPrecision(18, 2);
+
+            entity.Property(repayment => repayment.InterestPortion)
+                .HasPrecision(18, 2);
+
+            entity.HasOne(repayment => repayment.Loan)
+                .WithMany(loan => loan.Repayments)
+                .HasForeignKey(repayment => repayment.LoanId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(repayment => repayment.Transaction)
+                .WithMany()
+                .HasForeignKey(repayment => repayment.TransactionId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
 }

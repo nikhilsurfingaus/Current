@@ -364,11 +364,17 @@ Finite branch treasury with ledger-backed disbursements; stop client-side balanc
 - [x] Part 2: Admin disbursements API
 - [x] Part 2: `GET /branch/treasury`, `POST /branch/disbursements` (Admin role)
 - [x] Part 2: branch admin page — treasury balance + email top-up form
-- [ ] Part 3–6: loans, UX, admin UI, automation
+- [x] Part 3: `Loan` + `LoanRepayment` entities and migration
+- [x] Part 3: user loan APIs — request, list, detail, cancel, repay, repayment history
+- [x] Part 3: admin loan APIs — list (`?status=Pending`), approve (treasury disburse), reject
+- [x] Part 3: loan config — `MinLoanAmount`, `MaxLoanAmount`, `DefaultInterestRatePercent`, `MaxActiveLoansPerUser`, `MaxTermMonths`
+- [ ] Part 4–6: loan UX, admin UI, automation
 
 ### Notes
 - Treasury seeded via migration (`Current HQ`, code `HQ`, AUD)
 - Welcome credit uses `TransactionCategory.Income` and description `Welcome credit from Current HQ`
 - Config: `Branch:WelcomeCreditAmount`, `WelcomeCreditMaxAccounts`, `InitialTreasuryBalance`
 - Part 2: promote a user to Admin (`UPDATE "Users" SET "Role" = 'Admin' WHERE "Email" = '...'`) then log in again for branch admin access
+- Part 3: loan disbursements use `Loan disbursement from Current HQ` / repayments use `Loan repayment to Current HQ`; references `BRANCH-*` (disburse) and `LOAN-REPAY-*` (repay)
+- Part 3: test via Swagger — `POST /loans`, `GET /branch/loans?status=Pending`, `POST /branch/loans/{id}/approve`
 
