@@ -15,6 +15,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
+import { UserRole } from '../../shared/models';
 import {
   getDisplayNameFromEmail,
   getTimeGreeting,
@@ -85,6 +86,10 @@ export class MainLayoutComponent implements OnInit {
   );
 
   isDashboardRoute = computed(() => this.currentUrl().startsWith('/dashboard'));
+
+  isAdminUser = computed(
+    () => this.authService.getAuthResponse()?.role === UserRole.Admin,
+  );
 
   constructor() {
     effect((onCleanup) => {

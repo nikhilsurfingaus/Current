@@ -361,11 +361,14 @@ Finite branch treasury with ledger-backed disbursements; stop client-side balanc
 - [x] Part 1: accounts always start at $0; welcome **$2,500** on first user account
 - [x] Part 1: removed client-controlled `currentBalance` on create
 - [x] Part 1: frontend — hide starting balance, welcome hint + toast, branch label in transactions
-- [ ] Part 2: Admin disbursements API
+- [x] Part 2: Admin disbursements API
+- [x] Part 2: `GET /branch/treasury`, `POST /branch/disbursements` (Admin role)
+- [x] Part 2: branch admin page — treasury balance + email top-up form
 - [ ] Part 3–6: loans, UX, admin UI, automation
 
 ### Notes
 - Treasury seeded via migration (`Current HQ`, code `HQ`, AUD)
 - Welcome credit uses `TransactionCategory.Income` and description `Welcome credit from Current HQ`
 - Config: `Branch:WelcomeCreditAmount`, `WelcomeCreditMaxAccounts`, `InitialTreasuryBalance`
+- Part 2: promote a user to Admin (`UPDATE "Users" SET "Role" = 'Admin' WHERE "Email" = '...'`) then log in again for branch admin access
 

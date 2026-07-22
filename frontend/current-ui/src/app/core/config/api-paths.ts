@@ -44,4 +44,8 @@ export const API_PATHS = {
     list: '/contacts',
     byId: (contactId: string) => `/contacts/${contactId}`,
   },
+  branch: {
+    treasury: '/branch/treasury',
+    disbursements: '/branch/disbursements',
+  },
 } as const;

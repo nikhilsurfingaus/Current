@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { authGuard } from './core/guards/auth.guard';
+import { adminGuard } from './core/guards/admin.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { AUTH_TITLE_ROUTE_DATA_KEY } from './core/routing/app-title.constants';
 import { AccountsComponent } from './features/accounts/accounts/accounts';
@@ -17,6 +18,7 @@ import { PaymentHistoryComponent } from './features/payments/payment-history/pay
 import { PaySomeoneComponent } from './features/payments/pay-someone/pay-someone';
 import { PaymentReceiptComponent } from './features/payments/payment-receipt/payment-receipt';
 import { SettingsComponent } from './features/settings/settings/settings';
+import { BranchAdminComponent } from './features/branch/branch-admin/branch-admin';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout';
 
@@ -99,6 +101,12 @@ export const routes: Routes = [
         path: 'settings',
         component: SettingsComponent,
         title: 'Settings',
+      },
+      {
+        path: 'branch/admin',
+        component: BranchAdminComponent,
+        canActivate: [adminGuard],
+        title: 'Branch admin',
       },
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
     ],

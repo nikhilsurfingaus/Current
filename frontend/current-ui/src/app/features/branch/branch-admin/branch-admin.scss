@@ -1,0 +1,119 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.branch-admin-page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
+}
+
+.branch-admin-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+}
+
+.branch-admin-page__title {
+  @include app-page-header;
+}
+
+.branch-admin-page__subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.branch-admin-page__card {
+  @include app-card;
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.branch-admin-page__card-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.branch-admin-page__treasury-name {
+  margin: 0;
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.branch-admin-page__treasury-balance {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: $text-primary;
+}
+
+.branch-admin-page__hint {
+  margin: 0;
+  font-size: 13px;
+  color: $text-secondary;
+}
+
+.branch-admin-page__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.branch-admin-page__alert {
+  padding: 12px 14px;
+  border-radius: $radius-button;
+  font-size: 14px;
+
+  &--error {
+    background: color-mix(in srgb, $color-error-static 10%, transparent);
+    color: $color-error;
+    border: 1px solid color-mix(in srgb, $color-error-static 25%, transparent);
+
+    p {
+      margin: 0 0 8px;
+    }
+  }
+}
+
+.branch-admin-page__retry {
+  @include app-outline-button;
+  min-height: 40px;
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+.branch-admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.branch-admin-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.branch-admin-form__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.branch-admin-form__input {
+  @include app-input;
+}
+
+.branch-admin-form__error {
+  font-size: 12px;
+  color: $color-error;
+}
+
+.branch-admin-form__submit {
+  @include app-primary-button;
+  align-self: flex-start;
+}

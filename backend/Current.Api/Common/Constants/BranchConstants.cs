@@ -17,4 +17,6 @@ public static class BranchConstants
     public const string SystemUserEmail = "branch-system@current.internal";
 
     public const string WelcomeCreditDescription = "Welcome credit from Current HQ";
+
+    public const string BranchTopUpDescription = "Branch top-up from Current HQ";
 }

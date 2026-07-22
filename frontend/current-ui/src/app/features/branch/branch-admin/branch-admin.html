@@ -1,0 +1,84 @@
+<div class="branch-admin-page">
+  <header class="branch-admin-page__header">
+    <h1 class="branch-admin-page__title">Branch admin</h1>
+    <p class="branch-admin-page__subtitle">Manage Current HQ treasury and send branch top-ups</p>
+  </header>
+
+  @if (treasuryLoadError()) {
+    <div class="branch-admin-page__alert branch-admin-page__alert--error">
+      <p>{{ treasuryLoadError() }}</p>
+      <button class="branch-admin-page__retry" type="button" (click)="loadTreasury()">Try again</button>
+    </div>
+  }
+
+  @if (treasuryLoading()) {
+    <div class="branch-admin-page__skeleton" aria-busy="true" aria-live="polite">
+      <app-skeleton-loader variant="block" height="120px" />
+      <app-skeleton-loader variant="block" height="220px" />
+    </div>
+  } @else if (treasury(); as treasuryData) {
+    <section class="branch-admin-page__card">
+      <h2 class="branch-admin-page__card-title">Treasury</h2>
+      <p class="branch-admin-page__treasury-name">{{ treasuryData.branchName }} ({{ treasuryData.branchCode }})</p>
+      <p class="branch-admin-page__treasury-balance">
+        {{ treasuryData.treasuryBalance | currency: treasuryData.currency }}
+      </p>
+      <p class="branch-admin-page__hint">Disbursements debit this balance through the ledger.</p>
+    </section>
+
+    <section class="branch-admin-page__card">
+      <h2 class="branch-admin-page__card-title">Send top-up</h2>
+
+      @if (disbursementError()) {
+        <div class="branch-admin-page__alert branch-admin-page__alert--error">{{ disbursementError() }}</div>
+      }
+
+      <form class="branch-admin-form" [formGroup]="disbursementForm" (ngSubmit)="onSubmitDisbursement()">
+        <div class="branch-admin-form__field">
+          <label class="branch-admin-form__label" for="branch-recipient-email">Recipient email</label>
+          <input
+            id="branch-recipient-email"
+            class="branch-admin-form__input"
+            type="email"
+            formControlName="recipientEmail"
+            placeholder="user@example.com"
+          />
+          @if (disbursementSubmitted() && disbursementForm.controls.recipientEmail.invalid) {
+            <span class="branch-admin-form__error">Enter a valid recipient email.</span>
+          }
+        </div>
+
+        <div class="branch-admin-form__field">
+          <label class="branch-admin-form__label" for="branch-amount">Amount</label>
+          <input
+            id="branch-amount"
+            class="branch-admin-form__input"
+            type="number"
+            inputmode="decimal"
+            min="0.01"
+            step="0.01"
+            formControlName="amount"
+          />
+          @if (disbursementSubmitted() && disbursementForm.controls.amount.invalid) {
+            <span class="branch-admin-form__error">Enter an amount greater than zero.</span>
+          }
+        </div>
+
+        <div class="branch-admin-form__field">
+          <label class="branch-admin-form__label" for="branch-description">Description (optional)</label>
+          <input
+            id="branch-description"
+            class="branch-admin-form__input"
+            type="text"
+            formControlName="description"
+            placeholder="Branch top-up from Current HQ"
+          />
+        </div>
+
+        <button class="branch-admin-form__submit" type="submit" [disabled]="disbursementInFlight()">
+          {{ disbursementInFlight() ? 'Sending...' : 'Send top-up' }}
+        </button>
+      </form>
+    </section>
+  }
+</div>
