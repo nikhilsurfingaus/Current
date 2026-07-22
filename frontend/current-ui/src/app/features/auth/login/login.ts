@@ -1,9 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { UserService } from '../../../core/services/user.service';
 import { AuthMarkComponent } from '../../../shared/components/auth-mark/auth-mark';
 import { ApiError } from '../../../shared/models';
@@ -15,7 +16,7 @@ import { ApiError } from '../../../shared/models';
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   loginFormSubmitted = signal(false);
   loginErrorMessage = signal('');
   loginRequestInFlight = signal(false);
@@ -34,9 +35,14 @@ export class LoginComponent {
 
   constructor(
     private authService: AuthService,
+    private toastService: ToastService,
     private userService: UserService,
     private router: Router,
   ) {}
+
+  ngOnInit(): void {
+    this.toastService.dismissAll();
+  }
 
   togglePasswordVisible(): void {
     this.passwordVisible.update((visible) => !visible);

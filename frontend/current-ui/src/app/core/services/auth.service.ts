@@ -77,16 +77,15 @@ export class AuthService {
 
   getToken(): string | null {
     const storedAuth = this.getStoredAuth();
-    if (!storedAuth) {
-      return null;
-    }
-
-    if (this.isTokenExpired(storedAuth.expiresAt)) {
-      this.handleSessionExpired();
+    if (!storedAuth || this.isTokenExpired(storedAuth.expiresAt)) {
       return null;
     }
 
     return storedAuth.token;
+  }
+
+  getCurrentToken(): string | null {
+    return this.getStoredAuth()?.token ?? null;
   }
 
   isLoggedIn(): boolean {
@@ -108,6 +107,8 @@ export class AuthService {
   }
 
   private persistAuth(authResponse: AuthResponse): void {
+    this.sessionExpiredInProgress = false;
+    this.toastService.dismissAll();
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authResponse));
     this.scheduleSessionExpiry(authResponse.expiresAt);
     this.registerFocusSessionCheck();
@@ -116,7 +117,7 @@ export class AuthService {
   private scheduleSessionExpiry(expiresAt: string): void {
     this.clearSessionExpiryTimer();
 
-    const expiryDelayMs = new Date(expiresAt).getTime() - Date.now();
+    const expiryDelayMs = this.parseExpiresAtMs(expiresAt) - Date.now();
     if (expiryDelayMs <= 0) {
       this.handleSessionExpired();
       return;
@@ -164,6 +165,16 @@ export class AuthService {
   }
 
   private isTokenExpired(expiresAt: string): boolean {
-    return new Date(expiresAt).getTime() <= Date.now();
+    return this.parseExpiresAtMs(expiresAt) <= Date.now();
+  }
+
+  private parseExpiresAtMs(expiresAt: string): number {
+    const hasTimezone = expiresAt.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(expiresAt);
+
+    if (hasTimezone) {
+      return new Date(expiresAt).getTime();
+    }
+
+    return new Date(`${expiresAt}Z`).getTime();
   }
 }

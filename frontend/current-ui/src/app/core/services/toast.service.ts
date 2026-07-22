@@ -39,6 +39,14 @@ export class ToastService {
     this.toastsState.update((toasts) => toasts.filter((toast) => toast.id !== toastId));
   }
 
+  dismissAll(): void {
+    for (const toastId of [...this.dismissTimers.keys()]) {
+      this.clearTimer(toastId);
+    }
+
+    this.toastsState.set([]);
+  }
+
   private addToast(toast: Omit<Toast, 'id'>): void {
     const toastId = crypto.randomUUID();
     const nextToast: Toast = { ...toast, id: toastId };
