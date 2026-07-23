@@ -457,13 +457,6 @@ public class PaymentService : IPaymentService
         var senderName = $"{senderUser.FirstName} {senderUser.LastName}".Trim();
 
         await _notificationService.TryCreateNotificationAsync(
-            senderUserId,
-            NotificationType.PaymentSent,
-            "Payment sent",
-            $"{amountLabel} to {receipt.RecipientName}",
-            receipt.TransactionId);
-
-        await _notificationService.TryCreateNotificationAsync(
             recipientUser.Id,
             NotificationType.PaymentReceived,
             "Payment received",

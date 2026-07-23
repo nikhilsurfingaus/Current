@@ -415,3 +415,34 @@ Notify users when important events happen — in-app notification centre with un
 - Notifications are persisted per user; clicking an item marks it read
 - Distinct from toast messages (ephemeral UI feedback)
 
+---
+
+## Phase 11 — Testing
+
+**Status:** In progress  
+**Date started:** 2026-07-23
+
+### Goal
+Automated backend tests with xUnit — integration-first coverage of auth, ledger, payments, loans, and notifications.
+
+### Planned parts
+1. Test infrastructure
+2. Auth + ownership
+3. Ledger transfers
+4. Payments + idempotency
+5. Loans + branch admin
+6. Notification centre
+
+### Delivered
+- [x] Part 1: `Current.Api.Tests` xUnit project
+- [x] Part 1: `WebApplicationFactory` + SQLite in-memory DB for integration tests
+- [x] Part 1: shared helpers (`TestAuthHelper`, `TestDataSeeder`, `LedgerAssertions`)
+- [x] Part 1: `IntegrationTestBase` with per-test DB reset
+- [x] Part 1: `make test` target
+- [x] Part 1: smoke test — `GET /users/me` without token returns 401
+
+### Notes
+- Tests use `Testing` environment (skips HTTPS redirect, skips Npgsql registration)
+- Welcome credit disabled in test config (`Branch:WelcomeCreditAmount = 0`)
+- Part 2 next: auth register/login + ownership tests
+

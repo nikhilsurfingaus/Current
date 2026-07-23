@@ -5,7 +5,9 @@ export PATH := $(NODE_BIN):$(PG_BIN):$(PATH)
 API_DIR := backend/Current.Api
 UI_DIR := frontend/current-ui
 
-.PHONY: db-up db-down db-create migrate api ui dev build build-ui
+.PHONY: db-up db-down db-create migrate api ui dev build build-ui test
+
+TEST_DIR := backend/Current.Api.Tests
 
 db-up:
 	@pg_isready -q 2>/dev/null || brew services start postgresql@17
@@ -25,6 +27,9 @@ api:
 
 build:
 	cd $(API_DIR) && dotnet build
+
+test:
+	cd $(TEST_DIR) && dotnet test
 
 build-ui:
 	cd $(UI_DIR) && npm run build
