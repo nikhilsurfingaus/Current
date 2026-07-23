@@ -1,3 +1,4 @@
+using Current.Api.Common;
 using Current.Api.Common.Constants;
 using Current.Api.Common.Enums;
 using Current.Api.Configuration;
@@ -15,15 +16,18 @@ public class LoanService : ILoanService
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly IDisbursementService _disbursementService;
+    private readonly INotificationService _notificationService;
     private readonly BranchOptions _branchOptions;
 
     public LoanService(
         ApplicationDbContext dbContext,
         IDisbursementService disbursementService,
+        INotificationService notificationService,
         IOptions<BranchOptions> branchOptions)
     {
         _dbContext = dbContext;
         _disbursementService = disbursementService;
+        _notificationService = notificationService;
         _branchOptions = branchOptions.Value;
     }
 
@@ -122,6 +126,12 @@ public class LoanService : ILoanService
 
         _dbContext.Loans.Add(loan);
         await _dbContext.SaveChangesAsync();
+
+        await _notificationService.TryCreateNotificationAsync(
+            currentUserId,
+            NotificationType.System,
+            "Loan request submitted",
+            $"Your request for {NotificationFormatting.FormatAmount(loan.Principal, loan.Currency)} is pending review.");
 
         return loan.ToResponse();
     }
@@ -285,6 +295,23 @@ public class LoanService : ILoanService
             await _dbContext.SaveChangesAsync();
             await dbTransaction.CommitAsync();
 
+            var loanPaidOff = loan.Status == LoanStatus.Paid;
+
+            await _notificationService.TryCreateNotificationAsync(
+                currentUserId,
+                NotificationType.System,
+                "Loan repayment received",
+                $"You repaid {NotificationFormatting.FormatAmount(request.Amount, loan.Currency)} toward your loan.");
+
+            if (loanPaidOff)
+            {
+                await _notificationService.TryCreateNotificationAsync(
+                    currentUserId,
+                    NotificationType.System,
+                    "Loan paid off",
+                    "Congratulations — your loan is fully repaid.");
+            }
+
             return loan.ToResponse();
         }
         catch
@@ -390,6 +417,12 @@ public class LoanService : ILoanService
             await _dbContext.SaveChangesAsync();
             await dbTransaction.CommitAsync();
 
+            await _notificationService.TryCreateNotificationAsync(
+                loan.UserId,
+                NotificationType.System,
+                "Loan approved",
+                $"Your loan for {NotificationFormatting.FormatAmount(loan.Principal, loan.Currency)} was approved and disbursed.");
+
             return loan.ToAdminResponse();
         }
         catch
@@ -426,6 +459,12 @@ public class LoanService : ILoanService
         loan.UpdatedAt = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync();
+
+        await _notificationService.TryCreateNotificationAsync(
+            loan.UserId,
+            NotificationType.System,
+            "Loan request rejected",
+            $"Your loan request was declined. Reason: {rejectionReason}");
 
         return loan.ToAdminResponse();
     }

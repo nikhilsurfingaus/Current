@@ -18,15 +18,18 @@ public class AuthService : IAuthService
     private readonly ApplicationDbContext _dbContext;
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly IConfiguration _configuration;
+    private readonly INotificationService _notificationService;
 
     public AuthService(
         ApplicationDbContext dbContext,
         IPasswordHasher<User> passwordHasher,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        INotificationService notificationService)
     {
         _dbContext = dbContext;
         _passwordHasher = passwordHasher;
         _configuration = configuration;
+        _notificationService = notificationService;
     }
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
@@ -62,6 +65,12 @@ public class AuthService : IAuthService
 
         _dbContext.Users.Add(userToCreate);
         await _dbContext.SaveChangesAsync();
+
+        await _notificationService.TryCreateNotificationAsync(
+            userToCreate.Id,
+            NotificationType.Security,
+            "Welcome to Current",
+            "Your account is ready. Create your first account to get started.");
 
         return BuildAuthResponse(userToCreate);
     }

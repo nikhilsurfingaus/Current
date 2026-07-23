@@ -58,4 +58,10 @@ export const API_PATHS = {
     repay: (loanId: string) => `/loans/${loanId}/repay`,
     repayments: (loanId: string) => `/loans/${loanId}/repayments`,
   },
+  notifications: {
+    list: '/notifications',
+    unreadCount: '/notifications/unread-count',
+    markRead: (notificationId: string) => `/notifications/${notificationId}/read`,
+    markAllRead: '/notifications/read-all',
+  },
 } as const;

@@ -25,6 +25,10 @@ export class ApiService {
     return this.http.put<T>(this.buildUrl(path), body, { headers });
   }
 
+  patch<T>(path: string, body: unknown = {}, headers?: HttpHeaders): Observable<T> {
+    return this.http.patch<T>(this.buildUrl(path), body, { headers });
+  }
+
   delete<T>(path: string, headers?: HttpHeaders): Observable<T> {
     return this.http.delete<T>(this.buildUrl(path), { headers });
   }

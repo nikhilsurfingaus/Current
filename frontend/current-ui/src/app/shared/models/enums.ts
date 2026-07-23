@@ -71,3 +71,13 @@ export enum LoanStatus {
   Rejected = 5,
   Cancelled = 6,
 }
+
+export enum NotificationType {
+  PaymentSent = 0,
+  PaymentReceived = 1,
+  GoalCompleted = 2,
+  GoalContribution = 3,
+  AccountCreated = 4,
+  Security = 5,
+  System = 6,
+}

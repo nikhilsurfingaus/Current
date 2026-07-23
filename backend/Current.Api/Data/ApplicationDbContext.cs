@@ -33,6 +33,8 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<LoanRepayment> LoanRepayments => Set<LoanRepayment>();
 
+    public DbSet<Notification> Notifications => Set<Notification>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(entity =>
@@ -386,6 +388,31 @@ public class ApplicationDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(repayment => repayment.TransactionId)
                 .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.HasKey(notification => notification.Id);
+
+            entity.Property(notification => notification.Title)
+                .HasMaxLength(200)
+                .IsRequired();
+
+            entity.Property(notification => notification.Body)
+                .HasMaxLength(1000)
+                .IsRequired();
+
+            entity.Property(notification => notification.NotificationType)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.HasIndex(notification => new { notification.UserId, notification.CreatedAt });
+
+            entity.HasOne(notification => notification.User)
+                .WithMany()
+                .HasForeignKey(notification => notification.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

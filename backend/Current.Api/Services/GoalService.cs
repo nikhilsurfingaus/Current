@@ -1,3 +1,4 @@
+using Current.Api.Common;
 using Current.Api.Common.Constants;
 using Current.Api.Common.Enums;
 using Current.Api.Data;
@@ -12,10 +13,14 @@ namespace Current.Api.Services;
 public class GoalService : IGoalService
 {
     private readonly ApplicationDbContext _dbContext;
+    private readonly INotificationService _notificationService;
 
-    public GoalService(ApplicationDbContext dbContext)
+    public GoalService(
+        ApplicationDbContext dbContext,
+        INotificationService notificationService)
     {
         _dbContext = dbContext;
+        _notificationService = notificationService;
     }
 
     public async Task<IReadOnlyList<GoalResponse>> GetAllGoalsAsync(Guid currentUserId)
@@ -245,13 +250,37 @@ public class GoalService : IGoalService
             goal.CurrentAmount = goalAccount.CurrentBalance;
             goal.UpdatedAt = transaction.CreatedAt;
 
+            var wasGoalCompleted = goal.Status == GoalStatus.Completed;
+
             if (goal.CurrentAmount >= goal.TargetAmount)
             {
                 goal.Status = GoalStatus.Completed;
             }
 
+            var goalJustCompleted = !wasGoalCompleted && goal.Status == GoalStatus.Completed;
+            var goalName = goal.Name;
+            var contributionAmount = request.Amount;
+            var goalCurrency = goal.Currency;
+
             await _dbContext.SaveChangesAsync();
             await dbTransaction.CommitAsync();
+
+            var amountLabel = NotificationFormatting.FormatAmount(contributionAmount, goalCurrency);
+
+            await _notificationService.TryCreateNotificationAsync(
+                currentUserId,
+                NotificationType.GoalContribution,
+                "Goal contribution",
+                $"You added {amountLabel} to {goalName}.");
+
+            if (goalJustCompleted)
+            {
+                await _notificationService.TryCreateNotificationAsync(
+                    currentUserId,
+                    NotificationType.GoalCompleted,
+                    "Goal completed",
+                    $"{goalName} is fully funded.");
+            }
 
             return goal.ToResponse();
         }

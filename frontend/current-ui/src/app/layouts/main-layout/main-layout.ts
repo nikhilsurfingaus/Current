@@ -15,6 +15,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
+import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell';
 import { UserRole } from '../../shared/models';
 import {
   getDisplayNameFromEmail,
@@ -27,7 +28,7 @@ const MOBILE_NAV_BREAKPOINT_PX = 900;
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NotificationBellComponent],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.scss',
 })

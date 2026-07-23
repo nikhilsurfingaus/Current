@@ -340,9 +340,9 @@ Make every Current workflow intentionally usable on desktop, tablet, mobile, key
 
 ## Phase 9 — Branch & Lending
 
-**Status:** In progress  
+**Status:** Complete  
 **Date started:** 2026-07-22  
-**Date completed:** —
+**Date completed:** 2026-07-23
 
 ### Goal
 Finite branch treasury with ledger-backed disbursements; stop client-side balance minting; welcome credit on first account.
@@ -382,4 +382,36 @@ Finite branch treasury with ledger-backed disbursements; stop client-side balanc
 - Part 4–5: user flow at `/loans`; admin loan queue on `/branch/admin`
 - Part 6 deferred: overdue badge uses API `isOverdue` on fetch (no cron/background jobs until deploy infra exists)
 - Loan limits: holdings tiers in `Branch:LoanLimitTiers` — max single loan, total outstanding, max open loans per tier
+- Part 6 deferred: loan automation (cron/background jobs) skipped for now
+
+---
+
+## Phase 10 — Notifications
+
+**Status:** Complete  
+**Date started:** 2026-07-23  
+**Date completed:** 2026-07-23
+
+### Goal
+Notify users when important events happen — in-app notification centre with unread badge.
+
+### Delivered
+- [x] `Notification` entity + `NotificationType` enum
+- [x] `AddNotifications` migration
+- [x] `INotificationService` / `NotificationService`
+- [x] `NotificationsController` — list, unread count, mark read, mark all read
+- [x] Triggers: register, account created, welcome credit, transfer, payment sent/received, goal contribution/completed, loan submit/approve/reject/repay/paid off
+- [x] Frontend bell dropdown in top bar with unread badge
+
+### Endpoints
+| Method | Route | Status |
+|--------|-------|--------|
+| GET | `/notifications` | ✅ |
+| GET | `/notifications/unread-count` | ✅ |
+| PATCH | `/notifications/{id}/read` | ✅ |
+| PATCH | `/notifications/read-all` | ✅ |
+
+### Notes
+- Notifications are persisted per user; clicking an item marks it read
+- Distinct from toast messages (ephemeral UI feedback)
 

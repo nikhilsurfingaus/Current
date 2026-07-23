@@ -23,3 +23,4 @@ export * from './loans/loan.model';
 export * from './loans/create-loan-request.model';
 export * from './loans/repay-loan-request.model';
 export * from './loans/reject-loan-request.model';
+export * from './notifications/notification.model';

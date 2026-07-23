@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Current.Api.Common;
 using Current.Api.Common.Enums;
 using Current.Api.Common.Exceptions;
 using Current.Api.Data;
@@ -17,6 +18,7 @@ public class PaymentService : IPaymentService
 {
     private const string IdempotencyPendingMarker = "__PENDING__";
     private readonly ApplicationDbContext _dbContext;
+    private readonly INotificationService _notificationService;
     private static readonly TimeSpan IdempotencyKeyLifetime = TimeSpan.FromHours(24);
     private static readonly JsonSerializerOptions ReceiptJsonOptions = new()
     {
@@ -24,9 +26,12 @@ public class PaymentService : IPaymentService
         Converters = { new JsonStringEnumConverter() }
     };
 
-    public PaymentService(ApplicationDbContext dbContext)
+    public PaymentService(
+        ApplicationDbContext dbContext,
+        INotificationService notificationService)
     {
         _dbContext = dbContext;
+        _notificationService = notificationService;
     }
 
     public async Task<PaymentReceiptResponse> SendPaymentAsync(
@@ -40,6 +45,7 @@ public class PaymentService : IPaymentService
         var requestHash = BuildRequestHash(request);
 
         await using var dbTransaction = await _dbContext.Database.BeginTransactionAsync();
+        PaymentReceiptResponse? paymentReceipt = null;
 
         try
         {
@@ -91,18 +97,20 @@ public class PaymentService : IPaymentService
                     "A payment with this idempotency key is already in progress.");
             }
 
-            var receipt = await ExecutePaymentAsync(request, currentUserId);
-            idempotencyRecord.ResponseJson = JsonSerializer.Serialize(receipt, ReceiptJsonOptions);
+            paymentReceipt = await ExecutePaymentAsync(request, currentUserId);
+            idempotencyRecord.ResponseJson = JsonSerializer.Serialize(paymentReceipt, ReceiptJsonOptions);
             await _dbContext.SaveChangesAsync();
             await dbTransaction.CommitAsync();
-
-            return receipt;
         }
         catch
         {
             await dbTransaction.RollbackAsync();
             throw;
         }
+
+        await NotifyPaymentCompletedAsync(paymentReceipt!, currentUserId);
+
+        return paymentReceipt!;
     }
 
     private static void ValidateRequest(SendPaymentRequest request, string idempotencyKey)
@@ -428,5 +436,38 @@ public class PaymentService : IPaymentService
         }
 
         return receipt;
+    }
+
+    private async Task NotifyPaymentCompletedAsync(PaymentReceiptResponse receipt, Guid senderUserId)
+    {
+        var senderUser = await _dbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(user => user.Id == senderUserId);
+
+        var recipientUser = await _dbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(user => user.Email == receipt.RecipientEmail.Trim().ToLowerInvariant());
+
+        if (senderUser is null || recipientUser is null)
+        {
+            return;
+        }
+
+        var amountLabel = NotificationFormatting.FormatAmount(receipt.Amount, receipt.Currency);
+        var senderName = $"{senderUser.FirstName} {senderUser.LastName}".Trim();
+
+        await _notificationService.TryCreateNotificationAsync(
+            senderUserId,
+            NotificationType.PaymentSent,
+            "Payment sent",
+            $"{amountLabel} to {receipt.RecipientName}",
+            receipt.TransactionId);
+
+        await _notificationService.TryCreateNotificationAsync(
+            recipientUser.Id,
+            NotificationType.PaymentReceived,
+            "Payment received",
+            $"{amountLabel} from {senderName}",
+            receipt.TransactionId);
     }
 }

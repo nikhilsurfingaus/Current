@@ -1,3 +1,4 @@
+using Current.Api.Common;
 using Current.Api.Common.Enums;
 using Current.Api.Data;
 using Current.Api.DTOs.Transactions;
@@ -11,10 +12,14 @@ namespace Current.Api.Services;
 public class TransactionService : ITransactionService
 {
     private readonly ApplicationDbContext _dbContext;
+    private readonly INotificationService _notificationService;
 
-    public TransactionService(ApplicationDbContext dbContext)
+    public TransactionService(
+        ApplicationDbContext dbContext,
+        INotificationService notificationService)
     {
         _dbContext = dbContext;
+        _notificationService = notificationService;
     }
 
     public async Task<TransactionResponse> TransferFundsAsync(TransferRequest request, Guid currentUserId)
@@ -103,6 +108,12 @@ public class TransactionService : ITransactionService
             _dbContext.Transactions.Add(transaction);
             await _dbContext.SaveChangesAsync();
             await dbTransaction.CommitAsync();
+
+            await _notificationService.TryCreateNotificationAsync(
+                currentUserId,
+                NotificationType.System,
+                "Transfer completed",
+                $"{NotificationFormatting.FormatAmount(transferAmount, fromAccount.Currency)} moved from {fromAccount.Name} to {toAccount.Name}.");
 
             return transaction.ToResponse();
         }

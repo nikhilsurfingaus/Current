@@ -1,3 +1,4 @@
+using Current.Api.Common;
 using Current.Api.Common.Constants;
 using Current.Api.Common.Enums;
 using Current.Api.Configuration;
@@ -15,15 +16,18 @@ public class AccountService : IAccountService
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly IDisbursementService _disbursementService;
+    private readonly INotificationService _notificationService;
     private readonly BranchOptions _branchOptions;
 
     public AccountService(
         ApplicationDbContext dbContext,
         IDisbursementService disbursementService,
+        INotificationService notificationService,
         IOptions<BranchOptions> branchOptions)
     {
         _dbContext = dbContext;
         _disbursementService = disbursementService;
+        _notificationService = notificationService;
         _branchOptions = branchOptions.Value;
     }
 
@@ -129,6 +133,21 @@ public class AccountService : IAccountService
             }
 
             await dbTransaction.CommitAsync();
+
+            await _notificationService.TryCreateNotificationAsync(
+                currentUserId,
+                NotificationType.AccountCreated,
+                "Account created",
+                $"{account.Name} is ready to use.");
+
+            if (welcomeCreditAmount.HasValue)
+            {
+                await _notificationService.TryCreateNotificationAsync(
+                    currentUserId,
+                    NotificationType.System,
+                    "Welcome credit",
+                    $"You received {NotificationFormatting.FormatAmount(welcomeCreditAmount.Value, account.Currency)} from Current HQ.");
+            }
 
             var response = account.ToResponse();
             response.WelcomeCreditAmount = welcomeCreditAmount;
