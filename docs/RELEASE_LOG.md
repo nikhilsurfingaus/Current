@@ -419,8 +419,9 @@ Notify users when important events happen — in-app notification centre with un
 
 ## Phase 11 — Testing
 
-**Status:** In progress  
-**Date started:** 2026-07-23
+**Status:** Complete  
+**Date started:** 2026-07-23  
+**Date completed:** 2026-07-24
 
 ### Goal
 Automated backend tests with xUnit — integration-first coverage of auth, ledger, payments, loans, and notifications.
@@ -445,9 +446,23 @@ Automated backend tests with xUnit — integration-first coverage of auth, ledge
 - [x] Part 2: protected endpoints without token (401), cross-user account access (404)
 - [x] Part 2: register creates welcome `Security` notification
 - [x] Part 2: `appsettings.Testing.json` for consistent JWT config in test host
+- [x] Part 3: transfer happy path — balances update, 2 ledger entries
+- [x] Part 3: debit amount equals credit amount
+- [x] Part 3: insufficient funds — 400, balances unchanged, no transaction row
+- [x] Part 3: same account, non-positive amount, cross-user destination — 400
+- [x] Part 3: transfer creates `System` notification
+- [x] Part 4: payment happy path, self-pay, insufficient funds, recipient not found
+- [x] Part 4: idempotency replay + duplicate key conflict
+- [x] Part 4: `PaymentReceived` notification for recipient only
+- [x] Part 5: loan request, admin approve/reject, non-admin forbidden
+- [x] Part 5: loan repayment + overpayment validation
+- [x] Fix: flush disbursement transaction before loan approval lookup
+- [x] Part 6: list/unread-count/mark-read/mark-all-read API coverage
+- [x] Part 6: ownership on mark-read, notification service validation + ordering
 
 ### Notes
 - Tests use `Testing` environment (skips HTTPS redirect, skips Npgsql registration)
 - Welcome credit disabled in test config (`Branch:WelcomeCreditAmount = 0`)
-- Part 3 next: ledger transfer tests
+- `make test` runs 39 integration/service tests
+- Trigger coverage for payments, transfers, register, and loans lives in earlier parts; Part 6 focuses on the notification centre API
 

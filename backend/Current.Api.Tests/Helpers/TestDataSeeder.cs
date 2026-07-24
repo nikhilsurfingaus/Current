@@ -111,4 +111,33 @@ public static class TestDataSeeder
 
         return (branchToCreate, treasuryAccount);
     }
+
+    public static async Task<Notification> SeedNotificationAsync(
+        ApplicationDbContext dbContext,
+        Guid userId,
+        NotificationType notificationType,
+        string title,
+        string body,
+        bool isRead = false,
+        Guid? relatedEntityId = null,
+        DateTime? createdAt = null)
+    {
+        var utcNow = createdAt ?? DateTime.UtcNow;
+        var notificationToCreate = new Notification
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            Title = title,
+            Body = body,
+            NotificationType = notificationType,
+            RelatedEntityId = relatedEntityId,
+            IsRead = isRead,
+            CreatedAt = utcNow,
+        };
+
+        dbContext.Notifications.Add(notificationToCreate);
+        await dbContext.SaveChangesAsync();
+
+        return notificationToCreate;
+    }
 }

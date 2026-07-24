@@ -394,6 +394,8 @@ public class LoanService : ILoanService
                 LoanConstants.DisbursementDescription,
                 TransactionCategory.Income);
 
+            await _dbContext.SaveChangesAsync();
+
             var disbursementTransaction = await _dbContext.Transactions
                 .Where(transaction =>
                     transaction.FromAccountId == treasuryAccount.Id &&
