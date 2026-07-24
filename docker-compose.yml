@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-current}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-current}
+      POSTGRES_DB: ${POSTGRES_DB:-CurrentDb}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-current} -d ${POSTGRES_DB:-CurrentDb}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Current.Api/Dockerfile
+    ports:
+      - "${API_PORT:-5231}:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: >-
+        Host=postgres;Port=5432;Database=${POSTGRES_DB:-CurrentDb};Username=${POSTGRES_USER:-current};Password=${POSTGRES_PASSWORD:-current}
+      Jwt__Issuer: ${JWT_ISSUER:-Current.Api}
+      Jwt__Audience: ${JWT_AUDIENCE:-Current.Client}
+      Jwt__Key: ${JWT_KEY:-DOCKER_DEV_JWT_SIGNING_KEY_32_CHARS_MIN!!}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  ui:
+    build:
+      context: ./frontend/current-ui
+      dockerfile: Dockerfile
+    ports:
+      - "${UI_PORT:-4200}:80"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

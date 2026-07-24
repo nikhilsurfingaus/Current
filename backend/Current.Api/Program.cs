@@ -28,6 +28,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+await app.ApplyMigrationsAsync();
+
 app.Run();
 
 public partial class Program;

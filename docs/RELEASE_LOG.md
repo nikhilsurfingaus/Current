@@ -466,3 +466,39 @@ Automated backend tests with xUnit — integration-first coverage of auth, ledge
 - `make test` runs 39 integration/service tests
 - Trigger coverage for payments, transfers, register, and loans lives in earlier parts; Part 6 focuses on the notification centre API
 
+---
+
+## Phase 12 — DevOps, Deployment & Production
+
+**Status:** In progress  
+**Date started:** 2026-07-24
+
+### Goal
+Package, automate, deploy, and document Current as a production-ready system.
+
+### Planned parts
+1. Docker
+2. CI/CD (GitHub Actions)
+3. Neon production database
+4. Render API deployment
+5. Vercel frontend deployment
+6. Serilog logging
+7. Health checks
+8. Production middleware
+9. Configuration (env vars)
+10. Documentation + screenshots
+11. v1.0.0 release
+
+### Delivered
+- [x] Part 1: `backend/Current.Api/Dockerfile` (ASP.NET Core multi-stage build)
+- [x] Part 1: `frontend/current-ui/Dockerfile` (Angular build + Nginx)
+- [x] Part 1: `docker-compose.yml` — Postgres → API → UI
+- [x] Part 1: `.env.example` for secrets (JWT, Postgres); no secrets in repo
+- [x] Part 1: auto EF migrations on API startup (skipped in `Testing`)
+- [x] Part 1: `make docker-up`, `make docker-down`, `make docker-logs`
+
+### Notes
+- Postgres is internal to Docker network only (avoids conflict with local Homebrew Postgres on port 5432)
+- UI calls API at `http://localhost:5231` from the browser (host port mapping)
+- Default `JWT_KEY` in compose is for local Docker only — set a real secret in `.env` for anything shared
+

@@ -82,8 +82,33 @@ cd frontend/current-ui && npm install
 | `make build` | Build the API |
 | `make ui` | Run Angular dev server |
 | `make build-ui` | Build Angular app |
+| `make test` | Run backend integration tests |
+| `make docker-up` | Build and start Postgres + API + UI (Docker) |
+| `make docker-down` | Stop Docker stack |
+| `make docker-logs` | Follow Docker container logs |
 
-## API endpoints
+## Docker
+
+Run the full stack with one command (requires [Docker Desktop](https://www.docker.com/products/docker-desktop/)):
+
+```bash
+make docker-up
+```
+
+| Service | URL |
+|---------|-----|
+| UI | http://localhost:4200 |
+| API | http://localhost:5231 |
+| Swagger | http://localhost:5231/swagger |
+
+Optional: copy `.env.example` to `.env` to override JWT and ports. Defaults are fine for local Docker.
+
+Stop the stack:
+
+```bash
+make docker-down
+```
+
 
 ### Phase 1
 

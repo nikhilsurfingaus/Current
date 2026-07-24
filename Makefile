@@ -5,7 +5,7 @@ export PATH := $(NODE_BIN):$(PG_BIN):$(PATH)
 API_DIR := backend/Current.Api
 UI_DIR := frontend/current-ui
 
-.PHONY: db-up db-down db-create migrate api ui dev build build-ui test
+.PHONY: db-up db-down db-create migrate api ui dev build build-ui test docker-up docker-down docker-logs
 
 TEST_DIR := backend/Current.Api.Tests
 
@@ -38,3 +38,12 @@ ui:
 	cd $(UI_DIR) && npm start
 
 dev: db-up migrate api
+
+docker-up:
+	docker compose up --build
+
+docker-down:
+	docker compose down
+
+docker-logs:
+	docker compose logs -f
