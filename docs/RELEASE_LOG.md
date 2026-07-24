@@ -496,6 +496,8 @@ Package, automate, deploy, and document Current as a production-ready system.
 - [x] Part 1: `.env.example` for secrets (JWT, Postgres); no secrets in repo
 - [x] Part 1: auto EF migrations on API startup (skipped in `Testing`)
 - [x] Part 1: `make docker-up`, `make docker-down`, `make docker-logs`
+- [x] Part 2: `.github/workflows/build.yml` — push/PR runs API build, 39 tests, Angular build
+- [x] Part 2: uses `docker` Angular config in CI (relaxed budgets, no font inlining)
 
 ### Notes
 - Postgres is internal to Docker network only (avoids conflict with local Homebrew Postgres on port 5432)

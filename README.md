@@ -87,6 +87,12 @@ cd frontend/current-ui && npm install
 | `make docker-down` | Stop Docker stack |
 | `make docker-logs` | Follow Docker container logs |
 
+## CI
+
+[![Build](https://github.com/nikhilsurfingaus/Current/actions/workflows/build.yml/badge.svg)](https://github.com/nikhilsurfingaus/Current/actions/workflows/build.yml)
+
+Every push to `master` runs GitHub Actions: build API, run backend tests, build Angular.
+
 ## Docker
 
 Run the full stack with one command (requires [Docker Desktop](https://www.docker.com/products/docker-desktop/)):
