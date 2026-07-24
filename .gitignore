@@ -15,6 +15,10 @@ obj/
 .env.local
 !.env.example
 
+# Database dumps (never commit real data)
+*.sql
+current_backup.sql
+
 # Node (future frontend)
 node_modules/
 dist/
