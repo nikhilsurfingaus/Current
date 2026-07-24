@@ -1,6 +1,8 @@
 using System.Net.Http.Headers;
 using Current.Api.Data;
+using Current.Api.DTOs.Auth;
 using Current.Api.Entities;
+using Current.Api.Interfaces;
 using Current.Api.Tests.Helpers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -34,11 +36,27 @@ public sealed class CurrentApiWebApplicationFactory : WebApplicationFactory<Prog
     public HttpClient CreateAuthenticatedClient(User user)
     {
         var authenticatedClient = CreateAnonymousClient();
-        var configuration = Services.GetRequiredService<IConfiguration>();
-        var accessToken = TestAuthHelper.CreateAccessToken(user, configuration);
+        var accessToken = TestAuthHelper.CreateAccessToken(user);
 
         authenticatedClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", accessToken);
+
+        return authenticatedClient;
+    }
+
+    public async Task<HttpClient> CreateAuthenticatedClientViaLoginAsync(string email, string password)
+    {
+        using var scope = CreateScope();
+        var authService = scope.ServiceProvider.GetRequiredService<IAuthService>();
+        var authResponse = await authService.LoginAsync(new LoginRequest
+        {
+            Email = email,
+            Password = password,
+        });
+
+        var authenticatedClient = CreateAnonymousClient();
+        authenticatedClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", authResponse.Token);
 
         return authenticatedClient;
     }
@@ -61,13 +79,6 @@ public sealed class CurrentApiWebApplicationFactory : WebApplicationFactory<Prog
             configurationBuilder.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["ConnectionStrings:DefaultConnection"] = "Testing",
-                ["Jwt:Issuer"] = "Current.Api.Tests",
-                ["Jwt:Audience"] = "Current.Tests",
-                ["Jwt:Key"] = "TEST_JWT_SIGNING_KEY_32_CHARS_MIN!!",
-                ["Jwt:ExpiryMinutes"] = "60",
-                ["Branch:WelcomeCreditAmount"] = "0",
-                ["Branch:WelcomeCreditMaxAccounts"] = "0",
-                ["Branch:InitialTreasuryBalance"] = "10000000",
             });
         });
 

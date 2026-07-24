@@ -2,23 +2,15 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Current.Api.Entities;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Current.Api.Tests.Helpers;
 
 public static class TestAuthHelper
 {
-    public static string CreateAccessToken(User user, IConfiguration configuration)
+    public static string CreateAccessToken(User user)
     {
-        var jwtIssuer = configuration["Jwt:Issuer"]
-            ?? throw new InvalidOperationException("Jwt:Issuer is not configured.");
-        var jwtAudience = configuration["Jwt:Audience"]
-            ?? throw new InvalidOperationException("Jwt:Audience is not configured.");
-        var jwtKey = configuration["Jwt:Key"]
-            ?? throw new InvalidOperationException("Jwt:Key is not configured.");
-
-        var tokenSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+        var tokenSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TestJwtSettings.Key));
         var tokenCredentials = new SigningCredentials(tokenSecurityKey, SecurityAlgorithms.HmacSha256);
 
         var tokenClaims = new List<Claim>
@@ -30,8 +22,8 @@ public static class TestAuthHelper
         };
 
         var jwtToken = new JwtSecurityToken(
-            issuer: jwtIssuer,
-            audience: jwtAudience,
+            issuer: TestJwtSettings.Issuer,
+            audience: TestJwtSettings.Audience,
             claims: tokenClaims,
             expires: DateTime.UtcNow.AddHours(1),
             signingCredentials: tokenCredentials);

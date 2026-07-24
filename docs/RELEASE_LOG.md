@@ -440,9 +440,14 @@ Automated backend tests with xUnit — integration-first coverage of auth, ledge
 - [x] Part 1: `IntegrationTestBase` with per-test DB reset
 - [x] Part 1: `make test` target
 - [x] Part 1: smoke test — `GET /users/me` without token returns 401
+- [x] Part 2: register success, duplicate email (409), short password (400)
+- [x] Part 2: login success, invalid password (401)
+- [x] Part 2: protected endpoints without token (401), cross-user account access (404)
+- [x] Part 2: register creates welcome `Security` notification
+- [x] Part 2: `appsettings.Testing.json` for consistent JWT config in test host
 
 ### Notes
 - Tests use `Testing` environment (skips HTTPS redirect, skips Npgsql registration)
 - Welcome credit disabled in test config (`Branch:WelcomeCreditAmount = 0`)
-- Part 2 next: auth register/login + ownership tests
+- Part 3 next: ledger transfer tests
 
