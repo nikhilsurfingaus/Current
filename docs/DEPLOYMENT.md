@@ -9,6 +9,7 @@
 | Neon (production DB) | You set up — see below |
 | Render (API) | Done |
 | Vercel (UI) | Done |
+| Documentation | Done |
 
 ---
 
@@ -149,3 +150,8 @@ Expected: `200 OK` with body `Healthy` when the database is reachable.
 - Deploy `frontend/current-ui` (root directory, output `dist/current-ui/browser`)
 - Production `apiUrl` in `environment.ts` points at your Render URL
 - CORS origins in `appsettings.Production.json` or Render env vars (`Cors__AllowedOrigins__*`)
+
+## Demo account
+
+See [Demo account guide](DEMO.md) to register `demo@current.app` on production for portfolio reviewers.
+

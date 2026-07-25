@@ -507,6 +507,7 @@ Package, automate, deploy, and document Current as a production-ready system.
 - [x] Part 6: Serilog — console logging, HTTP request logging, structured logs for auth, transfers, and loan approvals
 - [x] Part 8: production middleware — global exception handler, security headers, forwarded headers + HSTS for Render
 - [x] Part 9: configuration — `Cors:AllowedOrigins` from `appsettings.Production.json` / Render env vars; documented config hierarchy
+- [x] Part 10: `ARCHITECTURE.md`, `ERD.md`, `API.md`, `DEMO.md`, screenshots folder, README overhaul, `database/scripts/promote-demo-admin.sql`
 
 ### Notes
 - Postgres is internal to Docker network only (avoids conflict with local Homebrew Postgres on port 5432)
