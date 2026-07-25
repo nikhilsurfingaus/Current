@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:5231',
+  apiUrl: 'https://current-zdw5.onrender.com',
 };
