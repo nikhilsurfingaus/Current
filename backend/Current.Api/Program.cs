@@ -17,9 +17,11 @@ try
     builder.Services.AddFrontendCors(builder.Environment);
     builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
     builder.Services.AddHealthMonitoring();
+    builder.Services.AddProductionMiddleware();
 
     var app = builder.Build();
 
+    app.UseProductionMiddleware();
     app.UseSerilogRequestLogging();
 
     // Middleware
