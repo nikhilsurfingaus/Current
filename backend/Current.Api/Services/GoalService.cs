@@ -14,13 +14,16 @@ public class GoalService : IGoalService
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly INotificationService _notificationService;
+    private readonly IBankAccountNumberService _bankAccountNumberService;
 
     public GoalService(
         ApplicationDbContext dbContext,
-        INotificationService notificationService)
+        INotificationService notificationService,
+        IBankAccountNumberService bankAccountNumberService)
     {
         _dbContext = dbContext;
         _notificationService = notificationService;
+        _bankAccountNumberService = bankAccountNumberService;
     }
 
     public async Task<IReadOnlyList<GoalResponse>> GetAllGoalsAsync(Guid currentUserId)
@@ -85,6 +88,8 @@ public class GoalService : IGoalService
             CreatedAt = utcNow,
             UpdatedAt = utcNow
         };
+
+        await _bankAccountNumberService.AssignBankDetailsAsync(goalAccount);
 
         var goal = new Goal
         {

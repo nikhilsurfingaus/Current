@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { PaymentService } from '../../../core/services/payment.service';
 import { PaymentDirection, PaymentHistoryItem, TransactionStatus } from '../../../shared/models';
+import { formatBankAccountLine } from '../../../shared/utils/bank-account.utils';
 import { resolveApiErrorMessage } from '../../../shared/utils/http-error.utils';
 import { getTransactionStatusLabel } from '../../../shared/utils/transaction-status.utils';
 
@@ -23,6 +24,15 @@ export class PaymentReceiptComponent implements OnInit {
   readonly paymentDirection = PaymentDirection;
   readonly getTransactionStatusLabel = getTransactionStatusLabel;
   readonly transactionStatus = TransactionStatus;
+  readonly formatBankAccountLine = formatBankAccountLine;
+
+  getRecipientDetailsLine(receipt: PaymentHistoryItem): string {
+    if (receipt.recipientEmail) {
+      return receipt.recipientEmail;
+    }
+
+    return formatBankAccountLine(receipt.recipientBsb, receipt.recipientAccountNumber);
+  }
 
   constructor(
     private activatedRoute: ActivatedRoute,

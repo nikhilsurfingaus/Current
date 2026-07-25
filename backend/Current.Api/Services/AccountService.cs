@@ -17,17 +17,20 @@ public class AccountService : IAccountService
     private readonly ApplicationDbContext _dbContext;
     private readonly IDisbursementService _disbursementService;
     private readonly INotificationService _notificationService;
+    private readonly IBankAccountNumberService _bankAccountNumberService;
     private readonly BranchOptions _branchOptions;
 
     public AccountService(
         ApplicationDbContext dbContext,
         IDisbursementService disbursementService,
         INotificationService notificationService,
+        IBankAccountNumberService bankAccountNumberService,
         IOptions<BranchOptions> branchOptions)
     {
         _dbContext = dbContext;
         _disbursementService = disbursementService;
         _notificationService = notificationService;
+        _bankAccountNumberService = bankAccountNumberService;
         _branchOptions = branchOptions.Value;
     }
 
@@ -103,6 +106,8 @@ public class AccountService : IAccountService
                 CreatedAt = utcNow,
                 UpdatedAt = utcNow
             };
+
+            await _bankAccountNumberService.AssignBankDetailsAsync(account);
 
             _dbContext.Accounts.Add(account);
             await _dbContext.SaveChangesAsync();

@@ -1,3 +1,4 @@
+using Current.Api.Common;
 using Current.Api.Data;
 using Current.Api.DTOs.Contacts;
 using Current.Api.Entities;
@@ -42,17 +43,22 @@ public class ContactService : IContactService
         CreateContactRequest request,
         Guid currentUserId)
     {
-        var contactName = NormalizeName(request.Name);
-        var contactEmail = NormalizeEmail(request.Email);
-        await EnsureEmailIsAvailableAsync(contactEmail, currentUserId);
+        var contactDetails = NormalizeContactDetails(request.Name, request.Email, request.Bsb, request.AccountNumber);
+        await EnsureContactIsAvailableAsync(
+            currentUserId,
+            contactDetails.Email,
+            contactDetails.Bsb,
+            contactDetails.AccountNumber);
 
         var utcNow = DateTime.UtcNow;
         var contact = new Contact
         {
             Id = Guid.NewGuid(),
             UserId = currentUserId,
-            Name = contactName,
-            Email = contactEmail,
+            Name = contactDetails.Name,
+            Email = contactDetails.Email,
+            Bsb = contactDetails.Bsb,
+            AccountNumber = contactDetails.AccountNumber,
             CreatedAt = utcNow,
             UpdatedAt = utcNow
         };
@@ -77,12 +83,18 @@ public class ContactService : IContactService
             return null;
         }
 
-        var contactName = NormalizeName(request.Name);
-        var contactEmail = NormalizeEmail(request.Email);
-        await EnsureEmailIsAvailableAsync(contactEmail, currentUserId, contact.Id);
+        var contactDetails = NormalizeContactDetails(request.Name, request.Email, request.Bsb, request.AccountNumber);
+        await EnsureContactIsAvailableAsync(
+            currentUserId,
+            contactDetails.Email,
+            contactDetails.Bsb,
+            contactDetails.AccountNumber,
+            contact.Id);
 
-        contact.Name = contactName;
-        contact.Email = contactEmail;
+        contact.Name = contactDetails.Name;
+        contact.Email = contactDetails.Email;
+        contact.Bsb = contactDetails.Bsb;
+        contact.AccountNumber = contactDetails.AccountNumber;
         contact.UpdatedAt = DateTime.UtcNow;
         await _dbContext.SaveChangesAsync();
 
@@ -105,21 +117,81 @@ public class ContactService : IContactService
         return true;
     }
 
-    private async Task EnsureEmailIsAvailableAsync(
-        string contactEmail,
+    private async Task EnsureContactIsAvailableAsync(
         Guid currentUserId,
+        string? contactEmail,
+        string? contactBsb,
+        string? contactAccountNumber,
         Guid? excludedContactId = null)
     {
-        var duplicateContactExists = await _dbContext.Contacts
-            .AnyAsync(contact =>
-                contact.UserId == currentUserId &&
-                contact.Email == contactEmail &&
-                contact.Id != excludedContactId);
-
-        if (duplicateContactExists)
+        if (!string.IsNullOrWhiteSpace(contactEmail))
         {
-            throw new InvalidOperationException("A contact with this email already exists.");
+            var duplicateEmailContactExists = await _dbContext.Contacts
+                .AnyAsync(contact =>
+                    contact.UserId == currentUserId &&
+                    contact.Email == contactEmail &&
+                    contact.Id != excludedContactId);
+
+            if (duplicateEmailContactExists)
+            {
+                throw new InvalidOperationException("A contact with this email already exists.");
+            }
         }
+
+        if (!string.IsNullOrWhiteSpace(contactBsb) && !string.IsNullOrWhiteSpace(contactAccountNumber))
+        {
+            var duplicateBankContactExists = await _dbContext.Contacts
+                .AnyAsync(contact =>
+                    contact.UserId == currentUserId &&
+                    contact.Bsb == contactBsb &&
+                    contact.AccountNumber == contactAccountNumber &&
+                    contact.Id != excludedContactId);
+
+            if (duplicateBankContactExists)
+            {
+                throw new InvalidOperationException("A contact with these bank details already exists.");
+            }
+        }
+    }
+
+    private static ContactDetails NormalizeContactDetails(
+        string name,
+        string? email,
+        string? bsb,
+        string? accountNumber)
+    {
+        var contactName = NormalizeName(name);
+        var hasEmail = !string.IsNullOrWhiteSpace(email);
+        var hasBsbDetails = !string.IsNullOrWhiteSpace(bsb) || !string.IsNullOrWhiteSpace(accountNumber);
+
+        if (!hasEmail && !hasBsbDetails)
+        {
+            throw new InvalidOperationException("Provide an email or BSB and account number.");
+        }
+
+        string? normalizedEmail = null;
+        string? normalizedBsb = null;
+        string? normalizedAccountNumber = null;
+
+        if (hasEmail)
+        {
+            normalizedEmail = NormalizeEmail(email!);
+        }
+
+        if (hasBsbDetails)
+        {
+            if (!BankAccountNormalizer.TryNormalizeBsb(bsb, out normalizedBsb))
+            {
+                throw new InvalidOperationException("BSB must be 6 digits.");
+            }
+
+            if (!BankAccountNormalizer.TryNormalizeAccountNumber(accountNumber, out normalizedAccountNumber))
+            {
+                throw new InvalidOperationException("Account number must be 6 to 9 digits.");
+            }
+        }
+
+        return new ContactDetails(contactName, normalizedEmail, normalizedBsb, normalizedAccountNumber);
     }
 
     private static string NormalizeName(string name)
@@ -155,4 +227,10 @@ public class ContactService : IContactService
 
         return contactEmail;
     }
+
+    private sealed record ContactDetails(
+        string Name,
+        string? Email,
+        string? Bsb,
+        string? AccountNumber);
 }

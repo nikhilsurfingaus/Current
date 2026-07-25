@@ -6,7 +6,11 @@ public class ContactResponse
 
     public required string Name { get; set; }
 
-    public required string Email { get; set; }
+    public string? Email { get; set; }
+
+    public string? Bsb { get; set; }
+
+    public string? AccountNumber { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

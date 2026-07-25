@@ -106,6 +106,8 @@ Returns `200` with body `Healthy` when the API and database are reachable.
 | GET | `/accounts/{id}` | Get account |
 | POST | `/accounts` | Create account (welcome credit on first account) |
 
+Account responses include `bsb` and `accountNumber`. New accounts receive a unique number under BSB `932-000`. Existing accounts are backfilled automatically on deploy.
+
 ### Transactions
 
 | Method | Route | Description |
@@ -116,6 +118,34 @@ Returns `200` with body `Healthy` when the API and database are reachable.
 
 ### Payments
 
+Pay by **email** (credits recipient's primary account) or **BSB + account number** (credits that specific account).
+
+```http
+POST /payments/send
+Idempotency-Key: <uuid>
+Content-Type: application/json
+
+{
+  "fromAccountId": "...",
+  "recipientEmail": "friend@email.com",
+  "amount": 50.00,
+  "reference": "Lunch"
+}
+```
+
+Or:
+
+```json
+{
+  "fromAccountId": "...",
+  "recipientBsb": "932-000",
+  "recipientAccountNumber": "10000001",
+  "amount": 50.00
+}
+```
+
+Provide either `recipientEmail` or both `recipientBsb` and `recipientAccountNumber`.
+
 | Method | Route | Description |
 |--------|-------|-------------|
 | POST | `/payments/send` | Pay another user (supports `Idempotency-Key` header) |
@@ -125,6 +155,8 @@ Returns `200` with body `Healthy` when the API and database are reachable.
 | GET | `/payments/{transactionId}` | Receipt |
 
 ### Contacts
+
+Contacts can be saved by email or by BSB + account number.
 
 | Method | Route | Description |
 |--------|-------|-------------|

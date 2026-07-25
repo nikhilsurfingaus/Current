@@ -261,7 +261,10 @@
                   </span>
                   <div>
                     <p class="dashboard-account-list__name">{{ account.name }}</p>
-                    <p class="dashboard-account-list__type">{{ getAccountTypeLabel(account.accountType) }}</p>
+                    <p class="dashboard-account-list__type">
+                      {{ getAccountTypeLabel(account.accountType) }} ·
+                      {{ formatBankAccountLine(account.bsb, account.accountNumber) }}
+                    </p>
                   </div>
                 </div>
                 <div class="dashboard-account-list__trailing">

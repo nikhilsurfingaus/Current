@@ -19,9 +19,6 @@
   } @else if (!pageLoadError()) {
     <section class="settings-page__card">
       <h2 class="settings-page__card-title">Profile</h2>
-      <p class="settings-page__email-label">Email</p>
-      <p class="settings-page__email-value">{{ userEmail() }}</p>
-      <p class="settings-page__hint">Email is used for payments and cannot be changed here.</p>
 
       @if (profileError()) {
         <div class="settings-page__alert settings-page__alert--error">{{ profileError() }}</div>
@@ -70,6 +67,45 @@
           {{ profileSaving() ? 'Saving...' : 'Save profile' }}
         </button>
       </form>
+    </section>
+
+    <section class="settings-page__card">
+      <h2 class="settings-page__card-title">Payment details</h2>
+      <p class="settings-page__hint">Share these details so others can pay you.</p>
+
+      <dl class="settings-payment-details">
+        <div class="settings-payment-details__row">
+          <dt class="settings-page__detail-label">PayID</dt>
+          <dd class="settings-page__detail-value">{{ userEmail() }}</dd>
+        </div>
+      </dl>
+
+      @if (userFacingAccounts().length === 0) {
+        <p class="settings-page__hint">Create an account to get a BSB and account number.</p>
+      } @else {
+        <ul class="settings-account-list">
+          @for (account of userFacingAccounts(); track account.id) {
+            <li class="settings-account-list__item">
+              <div class="settings-account-list__header">
+                <span class="settings-account-list__name">{{ account.name }}</span>
+                <span class="settings-account-list__type">{{ getAccountTypeLabel(account.accountType) }}</span>
+              </div>
+              <dl class="settings-payment-details settings-payment-details--compact">
+                <div class="settings-payment-details__row">
+                  <dt class="settings-page__detail-label">BSB</dt>
+                  <dd class="settings-page__detail-value settings-page__detail-value--mono">{{ account.bsb }}</dd>
+                </div>
+                <div class="settings-payment-details__row">
+                  <dt class="settings-page__detail-label">Account number</dt>
+                  <dd class="settings-page__detail-value settings-page__detail-value--mono">
+                    {{ account.accountNumber }}
+                  </dd>
+                </div>
+              </dl>
+            </li>
+          }
+        </ul>
+      }
     </section>
 
     <section class="settings-page__card">

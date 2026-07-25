@@ -15,6 +15,8 @@ public static class AccountMappings
             AccountType = account.AccountType,
             CurrentBalance = account.CurrentBalance,
             Currency = account.Currency,
+            Bsb = account.Bsb,
+            AccountNumber = account.AccountNumber,
             CreatedAt = account.CreatedAt,
             UpdatedAt = account.UpdatedAt
         };

@@ -2,16 +2,23 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
 
+import { AccountService } from '../../../core/services/account.service';
+import { GoalService } from '../../../core/services/goal.service';
 import { UserService } from '../../../core/services/user.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader';
 import {
+  Account,
+  Goal,
   ThemePreference,
   UpdateUserPreferencesRequest,
   UpdateUserProfileRequest,
   User,
 } from '../../../shared/models';
+import { getAccountTypeLabel } from '../../../shared/utils/account-type.utils';
+import { filterNonGoalAccounts } from '../../../shared/utils/goal-account.utils';
 import {
   focusFirstInvalidControl,
   getControlDescribedBy,
@@ -63,12 +70,20 @@ export class SettingsComponent implements OnInit {
   preferencesSaving = signal(false);
   profileError = signal('');
   preferencesError = signal('');
+  userAccounts = signal<Account[]>([]);
+  userGoals = signal<Goal[]>([]);
 
   readonly themeOptions = THEME_OPTIONS;
   readonly currencyOptions = CURRENCY_OPTIONS;
   readonly timezoneOptions = TIMEZONE_OPTIONS;
   readonly localeOptions = LOCALE_OPTIONS;
   readonly getControlDescribedBy = getControlDescribedBy;
+  readonly getAccountTypeLabel = getAccountTypeLabel;
+
+  userEmail = computed(() => this.userService.currentUser()?.email ?? '');
+  userFacingAccounts = computed(() =>
+    filterNonGoalAccounts(this.userAccounts(), this.userGoals()),
+  );
 
   profileForm = new FormGroup({
     firstName: new FormControl('', {
@@ -100,9 +115,9 @@ export class SettingsComponent implements OnInit {
     }),
   });
 
-  userEmail = computed(() => this.userService.currentUser()?.email ?? '');
-
   constructor(
+    private accountService: AccountService,
+    private goalService: GoalService,
     private userService: UserService,
     private toastService: ToastService,
   ) {}
@@ -111,11 +126,27 @@ export class SettingsComponent implements OnInit {
     const cachedUser = this.userService.currentUser();
     if (cachedUser) {
       this.applyUserToForms(cachedUser);
-      this.pageLoading.set(false);
+      this.loadPaymentDetails();
       return;
     }
 
     this.loadSettings();
+  }
+
+  loadPaymentDetails(): void {
+    forkJoin({
+      accounts: this.accountService.getAllAccounts(),
+      goals: this.goalService.getAllGoals(),
+    }).subscribe({
+      next: ({ accounts, goals }) => {
+        this.userAccounts.set(accounts);
+        this.userGoals.set(goals);
+        this.pageLoading.set(false);
+      },
+      error: () => {
+        this.pageLoading.set(false);
+      },
+    });
   }
 
   loadSettings(): void {
@@ -125,7 +156,7 @@ export class SettingsComponent implements OnInit {
     this.userService.loadCurrentUser().subscribe({
       next: (user) => {
         this.applyUserToForms(user);
-        this.pageLoading.set(false);
+        this.loadPaymentDetails();
       },
       error: (error: HttpErrorResponse) => {
         this.pageLoading.set(false);

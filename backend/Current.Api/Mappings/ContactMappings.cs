@@ -12,6 +12,8 @@ public static class ContactMappings
             Id = contact.Id,
             Name = contact.Name,
             Email = contact.Email,
+            Bsb = contact.Bsb,
+            AccountNumber = contact.AccountNumber,
             CreatedAt = contact.CreatedAt,
             UpdatedAt = contact.UpdatedAt
         };

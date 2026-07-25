@@ -77,6 +77,30 @@
   gap: 6px;
 }
 
+.contacts-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: $space-md;
+}
+
+.contacts-form__method-toggle {
+  display: flex;
+  gap: $space-md;
+}
+
+.contacts-form__method-option {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-sm;
+  font-size: 13px;
+  color: $text-primary;
+  cursor: pointer;
+
+  input {
+    accent-color: $color-primary;
+  }
+}
+
 .contacts-form__label {
   font-size: 13px;
   font-weight: 500;

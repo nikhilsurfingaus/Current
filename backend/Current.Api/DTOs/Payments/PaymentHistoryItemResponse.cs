@@ -18,7 +18,11 @@ public class PaymentHistoryItemResponse
 
     public required string RecipientName { get; set; }
 
-    public required string RecipientEmail { get; set; }
+    public string? RecipientEmail { get; set; }
+
+    public string RecipientBsb { get; set; } = string.Empty;
+
+    public string RecipientAccountNumber { get; set; } = string.Empty;
 
     public required string RecipientAccountName { get; set; }
 

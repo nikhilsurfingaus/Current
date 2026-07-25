@@ -101,6 +101,7 @@
             <tr>
               <th>Name</th>
               <th>Type</th>
+              <th>BSB &amp; account</th>
               <th>Balance</th>
               <th>Currency</th>
             </tr>
@@ -110,6 +111,7 @@
               <tr>
                 <td>{{ account.name }}</td>
                 <td>{{ getAccountTypeLabel(account.accountType) }}</td>
+                <td>{{ formatBankAccountLine(account.bsb, account.accountNumber) }}</td>
                 <td>{{ account.currentBalance | currency: account.currency }}</td>
                 <td>{{ account.currency }}</td>
               </tr>
@@ -129,6 +131,9 @@
             </div>
             <p class="accounts-card__meta">
               {{ getAccountTypeLabel(account.accountType) }} · {{ account.currency }}
+            </p>
+            <p class="accounts-card__bank">
+              {{ formatBankAccountLine(account.bsb, account.accountNumber) }}
             </p>
           </li>
         }

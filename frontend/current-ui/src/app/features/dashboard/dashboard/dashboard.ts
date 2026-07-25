@@ -25,6 +25,7 @@ import {
   Transaction,
 } from '../../../shared/models';
 import { filterNonGoalAccounts } from '../../../shared/utils/goal-account.utils';
+import { formatBankAccountLine } from '../../../shared/utils/bank-account.utils';
 import { getAccountTypeLabel } from '../../../shared/utils/account-type.utils';
 import { buildCurrencyBalanceTotals } from '../../../shared/utils/currency-balance.utils';
 import { getTransactionStatusLabel } from '../../../shared/utils/transaction-status.utils';
@@ -63,6 +64,7 @@ export class DashboardComponent implements OnInit {
   dashboardLoadError = signal('');
 
   readonly getAccountTypeLabel = getAccountTypeLabel;
+  readonly formatBankAccountLine = formatBankAccountLine;
   readonly getTransactionStatusLabel = getTransactionStatusLabel;
   readonly goalStatus = GoalStatus;
   readonly loanStatus = LoanStatus;

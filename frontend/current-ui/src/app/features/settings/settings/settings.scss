@@ -46,10 +46,75 @@
   letter-spacing: 0.04em;
 }
 
-.settings-page__email-value {
+.settings-page__detail-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.settings-page__detail-value {
   margin: 0;
   font-size: 15px;
   color: $text-primary;
+
+  &--mono {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.settings-payment-details {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+}
+
+.settings-payment-details__row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: $space-sm;
+  align-items: baseline;
+}
+
+.settings-payment-details--compact {
+  margin-top: $space-sm;
+}
+
+.settings-account-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.settings-account-list__item {
+  padding: $space-md;
+  border: 1px solid $border-color;
+  border-radius: $radius-button;
+  background: color-mix(in srgb, $bg-secondary 60%, transparent);
+}
+
+.settings-account-list__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-sm;
+}
+
+.settings-account-list__name {
+  font-size: 15px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.settings-account-list__type {
+  font-size: 12px;
+  color: $text-secondary;
 }
 
 .settings-page__hint {

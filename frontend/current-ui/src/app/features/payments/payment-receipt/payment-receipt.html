@@ -33,7 +33,7 @@
             <dt>Recipient</dt>
             <dd>
               {{ paymentReceipt.recipientName }}
-              <span class="payment-receipt__secondary">{{ paymentReceipt.recipientEmail }}</span>
+              <span class="payment-receipt__secondary">{{ getRecipientDetailsLine(paymentReceipt) }}</span>
             </dd>
           </div>
           <div class="payment-receipt__row">

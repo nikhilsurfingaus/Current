@@ -68,6 +68,30 @@
   gap: 6px;
 }
 
+.payments-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: $space-md;
+}
+
+.payments-form__method-toggle {
+  display: flex;
+  gap: $space-md;
+}
+
+.payments-form__method-option {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-sm;
+  font-size: 13px;
+  color: $text-primary;
+  cursor: pointer;
+
+  input {
+    accent-color: $color-primary;
+  }
+}
+
 .payments-form__label {
   font-size: 13px;
   font-weight: 500;
@@ -114,5 +138,9 @@
 
   .payments-page__header-actions {
     flex-wrap: wrap;
+  }
+
+  .payments-form__row {
+    grid-template-columns: 1fr;
   }
 }

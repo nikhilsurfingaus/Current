@@ -14,7 +14,11 @@ public class PaymentReceiptResponse
 
     public required string RecipientName { get; set; }
 
-    public required string RecipientEmail { get; set; }
+    public string? RecipientEmail { get; set; }
+
+    public string RecipientBsb { get; set; } = string.Empty;
+
+    public string RecipientAccountNumber { get; set; } = string.Empty;
 
     public decimal Amount { get; set; }
 

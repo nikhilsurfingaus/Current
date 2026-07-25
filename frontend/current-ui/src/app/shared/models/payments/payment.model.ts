@@ -6,7 +6,9 @@ export interface PaymentReceipt {
   recipientAccountId: string;
   recipientAccountName: string;
   recipientName: string;
-  recipientEmail: string;
+  recipientEmail?: string | null;
+  recipientBsb: string;
+  recipientAccountNumber: string;
   amount: number;
   currency: string;
   reference: string | null;
@@ -22,7 +24,9 @@ export interface PaymentHistoryItem {
   senderName: string;
   senderEmail: string;
   recipientName: string;
-  recipientEmail: string;
+  recipientEmail?: string | null;
+  recipientBsb: string;
+  recipientAccountNumber: string;
   recipientAccountName: string;
   amount: number;
   currency: string;

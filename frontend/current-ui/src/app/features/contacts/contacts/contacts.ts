@@ -82,7 +82,7 @@ export class ContactsComponent implements OnInit {
     this.contactFormSubmitted.set(false);
     this.contactForm.setValue({
       name: contact.name,
-      email: contact.email,
+      email: contact.email ?? '',
     });
   }
 

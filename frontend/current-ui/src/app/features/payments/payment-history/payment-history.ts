@@ -9,6 +9,7 @@ import { ToastService } from '../../../core/services/toast.service';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state';
 import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader';
 import { PaymentDirection, PaymentHistoryItem, TransactionStatus } from '../../../shared/models';
+import { formatBankAccountLine } from '../../../shared/utils/bank-account.utils';
 import { resolveApiErrorMessage } from '../../../shared/utils/http-error.utils';
 import { getTransactionStatusLabel } from '../../../shared/utils/transaction-status.utils';
 
@@ -66,7 +67,11 @@ export class PaymentHistoryComponent implements OnInit {
 
   getCounterpartyLabel(payment: PaymentHistoryItem): string {
     if (payment.direction === PaymentDirection.Sent) {
-      return payment.recipientName || payment.recipientEmail;
+      return (
+        payment.recipientName ||
+        payment.recipientEmail ||
+        formatBankAccountLine(payment.recipientBsb, payment.recipientAccountNumber)
+      );
     }
 
     return payment.senderName || payment.senderEmail;
@@ -74,7 +79,7 @@ export class PaymentHistoryComponent implements OnInit {
 
   getCounterpartyEmail(payment: PaymentHistoryItem): string {
     return payment.direction === PaymentDirection.Sent
-      ? payment.recipientEmail
+      ? payment.recipientEmail ?? ''
       : payment.senderEmail;
   }
 
@@ -128,7 +133,10 @@ export class PaymentHistoryComponent implements OnInit {
     this.contactService.getAllContacts().subscribe({
       next: (contacts) => {
         this.savedContactEmails.set(
-          new Set(contacts.map((contact) => contact.email.trim().toLowerCase())),
+          new Set(
+            contacts
+              .flatMap((contact) => (contact.email ? [contact.email.trim().toLowerCase()] : [])),
+          ),
         );
         this.contactsLoaded.set(true);
       },

@@ -4,6 +4,7 @@ public enum PaymentErrorCode
 {
     InvalidAmount,
     RecipientEmailRequired,
+    RecipientDetailsRequired,
     IdempotencyKeyRequired,
     SourceAccountNotFound,
     RecipientNotFound,

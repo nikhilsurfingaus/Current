@@ -3,6 +3,7 @@ using Current.Api.Common.Enums;
 using Current.Api.Data;
 using Current.Api.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Current.Api.Tests.Helpers;
 
@@ -48,6 +49,7 @@ public static class TestDataSeeder
         string currency = "AUD")
     {
         var utcNow = DateTime.UtcNow;
+        var existingAccountCount = await dbContext.Accounts.CountAsync();
         var accountToCreate = new Account
         {
             Id = Guid.NewGuid(),
@@ -56,6 +58,10 @@ public static class TestDataSeeder
             AccountType = accountType,
             CurrentBalance = currentBalance,
             Currency = currency,
+            Bsb = BankAccountConstants.DefaultBsb,
+            AccountNumber = (BankAccountConstants.AccountNumberStart + existingAccountCount)
+                .ToString()
+                .PadLeft(BankAccountConstants.AccountNumberLength, '0'),
             CreatedAt = utcNow,
             UpdatedAt = utcNow,
         };
@@ -92,6 +98,8 @@ public static class TestDataSeeder
             AccountType = AccountType.Branch,
             CurrentBalance = treasuryBalance,
             Currency = "AUD",
+            Bsb = BankAccountConstants.BranchTreasuryBsb,
+            AccountNumber = BankAccountConstants.BranchTreasuryAccountNumber,
             CreatedAt = utcNow,
             UpdatedAt = utcNow,
         };

@@ -129,11 +129,31 @@ public class PaymentService : IPaymentService
                 "Amount must be greater than zero.");
         }
 
-        if (string.IsNullOrWhiteSpace(request.RecipientEmail))
+        var hasEmailRecipient = !string.IsNullOrWhiteSpace(request.RecipientEmail);
+        var hasBsbRecipient = !string.IsNullOrWhiteSpace(request.RecipientBsb) ||
+                              !string.IsNullOrWhiteSpace(request.RecipientAccountNumber);
+
+        if (hasEmailRecipient && hasBsbRecipient)
         {
             throw new PaymentException(
-                PaymentErrorCode.RecipientEmailRequired,
-                "Recipient email is required.");
+                PaymentErrorCode.RecipientDetailsRequired,
+                "Provide either recipient email or BSB and account number.");
+        }
+
+        if (!hasEmailRecipient && !hasBsbRecipient)
+        {
+            throw new PaymentException(
+                PaymentErrorCode.RecipientDetailsRequired,
+                "Recipient email or BSB and account number is required.");
+        }
+
+        if (hasBsbRecipient &&
+            (!BankAccountNormalizer.TryNormalizeBsb(request.RecipientBsb, out _) ||
+             !BankAccountNormalizer.TryNormalizeAccountNumber(request.RecipientAccountNumber, out _)))
+        {
+            throw new PaymentException(
+                PaymentErrorCode.RecipientNotFound,
+                "Enter a valid BSB and account number.");
         }
     }
 
@@ -180,7 +200,6 @@ public class PaymentService : IPaymentService
         SendPaymentRequest request,
         Guid currentUserId)
     {
-        var recipientEmail = request.RecipientEmail.Trim().ToLowerInvariant();
         var paymentReference = string.IsNullOrWhiteSpace(request.Reference)
             ? null
             : request.Reference.Trim();
@@ -196,43 +215,7 @@ public class PaymentService : IPaymentService
                 "Source account not found.");
         }
 
-        var recipientUser = await _dbContext.Users
-            .FirstOrDefaultAsync(user => user.Email.ToLower() == recipientEmail);
-
-        if (recipientUser is null)
-        {
-            throw new PaymentException(
-                PaymentErrorCode.RecipientNotFound,
-                "Recipient not found.");
-        }
-
-        if (recipientUser.Id == currentUserId)
-        {
-            throw new PaymentException(
-                PaymentErrorCode.SelfPaymentNotAllowed,
-                "Use account transfer for your own accounts.");
-        }
-
-        var recipientGoalAccountIds = await _dbContext.Goals
-            .AsNoTracking()
-            .Where(goal => goal.UserId == recipientUser.Id)
-            .Select(goal => goal.GoalAccountId)
-            .ToListAsync();
-
-        var recipientAccount = await _dbContext.Accounts
-            .Where(account =>
-                account.UserId == recipientUser.Id &&
-                !recipientGoalAccountIds.Contains(account.Id))
-            .OrderBy(account => account.AccountType == AccountType.Everyday ? 0 : 1)
-            .ThenBy(account => account.CreatedAt)
-            .FirstOrDefaultAsync();
-
-        if (recipientAccount is null)
-        {
-            throw new PaymentException(
-                PaymentErrorCode.RecipientAccountNotFound,
-                "Recipient account not found.");
-        }
+        var (recipientUser, recipientAccount) = await ResolveRecipientAsync(request, currentUserId);
 
         if (!string.Equals(senderAccount.Currency, recipientAccount.Currency, StringComparison.OrdinalIgnoreCase))
         {
@@ -397,6 +380,110 @@ public class PaymentService : IPaymentService
             .ToList();
     }
 
+    private async Task<(User RecipientUser, Account RecipientAccount)> ResolveRecipientAsync(
+        SendPaymentRequest request,
+        Guid currentUserId)
+    {
+        if (!string.IsNullOrWhiteSpace(request.RecipientBsb) ||
+            !string.IsNullOrWhiteSpace(request.RecipientAccountNumber))
+        {
+            return await ResolveRecipientByBankDetailsAsync(request, currentUserId);
+        }
+
+        return await ResolveRecipientByEmailAsync(request, currentUserId);
+    }
+
+    private async Task<(User RecipientUser, Account RecipientAccount)> ResolveRecipientByBankDetailsAsync(
+        SendPaymentRequest request,
+        Guid currentUserId)
+    {
+        var normalizedBsb = BankAccountNormalizer.NormalizeBsb(request.RecipientBsb!);
+        var normalizedAccountNumber = BankAccountNormalizer.NormalizeAccountNumber(request.RecipientAccountNumber!);
+
+        var recipientAccount = await _dbContext.Accounts
+            .Include(account => account.User)
+            .FirstOrDefaultAsync(account =>
+                account.Bsb == normalizedBsb &&
+                account.AccountNumber == normalizedAccountNumber);
+
+        if (recipientAccount is null)
+        {
+            throw new PaymentException(
+                PaymentErrorCode.RecipientNotFound,
+                "Recipient not found.");
+        }
+
+        if (await IsGoalAccountAsync(recipientAccount.Id))
+        {
+            throw new PaymentException(
+                PaymentErrorCode.RecipientAccountNotFound,
+                "Recipient account not found.");
+        }
+
+        if (recipientAccount.UserId == currentUserId)
+        {
+            throw new PaymentException(
+                PaymentErrorCode.SelfPaymentNotAllowed,
+                "Use account transfer for your own accounts.");
+        }
+
+        return (recipientAccount.User, recipientAccount);
+    }
+
+    private async Task<(User RecipientUser, Account RecipientAccount)> ResolveRecipientByEmailAsync(
+        SendPaymentRequest request,
+        Guid currentUserId)
+    {
+        var recipientEmail = request.RecipientEmail!.Trim().ToLowerInvariant();
+
+        var recipientUser = await _dbContext.Users
+            .FirstOrDefaultAsync(user => user.Email.ToLower() == recipientEmail);
+
+        if (recipientUser is null)
+        {
+            throw new PaymentException(
+                PaymentErrorCode.RecipientNotFound,
+                "Recipient not found.");
+        }
+
+        if (recipientUser.Id == currentUserId)
+        {
+            throw new PaymentException(
+                PaymentErrorCode.SelfPaymentNotAllowed,
+                "Use account transfer for your own accounts.");
+        }
+
+        var recipientGoalAccountIds = await _dbContext.Goals
+            .AsNoTracking()
+            .Where(goal => goal.UserId == recipientUser.Id)
+            .Select(goal => goal.GoalAccountId)
+            .ToListAsync();
+
+        var recipientAccount = await _dbContext.Accounts
+            .Where(account =>
+                account.UserId == recipientUser.Id &&
+                !recipientGoalAccountIds.Contains(account.Id))
+            .OrderBy(account => account.AccountType == AccountType.Everyday ? 0 : 1)
+            .ThenBy(account => account.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        if (recipientAccount is null)
+        {
+            throw new PaymentException(
+                PaymentErrorCode.RecipientAccountNotFound,
+                "Recipient account not found.");
+        }
+
+        return (recipientUser, recipientAccount);
+    }
+
+    private async Task<bool> IsGoalAccountAsync(Guid accountId)
+    {
+        return await _dbContext.Goals
+            .AsNoTracking()
+            .AnyAsync(goal => goal.GoalAccountId == accountId);
+    }
+
     private async Task<List<Guid>> GetUserAccountIdsAsync(Guid currentUserId)
     {
         return await _dbContext.Accounts
@@ -408,7 +495,7 @@ public class PaymentService : IPaymentService
 
     private static string BuildRequestHash(SendPaymentRequest request)
     {
-        var recipientEmail = request.RecipientEmail.Trim().ToLowerInvariant();
+        var recipientIdentifier = BuildRecipientIdentifier(request);
         var paymentReference = string.IsNullOrWhiteSpace(request.Reference)
             ? string.Empty
             : request.Reference.Trim();
@@ -416,12 +503,25 @@ public class PaymentService : IPaymentService
         var requestFingerprint = string.Join(
             '|',
             request.FromAccountId,
-            recipientEmail,
+            recipientIdentifier,
             request.Amount.ToString("0.00"),
             paymentReference);
 
         var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(requestFingerprint));
         return Convert.ToHexString(hashBytes);
+    }
+
+    private static string BuildRecipientIdentifier(SendPaymentRequest request)
+    {
+        if (!string.IsNullOrWhiteSpace(request.RecipientBsb) ||
+            !string.IsNullOrWhiteSpace(request.RecipientAccountNumber))
+        {
+            var normalizedBsb = BankAccountNormalizer.NormalizeBsb(request.RecipientBsb!);
+            var normalizedAccountNumber = BankAccountNormalizer.NormalizeAccountNumber(request.RecipientAccountNumber!);
+            return $"bsb:{normalizedBsb}|acn:{normalizedAccountNumber}";
+        }
+
+        return $"email:{request.RecipientEmail!.Trim().ToLowerInvariant()}";
     }
 
     private static PaymentReceiptResponse DeserializeReceipt(string responseJson)
@@ -444,15 +544,17 @@ public class PaymentService : IPaymentService
             .AsNoTracking()
             .FirstOrDefaultAsync(user => user.Id == senderUserId);
 
-        var recipientUser = await _dbContext.Users
+        var recipientAccount = await _dbContext.Accounts
             .AsNoTracking()
-            .FirstOrDefaultAsync(user => user.Email == receipt.RecipientEmail.Trim().ToLowerInvariant());
+            .Include(account => account.User)
+            .FirstOrDefaultAsync(account => account.Id == receipt.RecipientAccountId);
 
-        if (senderUser is null || recipientUser is null)
+        if (senderUser is null || recipientAccount is null)
         {
             return;
         }
 
+        var recipientUser = recipientAccount.User;
         var amountLabel = NotificationFormatting.FormatAmount(receipt.Amount, receipt.Currency);
         var senderName = $"{senderUser.FirstName} {senderUser.LastName}".Trim();
 

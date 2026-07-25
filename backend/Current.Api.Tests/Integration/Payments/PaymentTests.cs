@@ -247,6 +247,44 @@ public class PaymentTests : IntegrationTestBase
         Assert.Equal(0, senderNotificationCount);
     }
 
+    [Fact]
+    public async Task SendPayment_ByBsbAndAccountNumber_UpdatesBalances()
+    {
+        var paymentParties = await SeedPaymentPartiesAsync();
+        var senderClient = await Factory.CreateAuthenticatedClientViaLoginAsync(
+            paymentParties.Sender.Email,
+            DefaultPassword);
+
+        var paymentRequest = new SendPaymentRequest
+        {
+            FromAccountId = paymentParties.SenderAccount.Id,
+            RecipientBsb = paymentParties.RecipientAccount.Bsb,
+            RecipientAccountNumber = paymentParties.RecipientAccount.AccountNumber,
+            Amount = 125m,
+            Reference = "BSB payment",
+        };
+
+        var response = await senderClient.PostJsonAsync(
+            "/payments/send",
+            paymentRequest,
+            CreateIdempotencyHeaders("payment-bsb-path"));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var receipt = await response.ReadJsonAsync<PaymentReceiptResponse>();
+
+        Assert.NotNull(receipt);
+        Assert.Equal(125m, receipt.Amount);
+        Assert.Equal(paymentParties.RecipientAccount.Bsb, receipt.RecipientBsb);
+        Assert.Equal(paymentParties.RecipientAccount.AccountNumber, receipt.RecipientAccountNumber);
+
+        using var scope = Factory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        await LedgerAssertions.AssertAccountBalanceAsync(dbContext, paymentParties.SenderAccount.Id, 875m);
+        await LedgerAssertions.AssertAccountBalanceAsync(dbContext, paymentParties.RecipientAccount.Id, 225m);
+    }
+
     private static SendPaymentRequest CreatePaymentRequest(
         Guid fromAccountId,
         string recipientEmail,

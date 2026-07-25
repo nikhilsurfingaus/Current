@@ -41,7 +41,7 @@
         </div>
 
         <div class="contacts-form__field">
-          <label class="contacts-form__label" for="contact-email">Email</label>
+          <label class="contacts-form__label" for="contact-email">Email (PayID)</label>
           <input
             id="contact-email"
             class="contacts-form__input"
@@ -91,6 +91,7 @@
       } @else {
         <ul class="contacts-list">
           @for (contact of contacts(); track contact.id) {
+            @if (contact.email) {
             <li class="contacts-list__item">
               <div class="contacts-list__identity">
                 <span class="contacts-list__avatar">{{ contact.name.slice(0, 1).toUpperCase() }}</span>
@@ -133,6 +134,7 @@
                 </div>
               }
             </li>
+            }
           }
         </ul>
       }

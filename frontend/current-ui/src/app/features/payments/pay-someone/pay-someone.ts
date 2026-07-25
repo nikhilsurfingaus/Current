@@ -26,9 +26,15 @@ import {
 import { NormalizeAmountDirective } from '../../../shared/directives/normalize-amount.directive';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state';
 import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader';
+import { formatBankAccountLine } from '../../../shared/utils/bank-account.utils';
 import { filterNonGoalAccounts } from '../../../shared/utils/goal-account.utils';
 import { focusFirstInvalidControl } from '../../../shared/utils/form-accessibility.utils';
 import { resolveApiErrorMessage } from '../../../shared/utils/http-error.utils';
+
+type PaymentMethod = 'email' | 'bsb';
+
+const BSB_PATTERN = /^\d{3}-?\d{3}$/;
+const ACCOUNT_NUMBER_PATTERN = /^\d{6,9}$/;
 
 @Component({
   selector: 'app-pay-someone',
@@ -53,6 +59,9 @@ export class PaySomeoneComponent implements OnInit {
     selectedContactId: new FormControl('', {
       nonNullable: true,
     }),
+    paymentMethod: new FormControl<PaymentMethod>('email', {
+      nonNullable: true,
+    }),
     fromAccountId: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required],
@@ -60,6 +69,12 @@ export class PaySomeoneComponent implements OnInit {
     recipientEmail: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.email],
+    }),
+    recipientBsb: new FormControl('', {
+      nonNullable: true,
+    }),
+    recipientAccountNumber: new FormControl('', {
+      nonNullable: true,
     }),
     amount: new FormControl(0, {
       nonNullable: true,
@@ -89,6 +104,7 @@ export class PaySomeoneComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.applyPaymentMethodValidators(this.paymentForm.controls.paymentMethod.value);
     this.loadPageData();
   }
 
@@ -98,8 +114,40 @@ export class PaySomeoneComponent implements OnInit {
   }
 
   get recipientAlreadySaved(): boolean {
-    const recipientEmail = this.paymentForm.controls.recipientEmail.value.trim().toLowerCase();
-    return this.contacts().some((contact) => contact.email.toLowerCase() === recipientEmail);
+    const formValues = this.paymentForm.getRawValue();
+
+    return this.contacts().some((contact) => {
+      if (formValues.paymentMethod === 'email') {
+        const recipientEmail = formValues.recipientEmail.trim().toLowerCase();
+        return contact.email?.toLowerCase() === recipientEmail;
+      }
+
+      const recipientBsb = this.normalizeBsbInput(formValues.recipientBsb);
+      const recipientAccountNumber = formValues.recipientAccountNumber.trim();
+      return (
+        contact.bsb === recipientBsb && contact.accountNumber === recipientAccountNumber
+      );
+    });
+  }
+
+  formatContactLabel(contact: Contact): string {
+    if (contact.email) {
+      return `${contact.name} (${contact.email})`;
+    }
+
+    return contact.name;
+  }
+
+  onPaymentMethodChanged(): void {
+    this.applyPaymentMethodValidators(this.paymentForm.controls.paymentMethod.value);
+    this.paymentForm.patchValue({
+      selectedContactId: '',
+      recipientEmail: '',
+      recipientBsb: '',
+      recipientAccountNumber: '',
+      saveContact: false,
+      contactName: '',
+    });
   }
 
   onSavedContactSelected(): void {
@@ -110,11 +158,28 @@ export class PaySomeoneComponent implements OnInit {
       return;
     }
 
+    if (selectedContact.bsb && selectedContact.accountNumber) {
+      this.paymentForm.patchValue({
+        paymentMethod: 'bsb',
+        recipientEmail: '',
+        recipientBsb: selectedContact.bsb,
+        recipientAccountNumber: selectedContact.accountNumber,
+        contactName: selectedContact.name,
+        saveContact: false,
+      });
+      this.applyPaymentMethodValidators('bsb');
+      return;
+    }
+
     this.paymentForm.patchValue({
-      recipientEmail: selectedContact.email,
+      paymentMethod: 'email',
+      recipientEmail: selectedContact.email ?? '',
+      recipientBsb: '',
+      recipientAccountNumber: '',
       contactName: selectedContact.name,
       saveContact: false,
     });
+    this.applyPaymentMethodValidators('email');
   }
 
   loadPageData(): void {
@@ -158,13 +223,7 @@ export class PaySomeoneComponent implements OnInit {
       return;
     }
 
-    const sendPaymentRequest: SendPaymentRequest = {
-      fromAccountId: formValues.fromAccountId,
-      recipientEmail: formValues.recipientEmail.trim(),
-      amount: formValues.amount,
-      reference: formValues.reference.trim() || null,
-    };
-
+    const sendPaymentRequest = this.buildSendPaymentRequest(formValues);
     this.paymentRequestInFlight.set(true);
     const idempotencyKey = crypto.randomUUID();
 
@@ -182,6 +241,25 @@ export class PaySomeoneComponent implements OnInit {
     });
   }
 
+  private buildSendPaymentRequest(formValues: ReturnType<typeof this.paymentForm.getRawValue>): SendPaymentRequest {
+    if (formValues.paymentMethod === 'bsb') {
+      return {
+        fromAccountId: formValues.fromAccountId,
+        recipientBsb: this.normalizeBsbInput(formValues.recipientBsb),
+        recipientAccountNumber: formValues.recipientAccountNumber.trim(),
+        amount: formValues.amount,
+        reference: formValues.reference.trim() || null,
+      };
+    }
+
+    return {
+      fromAccountId: formValues.fromAccountId,
+      recipientEmail: formValues.recipientEmail.trim(),
+      amount: formValues.amount,
+      reference: formValues.reference.trim() || null,
+    };
+  }
+
   private selectContactFromQuery(contacts: Contact[]): void {
     const contactId = this.activatedRoute.snapshot.queryParamMap.get('contactId');
     const selectedContact = contacts.find((contact) => contact.id === contactId);
@@ -192,9 +270,8 @@ export class PaySomeoneComponent implements OnInit {
 
     this.paymentForm.patchValue({
       selectedContactId: selectedContact.id,
-      recipientEmail: selectedContact.email,
-      contactName: selectedContact.name,
     });
+    this.onSavedContactSelected();
   }
 
   private saveContactAfterPayment(receipt: PaymentReceipt): void {
@@ -205,10 +282,17 @@ export class PaySomeoneComponent implements OnInit {
       return;
     }
 
-    const createContactRequest: CreateContactRequest = {
-      name: formValues.contactName.trim(),
-      email: formValues.recipientEmail.trim(),
-    };
+    const createContactRequest: CreateContactRequest =
+      formValues.paymentMethod === 'bsb'
+        ? {
+            name: formValues.contactName.trim(),
+            bsb: this.normalizeBsbInput(formValues.recipientBsb),
+            accountNumber: formValues.recipientAccountNumber.trim(),
+          }
+        : {
+            name: formValues.contactName.trim(),
+            email: formValues.recipientEmail.trim(),
+          };
 
     this.contactService.createContact(createContactRequest).subscribe({
       next: () => {
@@ -230,5 +314,38 @@ export class PaySomeoneComponent implements OnInit {
       route: `/payments/${receipt.transactionId}`,
     });
     void this.router.navigate(['/payments', receipt.transactionId]);
+  }
+
+  private applyPaymentMethodValidators(paymentMethod: PaymentMethod): void {
+    const emailControl = this.paymentForm.controls.recipientEmail;
+    const bsbControl = this.paymentForm.controls.recipientBsb;
+    const accountNumberControl = this.paymentForm.controls.recipientAccountNumber;
+
+    if (paymentMethod === 'email') {
+      emailControl.setValidators([Validators.required, Validators.email]);
+      bsbControl.clearValidators();
+      accountNumberControl.clearValidators();
+    } else {
+      emailControl.clearValidators();
+      bsbControl.setValidators([Validators.required, Validators.pattern(BSB_PATTERN)]);
+      accountNumberControl.setValidators([
+        Validators.required,
+        Validators.pattern(ACCOUNT_NUMBER_PATTERN),
+      ]);
+    }
+
+    emailControl.updateValueAndValidity();
+    bsbControl.updateValueAndValidity();
+    accountNumberControl.updateValueAndValidity();
+  }
+
+  private normalizeBsbInput(bsbValue: string): string {
+    const digitsOnly = bsbValue.replace(/\D/g, '');
+
+    if (digitsOnly.length !== 6) {
+      return bsbValue.trim();
+    }
+
+    return `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3)}`;
   }
 }

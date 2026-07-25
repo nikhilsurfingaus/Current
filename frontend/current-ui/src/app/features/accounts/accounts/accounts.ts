@@ -14,6 +14,7 @@ import {
   getAccountTypeLabel,
 } from '../../../shared/utils/account-type.utils';
 import { filterNonGoalAccounts } from '../../../shared/utils/goal-account.utils';
+import { formatBankAccountLine } from '../../../shared/utils/bank-account.utils';
 import { focusFirstInvalidControl } from '../../../shared/utils/form-accessibility.utils';
 
 @Component({
@@ -35,6 +36,7 @@ export class AccountsComponent implements OnInit {
 
   readonly accountTypeOptions = ACCOUNT_TYPE_OPTIONS;
   readonly getAccountTypeLabel = getAccountTypeLabel;
+  readonly formatBankAccountLine = formatBankAccountLine;
 
   userFacingAccounts = computed(() => filterNonGoalAccounts(this.accounts(), this.goals()));
 

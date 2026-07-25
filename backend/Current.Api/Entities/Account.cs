@@ -16,6 +16,10 @@ public class Account
 
     public string Currency { get; set; } = string.Empty;
 
+    public string Bsb { get; set; } = string.Empty;
+
+    public string AccountNumber { get; set; } = string.Empty;
+
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }

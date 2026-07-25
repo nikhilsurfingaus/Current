@@ -115,6 +115,17 @@ public class ApplicationDbContext : DbContext
                 .HasMaxLength(3)
                 .IsRequired();
 
+            entity.Property(account => account.Bsb)
+                .HasMaxLength(7)
+                .IsRequired();
+
+            entity.Property(account => account.AccountNumber)
+                .HasMaxLength(9)
+                .IsRequired();
+
+            entity.HasIndex(account => new { account.Bsb, account.AccountNumber })
+                .IsUnique();
+
             // One user owns many accounts
             entity.HasOne(account => account.User)
                 .WithMany(user => user.Accounts)
@@ -262,11 +273,21 @@ public class ApplicationDbContext : DbContext
                 .IsRequired();
 
             entity.Property(contact => contact.Email)
-                .HasMaxLength(255)
-                .IsRequired();
+                .HasMaxLength(255);
+
+            entity.Property(contact => contact.Bsb)
+                .HasMaxLength(7);
+
+            entity.Property(contact => contact.AccountNumber)
+                .HasMaxLength(9);
 
             entity.HasIndex(contact => new { contact.UserId, contact.Email })
-                .IsUnique();
+                .IsUnique()
+                .HasFilter("\"Email\" IS NOT NULL");
+
+            entity.HasIndex(contact => new { contact.UserId, contact.Bsb, contact.AccountNumber })
+                .IsUnique()
+                .HasFilter("\"Bsb\" IS NOT NULL AND \"AccountNumber\" IS NOT NULL");
 
             entity.HasOne(contact => contact.User)
                 .WithMany()

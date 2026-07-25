@@ -2,7 +2,7 @@
   <header class="payments-page__header">
     <div>
       <h1 class="payments-page__title">Pay someone</h1>
-      <p class="payments-page__subtitle">Send money to another Current user by email</p>
+      <p class="payments-page__subtitle">Send money by email or bank details</p>
     </div>
     <div class="payments-page__header-actions">
       <a class="payments-page__link" routerLink="/contacts">Manage contacts</a>
@@ -42,9 +42,9 @@
               formControlName="selectedContactId"
               (change)="onSavedContactSelected()"
             >
-              <option value="">Enter an email instead</option>
+              <option value="">Enter details manually</option>
               @for (contact of contacts(); track contact.id) {
-                <option [value]="contact.id">{{ contact.name }} ({{ contact.email }})</option>
+                <option [value]="contact.id">{{ formatContactLabel(contact) }}</option>
               }
             </select>
           </div>
@@ -66,19 +66,79 @@
         </div>
 
         <div class="payments-form__field">
-          <label class="payments-form__label" for="payment-email">Recipient email</label>
-          <input
-            id="payment-email"
-            class="payments-form__input"
-            type="email"
-            formControlName="recipientEmail"
-            placeholder="friend@email.com"
-            autocomplete="email"
-          />
-          @if (paymentFormSubmitted() && paymentForm.controls.recipientEmail.invalid) {
-            <span class="payments-form__error">Enter a valid recipient email.</span>
-          }
+          <span class="payments-form__label">Payment method</span>
+          <div class="payments-form__method-toggle">
+            <label class="payments-form__method-option">
+              <input
+                type="radio"
+                formControlName="paymentMethod"
+                value="email"
+                (change)="onPaymentMethodChanged()"
+              />
+              Email
+            </label>
+            <label class="payments-form__method-option">
+              <input
+                type="radio"
+                formControlName="paymentMethod"
+                value="bsb"
+                (change)="onPaymentMethodChanged()"
+              />
+              BSB &amp; account number
+            </label>
+          </div>
         </div>
+
+        @if (paymentForm.controls.paymentMethod.value === 'email') {
+          <div class="payments-form__field">
+            <label class="payments-form__label" for="payment-email">Recipient email</label>
+            <input
+              id="payment-email"
+              class="payments-form__input"
+              type="email"
+              formControlName="recipientEmail"
+              placeholder="friend@email.com"
+              autocomplete="email"
+            />
+            @if (paymentFormSubmitted() && paymentForm.controls.recipientEmail.invalid) {
+              <span class="payments-form__error">Enter a valid recipient email.</span>
+            }
+          </div>
+        } @else {
+          <div class="payments-form__row">
+            <div class="payments-form__field">
+              <label class="payments-form__label" for="payment-bsb">BSB</label>
+              <input
+                id="payment-bsb"
+                class="payments-form__input"
+                type="text"
+                formControlName="recipientBsb"
+                placeholder="932-000"
+                inputmode="numeric"
+                maxlength="7"
+              />
+              @if (paymentFormSubmitted() && paymentForm.controls.recipientBsb.invalid) {
+                <span class="payments-form__error">Enter a 6-digit BSB (e.g. 932-000).</span>
+              }
+            </div>
+
+            <div class="payments-form__field">
+              <label class="payments-form__label" for="payment-account-number">Account number</label>
+              <input
+                id="payment-account-number"
+                class="payments-form__input"
+                type="text"
+                formControlName="recipientAccountNumber"
+                placeholder="10000001"
+                inputmode="numeric"
+                maxlength="9"
+              />
+              @if (paymentFormSubmitted() && paymentForm.controls.recipientAccountNumber.invalid) {
+                <span class="payments-form__error">Enter a 6 to 9 digit account number.</span>
+              }
+            </div>
+          </div>
+        }
 
         @if (!recipientAlreadySaved) {
           <label class="payments-form__checkbox">
