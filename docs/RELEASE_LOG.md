@@ -470,8 +470,9 @@ Automated backend tests with xUnit — integration-first coverage of auth, ledge
 
 ## Phase 12 — DevOps, Deployment & Production
 
-**Status:** In progress  
-**Date started:** 2026-07-24
+**Status:** Complete  
+**Date started:** 2026-07-24  
+**Date completed:** 2026-07-26
 
 ### Goal
 Package, automate, deploy, and document Current as a production-ready system.
@@ -496,7 +497,7 @@ Package, automate, deploy, and document Current as a production-ready system.
 - [x] Part 1: `.env.example` for secrets (JWT, Postgres); no secrets in repo
 - [x] Part 1: auto EF migrations on API startup (skipped in `Testing`)
 - [x] Part 1: `make docker-up`, `make docker-down`, `make docker-logs`
-- [x] Part 2: `.github/workflows/build.yml` — push/PR runs API build, 39 tests, Angular build
+- [x] Part 2: `.github/workflows/build.yml` — push/PR runs API build, 41 tests, Angular build
 - [x] Part 2: uses `docker` Angular config in CI (relaxed budgets, no font inlining)
 - [x] Part 3: `docs/DEPLOYMENT.md` — Neon setup and migration steps
 - [x] Part 3: `appsettings.Production.json` (logging; secrets via env vars)
@@ -508,6 +509,7 @@ Package, automate, deploy, and document Current as a production-ready system.
 - [x] Part 8: production middleware — global exception handler, security headers, forwarded headers + HSTS for Render
 - [x] Part 9: configuration — `Cors:AllowedOrigins` from `appsettings.Production.json` / Render env vars; documented config hierarchy
 - [x] Part 10: `ARCHITECTURE.md`, `ERD.md`, `API.md`, `DEMO.md`, screenshots folder, README overhaul, `database/scripts/promote-demo-admin.sql`
+- [x] Part 11: GitHub release **v1.0.0**
 
 ### Notes
 - Postgres is internal to Docker network only (avoids conflict with local Homebrew Postgres on port 5432)

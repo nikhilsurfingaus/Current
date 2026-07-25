@@ -121,6 +121,6 @@ CI runs on every push to `master`: API build, tests, Angular production build.
 - [x] Loans, branch treasury, notifications
 - [x] Docker, CI/CD, cloud deployment
 - [x] Serilog, health checks, production middleware
-- [ ] v1.0.0 release tag
+- [x] v1.0.0 release tag
 
-See [Release Log](docs/RELEASE_LOG.md) for full history.
+See [Release notes v1.0.0](docs/RELEASE_v1.0.0.md).
