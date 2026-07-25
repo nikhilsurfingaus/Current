@@ -34,7 +34,7 @@ flowchart LR
 Production API: `https://current-zdw5.onrender.com`  
 Production UI: `https://current-au.vercel.app`
 
-See [Deployment Guide](docs/DEPLOYMENT.md) for Neon, Render, and Vercel setup. After deploying the UI, add your Vercel URL to API CORS in `CorsExtensions.cs`.
+See [Deployment Guide](docs/DEPLOYMENT.md) for Neon, Render, and Vercel setup. CORS origins are configured via `appsettings.Production.json` or Render env vars.
 
 ## Structure
 

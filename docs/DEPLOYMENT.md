@@ -93,15 +93,39 @@ Or use Neon's **SQL Editor** in the dashboard: `SELECT * FROM "__EFMigrationsHis
 
 ## Environment variables (production)
 
-Set these on **Render** (Part 4), not in code:
+Set these on **Render**, not in committed code. Secrets never go in `appsettings.json`.
+
+### Required
+
+| Variable | Example | Purpose |
+|----------|---------|---------|
+| `ASPNETCORE_ENVIRONMENT` | `Production` | Enables production config + middleware |
+| `ConnectionStrings__DefaultConnection` | Neon .NET connection string | PostgreSQL |
+| `Jwt__Key` | Random 32+ char secret | JWT signing |
+| `Jwt__Issuer` | `Current.Api` | JWT issuer |
+| `Jwt__Audience` | `Current.Client` | JWT audience |
+
+### CORS (Vercel frontend)
+
+Production origins are read from config (`Cors:AllowedOrigins`). Defaults are in `appsettings.Production.json`. Override on Render when your Vercel URL changes:
 
 | Variable | Example |
 |----------|---------|
-| `ASPNETCORE_ENVIRONMENT` | `Production` |
-| `ConnectionStrings__DefaultConnection` | Neon connection string |
-| `Jwt__Key` | Long random secret (32+ chars) |
-| `Jwt__Issuer` | `Current.Api` |
-| `Jwt__Audience` | `Current.Client` |
+| `Cors__AllowedOrigins__0` | `http://localhost:4200` |
+| `Cors__AllowedOrigins__1` | `https://current-au.vercel.app` |
+
+Add `__2`, `__3`, etc. for extra origins (custom domains).
+
+**Local dev** (`make dev` + `make ui`) allows any `localhost` origin automatically — no CORS env vars needed.
+
+### Config file hierarchy
+
+| File | When used |
+|------|-----------|
+| `appsettings.json` | Base defaults |
+| `appsettings.Development.json` | `make dev`, local API |
+| `appsettings.Production.json` | Render (`ASPNETCORE_ENVIRONMENT=Production`) |
+| Environment variables | Override any setting (Render dashboard) |
 
 ---
 
@@ -124,4 +148,4 @@ Expected: `200 OK` with body `Healthy` when the database is reachable.
 
 - Deploy `frontend/current-ui` (root directory, output `dist/current-ui/browser`)
 - Production `apiUrl` in `environment.ts` points at your Render URL
-- Add your Vercel origin to `CorsExtensions.cs` (e.g. `https://current-au.vercel.app`)
+- CORS origins in `appsettings.Production.json` or Render env vars (`Cors__AllowedOrigins__*`)
