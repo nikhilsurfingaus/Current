@@ -7,8 +7,8 @@
 | Docker (local) | Done |
 | CI/CD (GitHub Actions) | Done |
 | Neon (production DB) | You set up — see below |
-| Render (API) | Part 4 |
-| Vercel (UI) | Part 5 |
+| Render (API) | Done |
+| Vercel (UI) | Done |
 
 ---
 
@@ -105,14 +105,23 @@ Set these on **Render** (Part 4), not in code:
 
 ---
 
-## Part 4 preview — Render API
+## Part 4 — Render API
 
-- Connect repo → build from `backend/Current.Api/Dockerfile` or `dotnet publish`
+- Connect repo → build from `backend/Current.Api/Dockerfile`
 - Add env vars above
 - API auto-runs migrations on startup (`ApplyMigrationsAsync` in `Program.cs`)
+- **Health Check Path:** `/health` (Settings → Health Checks)
 
-## Part 5 preview — Vercel UI
+Test after deploy:
 
-- Deploy `frontend/current-ui`
-- Set `environment.ts` production `apiUrl` to your Render URL
-- Configure CORS on API for your Vercel domain
+```bash
+curl -i https://your-service.onrender.com/health
+```
+
+Expected: `200 OK` with body `Healthy` when the database is reachable.
+
+## Part 5 — Vercel UI
+
+- Deploy `frontend/current-ui` (root directory, output `dist/current-ui/browser`)
+- Production `apiUrl` in `environment.ts` points at your Render URL
+- Add your Vercel origin to `CorsExtensions.cs` (e.g. `https://current-au.vercel.app`)

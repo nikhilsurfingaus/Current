@@ -501,6 +501,9 @@ Package, automate, deploy, and document Current as a production-ready system.
 - [x] Part 3: `docs/DEPLOYMENT.md` — Neon setup and migration steps
 - [x] Part 3: `appsettings.Production.json` (logging; secrets via env vars)
 - [x] Part 3: `make migrate-neon` (runs EF migrations when connection string is set)
+- [x] Part 4: Render API deployed (`https://current-zdw5.onrender.com`)
+- [x] Part 5: Vercel UI deployed (`https://current-au.vercel.app`), CORS for production origin
+- [x] Part 7: `GET /health` — EF Core database health check; set Render Health Check Path to `/health`
 
 ### Notes
 - Postgres is internal to Docker network only (avoids conflict with local Homebrew Postgres on port 5432)

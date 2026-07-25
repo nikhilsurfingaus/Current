@@ -31,7 +31,8 @@ flowchart LR
 | **Local dev** | `make ui` → localhost:4200 | `make dev` → localhost:5231 | Homebrew Postgres (`CurrentDb`) |
 | **Local Docker** | `make docker-up` → localhost:4200 | same stack | Postgres container |
 
-Production API: `https://current-zdw5.onrender.com`
+Production API: `https://current-zdw5.onrender.com`  
+Production UI: `https://current-au.vercel.app`
 
 See [Deployment Guide](docs/DEPLOYMENT.md) for Neon, Render, and Vercel setup. After deploying the UI, add your Vercel URL to API CORS in `CorsExtensions.cs`.
 

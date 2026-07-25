@@ -8,6 +8,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerDocumentation();
 builder.Services.AddFrontendCors(builder.Environment);
 builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
+builder.Services.AddHealthMonitoring();
 
 var app = builder.Build();
 
@@ -27,6 +28,7 @@ app.UseCors(CorsExtensions.FrontendPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthMonitoring();
 
 await app.ApplyMigrationsAsync();
 
