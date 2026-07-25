@@ -87,6 +87,17 @@ cd frontend/current-ui && npm install
 | `make docker-down` | Stop Docker stack |
 | `make docker-logs` | Follow Docker container logs |
 
+## Production database (Neon)
+
+See [Deployment Guide](docs/DEPLOYMENT.md) for Neon setup. After creating a Neon project, run migrations:
+
+```bash
+export ConnectionStrings__DefaultConnection='your-neon-connection-string'
+make migrate-neon
+```
+
+Do not commit real connection strings.
+
 ## CI
 
 [![Build](https://github.com/nikhilsurfingaus/Current/actions/workflows/build.yml/badge.svg)](https://github.com/nikhilsurfingaus/Current/actions/workflows/build.yml)

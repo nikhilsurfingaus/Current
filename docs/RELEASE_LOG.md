@@ -498,6 +498,9 @@ Package, automate, deploy, and document Current as a production-ready system.
 - [x] Part 1: `make docker-up`, `make docker-down`, `make docker-logs`
 - [x] Part 2: `.github/workflows/build.yml` — push/PR runs API build, 39 tests, Angular build
 - [x] Part 2: uses `docker` Angular config in CI (relaxed budgets, no font inlining)
+- [x] Part 3: `docs/DEPLOYMENT.md` — Neon setup and migration steps
+- [x] Part 3: `appsettings.Production.json` (logging; secrets via env vars)
+- [x] Part 3: `make migrate-neon` (runs EF migrations when connection string is set)
 
 ### Notes
 - Postgres is internal to Docker network only (avoids conflict with local Homebrew Postgres on port 5432)

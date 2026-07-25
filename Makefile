@@ -5,7 +5,7 @@ export PATH := $(NODE_BIN):$(PG_BIN):$(PATH)
 API_DIR := backend/Current.Api
 UI_DIR := frontend/current-ui
 
-.PHONY: db-up db-down db-create migrate api ui dev build build-ui test docker-up docker-down docker-logs
+.PHONY: db-up db-down db-create migrate migrate-neon api ui dev build build-ui test docker-up docker-down docker-logs
 
 TEST_DIR := backend/Current.Api.Tests
 
@@ -20,6 +20,10 @@ db-down:
 	@brew services stop postgresql@17
 
 migrate:
+	cd $(API_DIR) && dotnet ef database update
+
+migrate-neon:
+	@test -n "$$ConnectionStrings__DefaultConnection" || (echo "Set ConnectionStrings__DefaultConnection to your Neon connection string first." && exit 1)
 	cd $(API_DIR) && dotnet ef database update
 
 api:
