@@ -2,6 +2,39 @@
 
 A full-stack personal finance platform built with Angular and ASP.NET Core.
 
+## Tech stack
+
+[![Angular](https://img.shields.io/badge/Angular-DD0031?style=flat-square&logo=angular&logoColor=white)](https://angular.dev/)
+[![.NET](https://img.shields.io/badge/.NET_10-512BD4?style=flat-square&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
+[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/features/actions)
+
+## Deployment
+
+Production runs as three managed services; local dev uses Homebrew Postgres (or Docker).
+
+[![Vercel](https://img.shields.io/badge/Frontend-Vercel-000000?style=flat-square&logo=vercel&logoColor=white)](https://vercel.com/)
+[![Render](https://img.shields.io/badge/API-Render-000000?style=flat-square&logo=render&logoColor=white)](https://render.com/)
+[![Neon](https://img.shields.io/badge/Database-Neon-00E599?style=flat-square&logo=neondatabase&logoColor=black)](https://neon.tech/)
+
+```mermaid
+flowchart LR
+  Browser --> Vercel["Vercel<br/>Angular UI"]
+  Vercel --> Render["Render<br/>ASP.NET Core API"]
+  Render --> Neon["Neon<br/>PostgreSQL"]
+```
+
+| Environment | UI | API | Database |
+|-------------|----|-----|----------|
+| **Production** | [Vercel](https://vercel.com/) — `frontend/current-ui` | [Render](https://render.com/) — Docker | [Neon](https://neon.tech/) |
+| **Local dev** | `make ui` → localhost:4200 | `make dev` → localhost:5231 | Homebrew Postgres (`CurrentDb`) |
+| **Local Docker** | `make docker-up` → localhost:4200 | same stack | Postgres container |
+
+Production API: `https://current-zdw5.onrender.com`
+
+See [Deployment Guide](docs/DEPLOYMENT.md) for Neon, Render, and Vercel setup. After deploying the UI, add your Vercel URL to API CORS in `CorsExtensions.cs`.
+
 ## Structure
 
 - `backend/` — ASP.NET Core API
@@ -12,8 +45,7 @@ A full-stack personal finance platform built with Angular and ASP.NET Core.
 
 ## Status
 
-**Phase 3:** Authentication — complete  
-**Phase 4:** Angular frontend — complete
+**Phase 12 (DevOps):** Docker, CI/CD, Neon, and Render API — complete. Vercel UI — in progress.
 
 See [Release Log](docs/RELEASE_LOG.md) for full phase-by-phase progress.
 
