@@ -19,6 +19,7 @@ public class AuthService : IAuthService
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly IConfiguration _configuration;
     private readonly INotificationService _notificationService;
+    private readonly IEmailVerificationService _emailVerificationService;
     private readonly ILogger<AuthService> _logger;
 
     public AuthService(
@@ -26,61 +27,43 @@ public class AuthService : IAuthService
         IPasswordHasher<User> passwordHasher,
         IConfiguration configuration,
         INotificationService notificationService,
+        IEmailVerificationService emailVerificationService,
         ILogger<AuthService> logger)
     {
         _dbContext = dbContext;
         _passwordHasher = passwordHasher;
         _configuration = configuration;
         _notificationService = notificationService;
+        _emailVerificationService = emailVerificationService;
         _logger = logger;
     }
 
-    public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
+    public Task<RegisterResponse> RegisterAsync(RegisterRequest request)
     {
-        if (request.Password.Length < 8)
-        {
-            throw new InvalidOperationException("Password must be at least 8 characters.");
-        }
+        return _emailVerificationService.BeginRegistrationAsync(request);
+    }
 
-        var userEmailNormalized = request.Email.Trim().ToLowerInvariant();
-
-        var userEmailExists = await _dbContext.Users
-            .AnyAsync(user => user.Email == userEmailNormalized);
-
-        if (userEmailExists)
-        {
-            throw new DuplicateEmailException();
-        }
-
-        var utcNow = DateTime.UtcNow;
-        var userToCreate = new User
-        {
-            Id = Guid.NewGuid(),
-            FirstName = request.FirstName.Trim(),
-            LastName = request.LastName.Trim(),
-            Email = userEmailNormalized,
-            Role = UserRole.User,
-            CreatedAt = utcNow,
-            UpdatedAt = utcNow
-        };
-
-        userToCreate.PasswordHash = _passwordHasher.HashPassword(userToCreate, request.Password);
-
-        _dbContext.Users.Add(userToCreate);
-        await _dbContext.SaveChangesAsync();
+    public async Task<AuthResponse> VerifyEmailAsync(VerifyEmailRequest request)
+    {
+        var verifiedUser = await _emailVerificationService.VerifyEmailAsync(request);
 
         await _notificationService.TryCreateNotificationAsync(
-            userToCreate.Id,
+            verifiedUser.Id,
             NotificationType.Security,
             "Welcome to Current",
             "Your account is ready. Create your first account to get started.");
 
         _logger.LogInformation(
             "User registered {UserId} with email {Email}",
-            userToCreate.Id,
-            userToCreate.Email);
+            verifiedUser.Id,
+            verifiedUser.Email);
 
-        return BuildAuthResponse(userToCreate);
+        return BuildAuthResponse(verifiedUser);
+    }
+
+    public Task<RegisterResponse> ResendVerificationAsync(ResendVerificationRequest request)
+    {
+        return _emailVerificationService.ResendVerificationAsync(request);
     }
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
@@ -106,6 +89,12 @@ public class AuthService : IAuthService
         {
             _logger.LogWarning("Authentication failed for {Email}: invalid password", userEmailNormalized);
             throw new InvalidCredentialsException();
+        }
+
+        if (!userByEmail.IsEmailVerified)
+        {
+            _logger.LogWarning("Authentication failed for {Email}: email not verified", userEmailNormalized);
+            throw new EmailNotVerifiedException();
         }
 
         _logger.LogInformation(

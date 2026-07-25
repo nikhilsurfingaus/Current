@@ -81,6 +81,12 @@ public class ExceptionHandlingMiddleware
             InvalidCredentialsException credentialsException => (
                 StatusCodes.Status401Unauthorized,
                 new { message = credentialsException.Message }),
+            EmailNotVerifiedException emailNotVerifiedException => (
+                StatusCodes.Status403Forbidden,
+                new { message = emailNotVerifiedException.Message }),
+            InvalidVerificationCodeException invalidVerificationCodeException => (
+                StatusCodes.Status400BadRequest,
+                new { message = invalidVerificationCodeException.Message }),
             DuplicateEmailException duplicateEmailException => (
                 StatusCodes.Status409Conflict,
                 new { message = duplicateEmailException.Message }),

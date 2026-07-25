@@ -170,6 +170,10 @@
 .contacts-list__pay,
 .contacts-list__button,
 .contacts-list__delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
   padding: 7px 10px;
   font-size: 12px;
 }

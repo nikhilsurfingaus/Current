@@ -2,6 +2,8 @@ export const API_PATHS = {
   auth: {
     login: '/auth/login',
     register: '/auth/register',
+    verifyEmail: '/auth/verify-email',
+    resendVerification: '/auth/resend-verification',
   },
   users: {
     me: '/users/me',

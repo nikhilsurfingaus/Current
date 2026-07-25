@@ -18,7 +18,8 @@ The demo user must exist in **Neon** (production database). Passwords are hashed
 
 1. Open https://current-au.vercel.app/register
 2. Register with the credentials above
-3. Log in and create an **Everyday** account (triggers $2,500 welcome credit)
+3. Enter the 6-digit verification code from your email (or from Render logs if SMTP is not configured yet)
+4. Log in and create an **Everyday** account (triggers $2,500 welcome credit)
 
 ### Option B — Register via API
 
@@ -33,7 +34,18 @@ curl -X POST https://current-zdw5.onrender.com/auth/register \
   }'
 ```
 
-Then log in on the UI and create an account.
+Then verify (replace `123456` with the code from email or logs):
+
+```bash
+curl -X POST https://current-zdw5.onrender.com/auth/verify-email \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "demo@current.app",
+    "code": "123456"
+  }'
+```
+
+Log in on the UI and create an account.
 
 ### Optional — Admin access (branch / loan approval)
 

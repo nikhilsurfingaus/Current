@@ -4,7 +4,11 @@ namespace Current.Api.Interfaces;
 
 public interface IAuthService
 {
-    Task<AuthResponse> RegisterAsync(RegisterRequest request);
+    Task<RegisterResponse> RegisterAsync(RegisterRequest request);
+
+    Task<AuthResponse> VerifyEmailAsync(VerifyEmailRequest request);
+
+    Task<RegisterResponse> ResendVerificationAsync(ResendVerificationRequest request);
 
     Task<AuthResponse> LoginAsync(LoginRequest request);
 }

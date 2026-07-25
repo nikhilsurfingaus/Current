@@ -57,6 +57,13 @@ public class ApplicationDbContext : DbContext
                 .HasMaxLength(500)
                 .IsRequired();
 
+            entity.Property(user => user.IsEmailVerified)
+                .HasDefaultValue(false)
+                .IsRequired();
+
+            entity.Property(user => user.EmailVerificationCodeHash)
+                .HasMaxLength(500);
+
             entity.Property(user => user.Role)
                 .HasConversion<string>()
                 .HasMaxLength(50)

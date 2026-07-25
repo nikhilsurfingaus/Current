@@ -16,6 +16,7 @@ try
     builder.Services.AddSwaggerDocumentation();
     builder.Services.AddFrontendCors(builder.Configuration, builder.Environment);
     builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
+builder.Services.AddEmailServices(builder.Configuration, builder.Environment);
     builder.Services.AddHealthMonitoring();
     builder.Services.AddProductionMiddleware();
 

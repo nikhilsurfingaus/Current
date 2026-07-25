@@ -3,6 +3,7 @@ using Current.Api.Data;
 using Current.Api.DTOs.Auth;
 using Current.Api.Entities;
 using Current.Api.Interfaces;
+using Current.Api.Services.Email;
 using Current.Api.Tests.Helpers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -61,8 +62,19 @@ public sealed class CurrentApiWebApplicationFactory : WebApplicationFactory<Prog
         return authenticatedClient;
     }
 
+    public string GetVerificationCode(string email)
+    {
+        var emailSender = Services.GetRequiredService<CapturingEmailSender>();
+        var normalizedEmail = email.Trim().ToLowerInvariant();
+        return emailSender.VerificationCodesByEmail.TryGetValue(normalizedEmail, out var verificationCode)
+            ? verificationCode
+            : string.Empty;
+    }
+
     public async Task ResetDatabaseAsync()
     {
+        Services.GetRequiredService<CapturingEmailSender>().Clear();
+
         using var scope = CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 

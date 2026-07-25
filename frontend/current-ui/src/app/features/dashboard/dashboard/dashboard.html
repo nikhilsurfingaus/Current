@@ -29,13 +29,43 @@
               {{ userFacingAccounts().length === 1 ? 'account' : 'accounts' }}
             </p>
             @if (netWorthPoints().length > 1) {
-              <div class="dashboard-hero-card__chart" aria-hidden="true">
+              <div class="dashboard-hero-card__chart-wrap">
                 <app-chart
                   chartType="line"
                   [chartData]="netWorthSparklineData()"
-                  [chartOptions]="netWorthSparklineOptions"
-                  chartHeight="56px"
+                  [chartOptions]="netWorthSparklineOptions()"
+                  chartHeight="112px"
+                  chartLabel="Net worth trend"
                 />
+                @if (netWorthTrendSummary(); as trend) {
+                  <div class="dashboard-hero-card__chart-summary">
+                    <span class="dashboard-hero-card__chart-stat">
+                      <span class="dashboard-hero-card__chart-stat-label">Start</span>
+                      <span class="dashboard-hero-card__chart-stat-value">
+                        {{ trend.firstPoint.balance | currency: currencyBalanceTotals()[0].currency }}
+                      </span>
+                      <span class="dashboard-hero-card__chart-stat-date">
+                        {{ formatChartDate(trend.firstPoint.date) }}
+                      </span>
+                    </span>
+                    <span
+                      class="dashboard-hero-card__chart-change"
+                      [class.dashboard-hero-card__chart-change--positive]="trend.balanceChange >= 0"
+                      [class.dashboard-hero-card__chart-change--negative]="trend.balanceChange < 0"
+                    >
+                      {{ trend.balanceChange >= 0 ? '+' : '' }}{{ trend.changePercent | number: '1.1-1' }}%
+                    </span>
+                    <span class="dashboard-hero-card__chart-stat dashboard-hero-card__chart-stat--end">
+                      <span class="dashboard-hero-card__chart-stat-label">Latest</span>
+                      <span class="dashboard-hero-card__chart-stat-value">
+                        {{ trend.lastPoint.balance | currency: currencyBalanceTotals()[0].currency }}
+                      </span>
+                      <span class="dashboard-hero-card__chart-stat-date">
+                        {{ formatChartDate(trend.lastPoint.date) }}
+                      </span>
+                    </span>
+                  </div>
+                }
               </div>
             }
           </div>
@@ -43,14 +73,36 @@
       }
 
       <article class="dashboard-stat-card">
-        <span class="dashboard-stat-card__icon" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.5" />
-          </svg>
-        </span>
-        <p class="dashboard-stat-card__value">{{ userFacingAccounts().length }}</p>
-        <p class="dashboard-stat-card__label">Total accounts</p>
-        <a class="dashboard-stat-card__link" routerLink="/accounts">View all accounts →</a>
+        <div class="dashboard-stat-card__header">
+          <div class="dashboard-stat-card__heading">
+            <p class="dashboard-stat-card__eyebrow">Accounts</p>
+            <p class="dashboard-stat-card__value">{{ userFacingAccounts().length }}</p>
+            <p class="dashboard-stat-card__meta">
+              {{ userFacingAccounts().length === 1 ? 'account' : 'accounts' }} total
+            </p>
+          </div>
+          <a class="dashboard-stat-card__link" routerLink="/accounts">View all →</a>
+        </div>
+
+        @if (accountPreview().length > 0) {
+          <ul class="dashboard-stat-card__list">
+            @for (account of accountPreview(); track account.id) {
+              <li class="dashboard-stat-card__item">
+                <div class="dashboard-stat-card__item-copy">
+                  <span class="dashboard-stat-card__item-name">{{ account.name }}</span>
+                  <span class="dashboard-stat-card__item-type">
+                    {{ getAccountTypeLabel(account.accountType) }}
+                  </span>
+                </div>
+                <span class="dashboard-stat-card__item-balance">
+                  {{ account.currentBalance | currency: account.currency }}
+                </span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="dashboard-stat-card__empty">Create your first account to get started.</p>
+        }
       </article>
 
       <article class="dashboard-quick-card">

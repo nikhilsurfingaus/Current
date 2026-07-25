@@ -18,5 +18,10 @@ export function resolveApiErrorMessage(error: HttpErrorResponse, fallbackMessage
 }
 
 export function isPublicAuthRequest(requestUrl: string): boolean {
-  return requestUrl.includes('/auth/login') || requestUrl.includes('/auth/register');
+  return (
+    requestUrl.includes('/auth/login') ||
+    requestUrl.includes('/auth/register') ||
+    requestUrl.includes('/auth/verify-email') ||
+    requestUrl.includes('/auth/resend-verification')
+  );
 }

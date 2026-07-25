@@ -1,0 +1,71 @@
+<form class="auth-form" [formGroup]="verifyEmailForm" (ngSubmit)="onSubmit()">
+  <header class="auth-form__header">
+    <app-auth-mark />
+    <h1 class="auth-form__title">Check your email</h1>
+    <p class="auth-form__subtitle">
+      We sent a 6-digit code to <strong>{{ verifyEmailAddress() }}</strong>. Enter it below to verify your account.
+    </p>
+  </header>
+
+  @if (verifyEmailErrorMessage()) {
+    <div class="auth-form__alert">{{ verifyEmailErrorMessage() }}</div>
+  }
+
+  @if (verifyEmailSuccessMessage()) {
+    <div class="auth-form__alert auth-form__alert--success">{{ verifyEmailSuccessMessage() }}</div>
+  }
+
+  <div class="auth-form__fields">
+    <div class="auth-form__field">
+      <label class="auth-form__label" for="verify-email-code">Verification code</label>
+      <input
+        id="verify-email-code"
+        class="auth-form__input auth-form__input--plain auth-form__code-input"
+        [class.auth-form__input--invalid]="verifyEmailFormSubmitted() && verifyEmailForm.controls.code.invalid"
+        type="text"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        maxlength="6"
+        formControlName="code"
+        placeholder="000000"
+      />
+      @if (verifyEmailFormSubmitted() && verifyEmailForm.controls.code.hasError('required')) {
+        <span class="auth-form__error">Verification code is required.</span>
+      }
+      @if (verifyEmailFormSubmitted() && verifyEmailForm.controls.code.hasError('pattern')) {
+        <span class="auth-form__error">Enter the 6-digit code from your email.</span>
+      }
+    </div>
+  </div>
+
+  <p class="auth-form__resend">
+    Didn't get a code?
+    <button
+      type="button"
+      class="auth-form__resend-btn"
+      [disabled]="resendCooldownSeconds() > 0 || resendRequestInFlight()"
+      (click)="onResend()"
+    >
+      @if (resendCooldownSeconds() > 0) {
+        Resend in {{ resendCooldownSeconds() }}s
+      } @else {
+        Resend code
+      }
+    </button>
+  </p>
+
+  <div class="auth-form__actions">
+    <button class="auth-form__submit" type="submit" [disabled]="verifyRequestInFlight()">
+      @if (verifyRequestInFlight()) {
+        Verifying…
+      } @else {
+        Verify email
+      }
+    </button>
+  </div>
+
+  <p class="auth-form__footer">
+    Already verified?
+    <a class="auth-form__link" routerLink="/login">Log on</a>
+  </p>
+</form>

@@ -26,6 +26,7 @@ public static class TestDataSeeder
             LastName = lastName.Trim(),
             Email = normalizedEmail,
             Role = role,
+            IsEmailVerified = true,
             CreatedAt = utcNow,
             UpdatedAt = utcNow,
         };
@@ -78,6 +79,7 @@ public static class TestDataSeeder
             Email = BranchConstants.SystemUserEmail,
             PasswordHash = "SYSTEM_NO_LOGIN",
             Role = UserRole.Admin,
+            IsEmailVerified = true,
             CreatedAt = utcNow,
             UpdatedAt = utcNow,
         };

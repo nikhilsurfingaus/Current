@@ -7,6 +7,7 @@ import { AUTH_TITLE_ROUTE_DATA_KEY } from './core/routing/app-title.constants';
 import { AccountsComponent } from './features/accounts/accounts/accounts';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
+import { VerifyEmailComponent } from './features/auth/verify-email/verify-email';
 import { ContactsComponent } from './features/contacts/contacts/contacts';
 import { DashboardComponent } from './features/dashboard/dashboard/dashboard';
 import { AnalyticsComponent } from './features/analytics/analytics/analytics';
@@ -38,6 +39,13 @@ export const routes: Routes = [
     canActivate: [guestGuard],
     data: { [AUTH_TITLE_ROUTE_DATA_KEY]: true },
     children: [{ path: '', component: RegisterComponent, title: 'Create account' }],
+  },
+  {
+    path: 'verify-email',
+    component: AuthLayoutComponent,
+    canActivate: [guestGuard],
+    data: { [AUTH_TITLE_ROUTE_DATA_KEY]: true },
+    children: [{ path: '', component: VerifyEmailComponent, title: 'Verify email' }],
   },
   {
     path: '',

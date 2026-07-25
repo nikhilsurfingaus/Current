@@ -151,6 +151,24 @@ Expected: `200 OK` with body `Healthy` when the database is reachable.
 - Production `apiUrl` in `environment.ts` points at your Render URL
 - CORS origins in `appsettings.Production.json` or Render env vars (`Cors__AllowedOrigins__*`)
 
+## Email verification (SMTP)
+
+Signup sends a 6-digit code. Without SMTP, codes are written to API logs only (`LoggingEmailSender`).
+
+On Render, add (example: [Resend](https://resend.com) SMTP):
+
+| Variable | Example |
+|----------|---------|
+| `Email__Enabled` | `true` |
+| `Email__FromAddress` | `noreply@yourdomain.com` |
+| `Email__FromName` | `Current` |
+| `Email__SmtpHost` | `smtp.resend.com` |
+| `Email__SmtpPort` | `587` |
+| `Email__SmtpUsername` | `resend` |
+| `Email__SmtpPassword` | your API key |
+
+Local dev: leave `Email:Enabled` false in `appsettings.json` and read codes from the API console output.
+
 ## Demo account
 
 See [Demo account guide](DEMO.md) to register `demo@current.app` on production for portfolio reviewers.

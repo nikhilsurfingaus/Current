@@ -71,6 +71,15 @@ export class LoginComponent implements OnInit {
       },
       error: (error: HttpErrorResponse) => {
         this.loginRequestInFlight.set(false);
+
+        if (error.status === 403) {
+          const loginEmail = this.loginForm.controls.email.value.trim();
+          void this.router.navigate(['/verify-email'], {
+            queryParams: { email: loginEmail },
+          });
+          return;
+        }
+
         this.loginErrorMessage.set(this.resolveLoginErrorMessage(error));
       },
     });

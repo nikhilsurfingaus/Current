@@ -10,7 +10,7 @@ Base URLs:
 
 ## Authentication
 
-Public endpoints: `POST /auth/register`, `POST /auth/login`, `GET /health`.
+Public endpoints: `POST /auth/register`, `POST /auth/verify-email`, `POST /auth/resend-verification`, `POST /auth/login`, `GET /health`.
 
 All other endpoints require:
 
@@ -32,7 +32,38 @@ Content-Type: application/json
 }
 ```
 
-Returns `201` with `token`, `userId`, `email`, `role`, `expiresAt`.
+Returns `201` with `{ "email", "message", "verificationExpiresAt" }` — **no JWT**. A 6-digit code is emailed (or logged in dev when SMTP is not configured). Codes expire in 30 minutes.
+
+If the email is already registered and verified, returns `409`. Unverified emails can register again to receive a new code.
+
+### Verify email
+
+```http
+POST /auth/verify-email
+Content-Type: application/json
+
+{
+  "email": "demo@current.app",
+  "code": "123456"
+}
+```
+
+Returns `200` with `token`, `userId`, `email`, `role`, `expiresAt` and creates a welcome notification.
+
+Invalid or expired codes return `400`.
+
+### Resend verification
+
+```http
+POST /auth/resend-verification
+Content-Type: application/json
+
+{
+  "email": "demo@current.app"
+}
+```
+
+Returns `200` with the same shape as register. A 60-second cooldown applies between resends.
 
 ### Login
 
@@ -46,7 +77,7 @@ Content-Type: application/json
 }
 ```
 
-Returns `200` with the same auth payload. Failures return `401`.
+Returns `200` with the auth payload. Invalid credentials return `401`. Unverified email returns `403`.
 
 ## Health
 
@@ -165,9 +196,10 @@ Requires `Admin` role.
 | Status | When |
 |--------|------|
 | 400 | Validation / business rule (`{ "message": "..." }`) |
-| 401 | Missing or invalid JWT |
+| 401 | Missing or invalid JWT / invalid login credentials |
+| 403 | Email not verified on login |
 | 404 | Resource not found or not owned |
-| 409 | Duplicate email on register |
+| 409 | Duplicate email on register (verified account) |
 | 500 | Unhandled error (generic message in production) |
 
 Payment errors use `{ "code": "...", "message": "..." }`.

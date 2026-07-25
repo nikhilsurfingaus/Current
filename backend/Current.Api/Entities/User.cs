@@ -14,6 +14,14 @@ public class User
 
     public string PasswordHash { get; set; } = string.Empty;
 
+    public bool IsEmailVerified { get; set; }
+
+    public string? EmailVerificationCodeHash { get; set; }
+
+    public DateTime? EmailVerificationExpiresAt { get; set; }
+
+    public DateTime? EmailVerificationSentAt { get; set; }
+
     public UserRole Role { get; set; } = UserRole.User;
 
     public ThemePreference ThemePreference { get; set; } = ThemePreference.System;
