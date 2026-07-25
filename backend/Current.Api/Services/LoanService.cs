@@ -18,17 +18,20 @@ public class LoanService : ILoanService
     private readonly IDisbursementService _disbursementService;
     private readonly INotificationService _notificationService;
     private readonly BranchOptions _branchOptions;
+    private readonly ILogger<LoanService> _logger;
 
     public LoanService(
         ApplicationDbContext dbContext,
         IDisbursementService disbursementService,
         INotificationService notificationService,
-        IOptions<BranchOptions> branchOptions)
+        IOptions<BranchOptions> branchOptions,
+        ILogger<LoanService> logger)
     {
         _dbContext = dbContext;
         _disbursementService = disbursementService;
         _notificationService = notificationService;
         _branchOptions = branchOptions.Value;
+        _logger = logger;
     }
 
     public async Task<IReadOnlyList<LoanResponse>> GetUserLoansAsync(Guid currentUserId)
@@ -424,6 +427,12 @@ public class LoanService : ILoanService
                 NotificationType.System,
                 "Loan approved",
                 $"Your loan for {NotificationFormatting.FormatAmount(loan.Principal, loan.Currency)} was approved and disbursed.");
+
+            _logger.LogInformation(
+                "Loan {LoanId} approved for user {UserId} amount {Amount}",
+                loan.Id,
+                loan.UserId,
+                loan.Principal);
 
             return loan.ToAdminResponse();
         }

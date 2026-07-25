@@ -19,17 +19,20 @@ public class AuthService : IAuthService
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly IConfiguration _configuration;
     private readonly INotificationService _notificationService;
+    private readonly ILogger<AuthService> _logger;
 
     public AuthService(
         ApplicationDbContext dbContext,
         IPasswordHasher<User> passwordHasher,
         IConfiguration configuration,
-        INotificationService notificationService)
+        INotificationService notificationService,
+        ILogger<AuthService> logger)
     {
         _dbContext = dbContext;
         _passwordHasher = passwordHasher;
         _configuration = configuration;
         _notificationService = notificationService;
+        _logger = logger;
     }
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
@@ -72,6 +75,11 @@ public class AuthService : IAuthService
             "Welcome to Current",
             "Your account is ready. Create your first account to get started.");
 
+        _logger.LogInformation(
+            "User registered {UserId} with email {Email}",
+            userToCreate.Id,
+            userToCreate.Email);
+
         return BuildAuthResponse(userToCreate);
     }
 
@@ -85,6 +93,7 @@ public class AuthService : IAuthService
 
         if (userByEmail is null)
         {
+            _logger.LogWarning("Authentication failed for {Email}: user not found", userEmailNormalized);
             throw new InvalidCredentialsException();
         }
 
@@ -95,8 +104,14 @@ public class AuthService : IAuthService
 
         if (passwordVerificationResult == PasswordVerificationResult.Failed)
         {
+            _logger.LogWarning("Authentication failed for {Email}: invalid password", userEmailNormalized);
             throw new InvalidCredentialsException();
         }
+
+        _logger.LogInformation(
+            "User {UserId} authenticated as {Email}",
+            userByEmail.Id,
+            userByEmail.Email);
 
         return BuildAuthResponse(userByEmail);
     }

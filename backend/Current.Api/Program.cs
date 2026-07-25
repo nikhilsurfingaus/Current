@@ -1,37 +1,57 @@
 using Current.Api.Extensions;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-// Services
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerDocumentation();
-builder.Services.AddFrontendCors(builder.Environment);
-builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
-builder.Services.AddHealthMonitoring();
-
-var app = builder.Build();
-
-// Middleware
-if (app.Environment.IsDevelopment())
+try
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    var builder = WebApplication.CreateBuilder(args);
+    builder.AddSerilogLogging();
 
-if (!app.Environment.IsEnvironment("Testing"))
+    // Services
+    builder.Services.AddControllers();
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerDocumentation();
+    builder.Services.AddFrontendCors(builder.Environment);
+    builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
+    builder.Services.AddHealthMonitoring();
+
+    var app = builder.Build();
+
+    app.UseSerilogRequestLogging();
+
+    // Middleware
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    if (!app.Environment.IsEnvironment("Testing"))
+    {
+        app.UseHttpsRedirection();
+    }
+
+    app.UseCors(CorsExtensions.FrontendPolicy);
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.MapControllers();
+    app.MapHealthMonitoring();
+
+    await app.ApplyMigrationsAsync();
+
+    app.Run();
+}
+catch (Exception ex)
 {
-    app.UseHttpsRedirection();
+    Log.Fatal(ex, "Application terminated unexpectedly");
+    throw;
 }
-
-app.UseCors(CorsExtensions.FrontendPolicy);
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
-app.MapHealthMonitoring();
-
-await app.ApplyMigrationsAsync();
-
-app.Run();
+finally
+{
+    Log.CloseAndFlush();
+}
 
 public partial class Program;

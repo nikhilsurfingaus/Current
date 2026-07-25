@@ -13,13 +13,16 @@ public class TransactionService : ITransactionService
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly INotificationService _notificationService;
+    private readonly ILogger<TransactionService> _logger;
 
     public TransactionService(
         ApplicationDbContext dbContext,
-        INotificationService notificationService)
+        INotificationService notificationService,
+        ILogger<TransactionService> logger)
     {
         _dbContext = dbContext;
         _notificationService = notificationService;
+        _logger = logger;
     }
 
     public async Task<TransactionResponse> TransferFundsAsync(TransferRequest request, Guid currentUserId)
@@ -114,6 +117,12 @@ public class TransactionService : ITransactionService
                 NotificationType.System,
                 "Transfer completed",
                 $"{NotificationFormatting.FormatAmount(transferAmount, fromAccount.Currency)} moved from {fromAccount.Name} to {toAccount.Name}.");
+
+            _logger.LogInformation(
+                "Transfer completed for user {UserId} amount {Amount} transaction {TransactionId}",
+                currentUserId,
+                transferAmount,
+                transaction.Id);
 
             return transaction.ToResponse();
         }

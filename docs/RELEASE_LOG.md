@@ -504,6 +504,7 @@ Package, automate, deploy, and document Current as a production-ready system.
 - [x] Part 4: Render API deployed (`https://current-zdw5.onrender.com`)
 - [x] Part 5: Vercel UI deployed (`https://current-au.vercel.app`), CORS for production origin
 - [x] Part 7: `GET /health` — EF Core database health check; set Render Health Check Path to `/health`
+- [x] Part 6: Serilog — console logging, HTTP request logging, structured logs for auth, transfers, and loan approvals
 
 ### Notes
 - Postgres is internal to Docker network only (avoids conflict with local Homebrew Postgres on port 5432)
