@@ -22,7 +22,9 @@ public static class CorsExtensions
                 }
                 else
                 {
-                    policy.WithOrigins("http://localhost:4200")
+                    policy.WithOrigins(
+                            "http://localhost:4200",
+                            "https://current-au.vercel.app")
                         .AllowAnyHeader()
                         .AllowAnyMethod();
                 }
