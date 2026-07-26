@@ -10,7 +10,7 @@ Base URLs:
 
 ## Authentication
 
-Public endpoints: `POST /auth/register`, `POST /auth/verify-email`, `POST /auth/resend-verification`, `POST /auth/login`, `GET /health`.
+Public endpoints: `POST /auth/register`, `POST /auth/login`, `GET /health`.
 
 All other endpoints require:
 
@@ -32,38 +32,9 @@ Content-Type: application/json
 }
 ```
 
-Returns `201` with `{ "email", "message", "verificationExpiresAt" }` — **no JWT**. A 6-digit code is emailed (or logged in dev when SMTP is not configured). Codes expire in 10 minutes.
+Returns `201` with `token`, `userId`, `email`, `role`, `expiresAt` and creates a welcome notification.
 
-If the email is already registered and verified, returns `409`. Unverified emails can register again to receive a new code.
-
-### Verify email
-
-```http
-POST /auth/verify-email
-Content-Type: application/json
-
-{
-  "email": "demo@current.app",
-  "code": "123456"
-}
-```
-
-Returns `200` with `token`, `userId`, `email`, `role`, `expiresAt` and creates a welcome notification.
-
-Invalid or expired codes return `400`.
-
-### Resend verification
-
-```http
-POST /auth/resend-verification
-Content-Type: application/json
-
-{
-  "email": "demo@current.app"
-}
-```
-
-Returns `200` with the same shape as register. A 10-minute cooldown applies between resends.
+Duplicate email returns `409`. Password must be at least 8 characters.
 
 ### Login
 
@@ -77,7 +48,7 @@ Content-Type: application/json
 }
 ```
 
-Returns `200` with the auth payload. Invalid credentials return `401`. Unverified email returns `403`.
+Returns `200` with the auth payload. Invalid credentials return `401`.
 
 ## Health
 

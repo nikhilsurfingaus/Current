@@ -10,9 +10,6 @@ import {
   AuthResponse,
   LoginRequest,
   RegisterRequest,
-  RegisterResponse,
-  ResendVerificationRequest,
-  VerifyEmailRequest,
 } from '../../shared/models';
 import { AUTH_STORAGE_KEY } from '../auth/auth.constants';
 import { SESSION_EXPIRED_MESSAGE } from '../../shared/utils/http-error.utils';
@@ -39,23 +36,10 @@ export class AuthService {
       .pipe(tap((authResponse) => this.persistAuth(authResponse)));
   }
 
-  register(registerRequest: RegisterRequest): Observable<RegisterResponse> {
-    return this.apiService.post<RegisterResponse>(API_PATHS.auth.register, registerRequest);
-  }
-
-  verifyEmail(verifyEmailRequest: VerifyEmailRequest): Observable<AuthResponse> {
+  register(registerRequest: RegisterRequest): Observable<AuthResponse> {
     return this.apiService
-      .post<AuthResponse>(API_PATHS.auth.verifyEmail, verifyEmailRequest)
+      .post<AuthResponse>(API_PATHS.auth.register, registerRequest)
       .pipe(tap((authResponse) => this.persistAuth(authResponse)));
-  }
-
-  resendVerification(
-    resendVerificationRequest: ResendVerificationRequest,
-  ): Observable<RegisterResponse> {
-    return this.apiService.post<RegisterResponse>(
-      API_PATHS.auth.resendVerification,
-      resendVerificationRequest,
-    );
   }
 
   initializeSession(): void {

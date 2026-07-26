@@ -9,6 +9,7 @@ import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
 import { AuthMarkComponent } from '../../../shared/components/auth-mark/auth-mark';
 import { ApiError } from '../../../shared/models';
 import { passwordMatchValidator } from './password-match.validator';
@@ -52,6 +53,7 @@ export class RegisterComponent {
 
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private router: Router,
   ) {}
 
@@ -84,8 +86,9 @@ export class RegisterComponent {
     this.authService.register(registerRequest).subscribe({
       next: () => {
         this.registerRequestInFlight.set(false);
-        void this.router.navigate(['/verify-email'], {
-          queryParams: { email: registerRequest.email },
+        this.userService.loadCurrentUser().subscribe({
+          next: () => this.router.navigate(['/dashboard']),
+          error: () => this.router.navigate(['/dashboard']),
         });
       },
       error: (error: HttpErrorResponse) => {

@@ -93,7 +93,7 @@ sequenceDiagram
   API-->>UI: User profile
 ```
 
-Registration: `POST /auth/register` sends a verification email (no JWT). `POST /auth/verify-email` returns the JWT and welcome notification.
+Registration: `POST /auth/register` returns the JWT and welcome notification (same shape as login).
 
 ## Financial core (transfer)
 
