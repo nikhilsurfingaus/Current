@@ -47,7 +47,7 @@
       (click)="onResend()"
     >
       @if (resendCooldownSeconds() > 0) {
-        Resend in {{ resendCooldownSeconds() }}s
+        Resend in {{ resendCooldownLabel() }}
       } @else {
         Resend code
       }

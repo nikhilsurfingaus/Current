@@ -9,7 +9,7 @@ import { AuthMarkComponent } from '../../../shared/components/auth-mark/auth-mar
 import { ApiError } from '../../../shared/models';
 import { focusFirstInvalidControl } from '../../../shared/utils/form-accessibility.utils';
 
-const RESEND_COOLDOWN_SECONDS = 60;
+const RESEND_COOLDOWN_SECONDS = 10 * 60;
 const VERIFICATION_CODE_PATTERN = /^\d{6}$/;
 
 @Component({
@@ -26,6 +26,7 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
   verifyRequestInFlight = signal(false);
   resendRequestInFlight = signal(false);
   resendCooldownSeconds = signal(0);
+  resendCooldownLabel = signal('');
   verifyEmailAddress = signal('');
 
   verifyEmailForm = new FormGroup({
@@ -136,17 +137,35 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
   private startResendCooldown(secondsRemaining: number): void {
     this.clearResendCooldownTimer();
     this.resendCooldownSeconds.set(secondsRemaining);
+    this.resendCooldownLabel.set(this.formatResendCooldown(secondsRemaining));
 
     this.resendCooldownTimer = setInterval(() => {
       const nextSeconds = this.resendCooldownSeconds() - 1;
       if (nextSeconds <= 0) {
         this.resendCooldownSeconds.set(0);
+        this.resendCooldownLabel.set('');
         this.clearResendCooldownTimer();
         return;
       }
 
       this.resendCooldownSeconds.set(nextSeconds);
+      this.resendCooldownLabel.set(this.formatResendCooldown(nextSeconds));
     }, 1000);
+  }
+
+  private formatResendCooldown(secondsRemaining: number): string {
+    const minutesRemaining = Math.floor(secondsRemaining / 60);
+    const secondsPart = secondsRemaining % 60;
+
+    if (minutesRemaining === 0) {
+      return `${secondsPart}s`;
+    }
+
+    if (secondsPart === 0) {
+      return `${minutesRemaining}m`;
+    }
+
+    return `${minutesRemaining}m ${secondsPart}s`;
   }
 
   private clearResendCooldownTimer(): void {

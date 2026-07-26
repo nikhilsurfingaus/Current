@@ -153,7 +153,9 @@ Expected: `200 OK` with body `Healthy` when the database is reachable.
 
 ## Email verification (Resend)
 
-Signup sends a 6-digit code. The API already supports Resend via **SMTP** — you do **not** need the Resend SDK or code changes. Set env vars on Render only (never commit API keys to git).
+Signup sends a 6-digit code. The API sends mail via the **Resend HTTP API** (HTTPS). Render blocks outbound SMTP (ports 25/587/465), so do **not** rely on SMTP on Render.
+
+Set env vars on Render only (never commit API keys to git).
 
 ### 1. Resend account
 
@@ -170,20 +172,18 @@ Render dashboard → your API service → **Environment** → add:
 | `Email__Enabled` | `true` |
 | `Email__FromAddress` | `onboarding@resend.dev` |
 | `Email__FromName` | `Current` |
-| `Email__SmtpHost` | `smtp.resend.com` |
-| `Email__SmtpPort` | `587` |
-| `Email__SmtpUsername` | `resend` |
-| `Email__SmtpPassword` | your Resend API key (`re_...`) |
-| `Email__UseStartTls` | `true` |
+| `Email__ApiKey` | your Resend API key (`re_...`) |
 
-Use double underscores (`__`) — that maps to `Email:SmtpPassword` in .NET config.
+Use double underscores (`__`) — that maps to `Email:ApiKey` in .NET config.
+
+**Already set SMTP vars?** If you have `Email__SmtpHost=smtp.resend.com` and `Email__SmtpPassword=re_...`, the API will use the HTTP API automatically (no SMTP connection). You can remove the SMTP vars and set `Email__ApiKey` instead.
 
 Save → Render redeploys the API. After deploy, register or tap **Resend code** on the verify page; check inbox and spam.
 
 ### 3. Verify it is working
 
-- **Working:** verification email arrives; Render logs do not show `LoggingEmailSender` code lines for new signups
-- **Not working:** codes only in Render logs → `Email__SmtpHost` or `Email__SmtpPassword` missing/wrong, or redeploy not finished
+- **Working:** startup log shows `Email verification: Resend API enabled`; verification email arrives
+- **Not working:** codes only in Render logs → `Email__ApiKey` missing/wrong, or redeploy not finished
 
 ### 4. Custom domain (later)
 

@@ -17,7 +17,7 @@ try
     builder.Services.AddSwaggerDocumentation();
     builder.Services.AddFrontendCors(builder.Configuration, builder.Environment);
     builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
-builder.Services.AddEmailServices(builder.Configuration, builder.Environment);
+    builder.Services.AddEmailServices(builder.Configuration, builder.Environment);
     builder.Services.AddHealthMonitoring();
     builder.Services.AddProductionMiddleware();
 
@@ -26,21 +26,24 @@ builder.Services.AddEmailServices(builder.Configuration, builder.Environment);
     if (!app.Environment.IsEnvironment("Testing"))
     {
         var emailOptions = app.Configuration.GetSection(EmailOptions.SectionName).Get<EmailOptions>();
-        var smtpConfigured = emailOptions is not null &&
-                             emailOptions.Enabled &&
-                             !string.IsNullOrWhiteSpace(emailOptions.SmtpHost);
 
-        if (smtpConfigured)
+        if (emailOptions is not null && emailOptions.IsResendApiConfigured())
+        {
+            Log.Information(
+                "Email verification: Resend API enabled (from {FromAddress})",
+                emailOptions.FromAddress);
+        }
+        else if (emailOptions is not null && emailOptions.IsSmtpConfigured())
         {
             Log.Information(
                 "Email verification: SMTP enabled (from {FromAddress} via {SmtpHost})",
-                emailOptions!.FromAddress,
+                emailOptions.FromAddress,
                 emailOptions.SmtpHost);
         }
         else
         {
             Log.Warning(
-                "Email verification: SMTP not configured — codes are logged only. Set Email__SmtpHost and Email__SmtpPassword on Render.");
+                "Email verification: not configured — codes are logged only. Set Email__ApiKey on Render.");
         }
     }
 

@@ -32,7 +32,7 @@ Content-Type: application/json
 }
 ```
 
-Returns `201` with `{ "email", "message", "verificationExpiresAt" }` — **no JWT**. A 6-digit code is emailed (or logged in dev when SMTP is not configured). Codes expire in 30 minutes.
+Returns `201` with `{ "email", "message", "verificationExpiresAt" }` — **no JWT**. A 6-digit code is emailed (or logged in dev when SMTP is not configured). Codes expire in 10 minutes.
 
 If the email is already registered and verified, returns `409`. Unverified emails can register again to receive a new code.
 
@@ -63,7 +63,7 @@ Content-Type: application/json
 }
 ```
 
-Returns `200` with the same shape as register. A 60-second cooldown applies between resends.
+Returns `200` with the same shape as register. A 10-minute cooldown applies between resends.
 
 ### Login
 

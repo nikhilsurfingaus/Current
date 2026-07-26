@@ -24,19 +24,22 @@ public static class EmailServiceCollectionExtensions
         }
 
         var emailOptions = configuration.GetSection(EmailOptions.SectionName).Get<EmailOptions>();
-        var smtpConfigured = emailOptions is not null &&
-                             emailOptions.Enabled &&
-                             !string.IsNullOrWhiteSpace(emailOptions.SmtpHost);
 
-        if (smtpConfigured)
+        if (emailOptions is not null && emailOptions.IsResendApiConfigured())
+        {
+            services.AddHttpClient<ResendEmailSender>();
+            services.AddSingleton<IEmailSender>(serviceProvider =>
+                serviceProvider.GetRequiredService<ResendEmailSender>());
+            return services;
+        }
+
+        if (emailOptions is not null && emailOptions.IsSmtpConfigured())
         {
             services.AddSingleton<IEmailSender, SmtpEmailSender>();
-        }
-        else
-        {
-            services.AddSingleton<IEmailSender, LoggingEmailSender>();
+            return services;
         }
 
+        services.AddSingleton<IEmailSender, LoggingEmailSender>();
         return services;
     }
 }
