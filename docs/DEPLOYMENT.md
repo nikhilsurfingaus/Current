@@ -151,23 +151,51 @@ Expected: `200 OK` with body `Healthy` when the database is reachable.
 - Production `apiUrl` in `environment.ts` points at your Render URL
 - CORS origins in `appsettings.Production.json` or Render env vars (`Cors__AllowedOrigins__*`)
 
-## Email verification (SMTP)
+## Email verification (Resend)
 
-Signup sends a 6-digit code. Without SMTP, codes are written to API logs only (`LoggingEmailSender`).
+Signup sends a 6-digit code. The API already supports Resend via **SMTP** — you do **not** need the Resend SDK or code changes. Set env vars on Render only (never commit API keys to git).
 
-On Render, add (example: [Resend](https://resend.com) SMTP):
+### 1. Resend account
 
-| Variable | Example |
-|----------|---------|
+1. Sign up at [resend.com](https://resend.com)
+2. **API Keys** → create a key (`re_...`)
+3. For testing without a custom domain, use sender **`onboarding@resend.dev`** (Resend only delivers to addresses allowed on your Resend account — typically the email you signed up with)
+
+### 2. Render environment variables
+
+Render dashboard → your API service → **Environment** → add:
+
+| Variable | Value |
+|----------|--------|
 | `Email__Enabled` | `true` |
-| `Email__FromAddress` | `noreply@yourdomain.com` |
+| `Email__FromAddress` | `onboarding@resend.dev` |
 | `Email__FromName` | `Current` |
 | `Email__SmtpHost` | `smtp.resend.com` |
 | `Email__SmtpPort` | `587` |
 | `Email__SmtpUsername` | `resend` |
-| `Email__SmtpPassword` | your API key |
+| `Email__SmtpPassword` | your Resend API key (`re_...`) |
+| `Email__UseStartTls` | `true` |
 
-Local dev: leave `Email:Enabled` false in `appsettings.json` and read codes from the API console output.
+Use double underscores (`__`) — that maps to `Email:SmtpPassword` in .NET config.
+
+Save → Render redeploys the API. After deploy, register or tap **Resend code** on the verify page; check inbox and spam.
+
+### 3. Verify it is working
+
+- **Working:** verification email arrives; Render logs do not show `LoggingEmailSender` code lines for new signups
+- **Not working:** codes only in Render logs → `Email__SmtpHost` or `Email__SmtpPassword` missing/wrong, or redeploy not finished
+
+### 4. Custom domain (later)
+
+When you own a domain (e.g. `current.app`):
+
+1. Resend → **Domains** → add domain → add DNS records
+2. Change `Email__FromAddress` to e.g. `noreply@yourdomain.com`
+3. Redeploy
+
+### Local dev
+
+Leave `Email:Enabled` false in `appsettings.json` — codes print in the API console (`make dev`).
 
 ## Demo account
 

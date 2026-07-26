@@ -1,3 +1,4 @@
+using Current.Api.Configuration;
 using Current.Api.Extensions;
 using Serilog;
 
@@ -21,6 +22,27 @@ builder.Services.AddEmailServices(builder.Configuration, builder.Environment);
     builder.Services.AddProductionMiddleware();
 
     var app = builder.Build();
+
+    if (!app.Environment.IsEnvironment("Testing"))
+    {
+        var emailOptions = app.Configuration.GetSection(EmailOptions.SectionName).Get<EmailOptions>();
+        var smtpConfigured = emailOptions is not null &&
+                             emailOptions.Enabled &&
+                             !string.IsNullOrWhiteSpace(emailOptions.SmtpHost);
+
+        if (smtpConfigured)
+        {
+            Log.Information(
+                "Email verification: SMTP enabled (from {FromAddress} via {SmtpHost})",
+                emailOptions!.FromAddress,
+                emailOptions.SmtpHost);
+        }
+        else
+        {
+            Log.Warning(
+                "Email verification: SMTP not configured — codes are logged only. Set Email__SmtpHost and Email__SmtpPassword on Render.");
+        }
+    }
 
     app.UseProductionMiddleware();
     app.UseSerilogRequestLogging();
