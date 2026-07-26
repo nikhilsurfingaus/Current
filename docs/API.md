@@ -180,7 +180,7 @@ Requires `Admin` role.
 | Method | Route | Description |
 |--------|-------|-------------|
 | GET | `/branch/treasury` | Treasury balance |
-| POST | `/branch/disbursements` | Top up a user account |
+| POST | `/branch/disbursements` | Top up a user account (by email, account id, or BSB + account number) |
 | GET | `/branch/loans` | List loans (`?status=Pending`) |
 | POST | `/branch/loans/{id}/approve` | Approve and disburse loan |
 | POST | `/branch/loans/{id}/reject` | Reject loan |
@@ -200,7 +200,6 @@ Requires `Admin` role.
 |--------|------|
 | 400 | Validation / business rule (`{ "message": "..." }`) |
 | 401 | Missing or invalid JWT / invalid login credentials |
-| 403 | Email not verified on login |
 | 404 | Resource not found or not owned |
 | 409 | Duplicate email on register (verified account) |
 | 500 | Unhandled error (generic message in production) |

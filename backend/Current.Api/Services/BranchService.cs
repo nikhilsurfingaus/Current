@@ -1,3 +1,4 @@
+using Current.Api.Common;
 using Current.Api.Common.Constants;
 using Current.Api.Common.Enums;
 using Current.Api.Data;
@@ -46,11 +47,23 @@ public class BranchService : IBranchService
         var hasRecipientEmail = !string.IsNullOrWhiteSpace(request.RecipientEmail);
         var hasRecipientAccountId = request.RecipientAccountId.HasValue
             && request.RecipientAccountId.Value != Guid.Empty;
+        var hasBsbRecipient = !string.IsNullOrWhiteSpace(request.RecipientBsb) ||
+                                !string.IsNullOrWhiteSpace(request.RecipientAccountNumber);
+        var recipientMethodCount = (hasRecipientEmail ? 1 : 0)
+            + (hasRecipientAccountId ? 1 : 0)
+            + (hasBsbRecipient ? 1 : 0);
 
-        if (hasRecipientEmail == hasRecipientAccountId)
+        if (recipientMethodCount != 1)
         {
             throw new InvalidOperationException(
-                "Provide either recipientEmail or recipientAccountId, not both.");
+                "Provide exactly one of recipientEmail, recipientAccountId, or BSB and account number.");
+        }
+
+        if (hasBsbRecipient &&
+            (!BankAccountNormalizer.TryNormalizeBsb(request.RecipientBsb, out _) ||
+             !BankAccountNormalizer.TryNormalizeAccountNumber(request.RecipientAccountNumber, out _)))
+        {
+            throw new InvalidOperationException("Enter a valid BSB and account number.");
         }
 
         await using var dbTransaction = await _dbContext.Database.BeginTransactionAsync();
@@ -63,7 +76,11 @@ public class BranchService : IBranchService
 
             var recipientAccount = hasRecipientAccountId
                 ? await ResolveRecipientAccountByIdAsync(request.RecipientAccountId!.Value)
-                : await ResolveRecipientAccountByEmailAsync(request.RecipientEmail!);
+                : hasRecipientEmail
+                    ? await ResolveRecipientAccountByEmailAsync(request.RecipientEmail!)
+                    : await ResolveRecipientAccountByBsbAsync(
+                        request.RecipientBsb!,
+                        request.RecipientAccountNumber!);
 
             var recipientUser = await _dbContext.Users
                 .AsNoTracking()
@@ -135,6 +152,45 @@ public class BranchService : IBranchService
     {
         var recipientAccount = await _dbContext.Accounts
             .FirstOrDefaultAsync(account => account.Id == recipientAccountId);
+
+        if (recipientAccount is null)
+        {
+            throw new InvalidOperationException("Recipient account not found.");
+        }
+
+        if (recipientAccount.AccountType == AccountType.Branch)
+        {
+            throw new InvalidOperationException("Cannot disburse to a branch treasury account.");
+        }
+
+        if (recipientAccount.UserId == BranchConstants.SystemUserId)
+        {
+            throw new InvalidOperationException("Cannot disburse to the branch system user.");
+        }
+
+        var isGoalAccount = await _dbContext.Goals
+            .AsNoTracking()
+            .AnyAsync(goal => goal.GoalAccountId == recipientAccount.Id);
+
+        if (isGoalAccount)
+        {
+            throw new InvalidOperationException("Cannot disburse to a goal account.");
+        }
+
+        return recipientAccount;
+    }
+
+    private async Task<Account> ResolveRecipientAccountByBsbAsync(
+        string recipientBsb,
+        string recipientAccountNumber)
+    {
+        var normalizedBsb = BankAccountNormalizer.NormalizeBsb(recipientBsb);
+        var normalizedAccountNumber = BankAccountNormalizer.NormalizeAccountNumber(recipientAccountNumber);
+
+        var recipientAccount = await _dbContext.Accounts
+            .FirstOrDefaultAsync(account =>
+                account.Bsb == normalizedBsb &&
+                account.AccountNumber == normalizedAccountNumber);
 
         if (recipientAccount is null)
         {

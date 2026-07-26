@@ -336,7 +336,18 @@
         </span>
         <span class="mobile-chrome__brand-name">Current</span>
       </a>
+
+      <div class="mobile-chrome__actions">
+        <app-notification-bell class="notification-bell--mobile" />
+      </div>
     </div>
+
+    @if (isDashboardRoute()) {
+      <div class="mobile-dashboard-heading">
+        <h1 class="mobile-dashboard-heading__title">{{ greetingLabel() }}</h1>
+        <p class="mobile-dashboard-heading__subtitle">Here's what's happening with your money today.</p>
+      </div>
+    }
 
     <header class="topbar" [class.topbar--with-subtitle]="isDashboardRoute()">
       @if (isDashboardRoute()) {
@@ -348,7 +359,7 @@
         <div class="topbar__heading topbar__heading--spacer" aria-hidden="true"></div>
       }
       <div class="topbar__actions">
-        <app-notification-bell />
+        <app-notification-bell class="notification-bell--desktop" />
         <button class="topbar__logout" type="button" (click)="logout()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M10 7V5a2 2 0 0 1 2-2h7v18h-7a2 2 0 0 1-2-2v-2" stroke="currentColor" stroke-width="1.5" />

@@ -16,6 +16,11 @@ import {
   sortLoansByDisplayPriority,
 } from '../../../shared/utils/loan-status.utils';
 
+type DisbursementMethod = 'email' | 'bsb';
+
+const BSB_PATTERN = /^\d{3}-?\d{3}$/;
+const ACCOUNT_NUMBER_PATTERN = /^\d{6,9}$/;
+
 export type BranchAdminTab = 'treasury' | 'topup' | 'loans';
 
 const BRANCH_ADMIN_TABS: { id: BranchAdminTab; label: string }[] = [
@@ -83,9 +88,18 @@ export class BranchAdminComponent implements OnInit {
   summaryCurrency = computed(() => this.loans()[0]?.currency ?? this.treasury()?.currency ?? 'AUD');
 
   disbursementForm = new FormGroup({
+    disbursementMethod: new FormControl<DisbursementMethod>('email', {
+      nonNullable: true,
+    }),
     recipientEmail: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.email],
+    }),
+    recipientBsb: new FormControl('', {
+      nonNullable: true,
+    }),
+    recipientAccountNumber: new FormControl('', {
+      nonNullable: true,
     }),
     amount: new FormControl(2500, {
       nonNullable: true,
@@ -110,8 +124,13 @@ export class BranchAdminComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.applyDisbursementMethodValidators(this.disbursementForm.controls.disbursementMethod.value);
     this.loadTreasury();
     this.loadLoans();
+  }
+
+  onDisbursementMethodChanged(): void {
+    this.applyDisbursementMethodValidators(this.disbursementForm.controls.disbursementMethod.value);
   }
 
   loadTreasury(): void {
@@ -143,9 +162,15 @@ export class BranchAdminComponent implements OnInit {
 
     const formValues = this.disbursementForm.getRawValue();
     const request: CreateBranchDisbursementRequest = {
-      recipientEmail: formValues.recipientEmail.trim().toLowerCase(),
       amount: formValues.amount,
     };
+
+    if (formValues.disbursementMethod === 'email') {
+      request.recipientEmail = formValues.recipientEmail.trim().toLowerCase();
+    } else {
+      request.recipientBsb = this.normalizeBsbInput(formValues.recipientBsb);
+      request.recipientAccountNumber = formValues.recipientAccountNumber.trim();
+    }
 
     const description = formValues.description.trim();
     if (description) {
@@ -174,6 +199,39 @@ export class BranchAdminComponent implements OnInit {
         );
       },
     });
+  }
+
+  private applyDisbursementMethodValidators(disbursementMethod: DisbursementMethod): void {
+    const emailControl = this.disbursementForm.controls.recipientEmail;
+    const bsbControl = this.disbursementForm.controls.recipientBsb;
+    const accountNumberControl = this.disbursementForm.controls.recipientAccountNumber;
+
+    if (disbursementMethod === 'email') {
+      emailControl.setValidators([Validators.required, Validators.email]);
+      bsbControl.clearValidators();
+      accountNumberControl.clearValidators();
+    } else {
+      emailControl.clearValidators();
+      bsbControl.setValidators([Validators.required, Validators.pattern(BSB_PATTERN)]);
+      accountNumberControl.setValidators([
+        Validators.required,
+        Validators.pattern(ACCOUNT_NUMBER_PATTERN),
+      ]);
+    }
+
+    emailControl.updateValueAndValidity();
+    bsbControl.updateValueAndValidity();
+    accountNumberControl.updateValueAndValidity();
+  }
+
+  private normalizeBsbInput(bsbValue: string): string {
+    const digitsOnly = bsbValue.replace(/\D/g, '');
+
+    if (digitsOnly.length !== 6) {
+      return bsbValue.trim();
+    }
+
+    return `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3)}`;
   }
 
   loadLoans(): void {

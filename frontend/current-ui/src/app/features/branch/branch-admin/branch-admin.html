@@ -51,18 +51,78 @@
 
         <form class="branch-admin-form" [formGroup]="disbursementForm" (ngSubmit)="onSubmitDisbursement()">
           <div class="branch-admin-form__field">
-            <label class="branch-admin-form__label" for="branch-recipient-email">Recipient email</label>
-            <input
-              id="branch-recipient-email"
-              class="branch-admin-form__input"
-              type="email"
-              formControlName="recipientEmail"
-              placeholder="user@example.com"
-            />
-            @if (disbursementSubmitted() && disbursementForm.controls.recipientEmail.invalid) {
-              <span class="branch-admin-form__error">Enter a valid recipient email.</span>
-            }
+            <span class="branch-admin-form__label">Recipient</span>
+            <div class="branch-admin-form__method-toggle">
+              <label class="branch-admin-form__method-option">
+                <input
+                  type="radio"
+                  formControlName="disbursementMethod"
+                  value="email"
+                  (change)="onDisbursementMethodChanged()"
+                />
+                Email
+              </label>
+              <label class="branch-admin-form__method-option">
+                <input
+                  type="radio"
+                  formControlName="disbursementMethod"
+                  value="bsb"
+                  (change)="onDisbursementMethodChanged()"
+                />
+                BSB &amp; account number
+              </label>
+            </div>
           </div>
+
+          @if (disbursementForm.controls.disbursementMethod.value === 'email') {
+            <div class="branch-admin-form__field">
+              <label class="branch-admin-form__label" for="branch-recipient-email">Recipient email</label>
+              <input
+                id="branch-recipient-email"
+                class="branch-admin-form__input"
+                type="email"
+                formControlName="recipientEmail"
+                placeholder="user@example.com"
+              />
+              @if (disbursementSubmitted() && disbursementForm.controls.recipientEmail.invalid) {
+                <span class="branch-admin-form__error">Enter a valid recipient email.</span>
+              }
+            </div>
+          } @else {
+            <div class="branch-admin-form__row">
+              <div class="branch-admin-form__field">
+                <label class="branch-admin-form__label" for="branch-recipient-bsb">BSB</label>
+                <input
+                  id="branch-recipient-bsb"
+                  class="branch-admin-form__input"
+                  type="text"
+                  formControlName="recipientBsb"
+                  placeholder="932-000"
+                  inputmode="numeric"
+                  maxlength="7"
+                />
+                @if (disbursementSubmitted() && disbursementForm.controls.recipientBsb.invalid) {
+                  <span class="branch-admin-form__error">Enter a 6-digit BSB (e.g. 932-000).</span>
+                }
+              </div>
+
+              <div class="branch-admin-form__field">
+                <label class="branch-admin-form__label" for="branch-recipient-account-number">Account number</label>
+                <input
+                  id="branch-recipient-account-number"
+                  class="branch-admin-form__input"
+                  type="text"
+                  formControlName="recipientAccountNumber"
+                  placeholder="10000001"
+                  inputmode="numeric"
+                  maxlength="9"
+                />
+                @if (disbursementSubmitted() && disbursementForm.controls.recipientAccountNumber.invalid) {
+                  <span class="branch-admin-form__error">Enter a 6 to 9 digit account number.</span>
+                }
+              </div>
+            </div>
+          }
 
           <div class="branch-admin-form__field">
             <label class="branch-admin-form__label" for="branch-amount">Amount</label>

@@ -9,6 +9,8 @@ export interface BranchTreasury {
 export interface CreateBranchDisbursementRequest {
   recipientEmail?: string;
   recipientAccountId?: string;
+  recipientBsb?: string;
+  recipientAccountNumber?: string;
   amount: number;
   description?: string;
 }
